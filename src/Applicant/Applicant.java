@@ -22,25 +22,27 @@ public class Applicant {
 		this.enquiries = new ArrayList<>();
 	}
 	//methods
+	public boolean isEligible(Project project) {
+		if (marital_status == "Married" && age>=21) {
+			return true; //eligible for all
+		}else if (marital_status == "Single" && age>=35) {
+			return project.getFlatType().equals("2-Room"); //true if have 2-Room, false if no 2-Room (only eligible for 2-Room)
+		}
+		return false; //X eligible at all
+	}
+	
 	public void viewProj(List<Project> projects) {
 		System.out.println("Available Porjects:");
-		for (Project project : projects) {
+		for (Project project : projects) { //run thru all proj in proj class, only print if applicant meets the 2 condition
 			if (project.isVisible() && isEligible(project)){
 				System.out.println(project);
-			}
+			}	
 		}
 		
 	}
-	public boolean isEligible(Project project) {
-		if (marital_status == "Married" && age>=21) {
-			return true;
-		}else if (marital_status == "Single" && age>=35) {
-			return project.getflatType().equals("2-Room");
-		}
-		return false;
-	}
-	 
+		 
     public void applyProj() {
+    	
     	
     	
     }
@@ -70,6 +72,7 @@ public class Applicant {
     	int index;
     	System.out.println("Please enter the number for the enquiry you want to delete.");
     	index = sc.nextInt();
+    	sc.close();
     	if (index<1||index>enquiries.size()) { //handle invalid case
     		System.out.println("Invalid enquiry index.");
     		return;
@@ -78,15 +81,7 @@ public class Applicant {
     		System.out.println("Enquiry deleted.");
     		
     	}
-    	sc.close();
+    	
     }
 	
-	
-	
-	
-	
-	
-	
-	
-
 }
