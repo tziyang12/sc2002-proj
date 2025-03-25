@@ -81,6 +81,10 @@ public class Applicant extends User{
         System.out.println("Enquiry submitted successfully.");
     }
     public void viewEnquries() {
+    	if (enquiries.isEmpty()) {
+            System.out.println("No enquiries available.");
+            return;
+        }
     	System.out.println("Your enquiries:");
     	for (int i=1; i <=enquiries.size();i++) {
     		System.out.println(i + ") " + enquiries.get(i-1));
@@ -96,6 +100,7 @@ public class Applicant extends User{
     }
     public void deleteEnquries() {
     	Scanner sc = new Scanner(System.in);
+    	viewEnquries();
     	int index;
     	System.out.println("Please enter the number for the enquiry you want to delete.");
     	index = sc.nextInt();
