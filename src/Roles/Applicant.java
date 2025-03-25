@@ -1,5 +1,4 @@
 package Roles;
-import Roles.User;
 import ProjectManagement.Project;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,14 +12,14 @@ public class Applicant extends User{
 	
 	//constructor
 	public Applicant(String name, String ID, int age, String maritalStatus) {
-		super(name, ID, age, maritalStatus);
+		super(name, ID, age, maritalStatus, "Applicant");
 		this.enquiries = new ArrayList<>();
 	}
 	//methods
 	public boolean isEligible(Project project) {
-		if (maritalStatus == "Married" && age>=21) {
+		if (maritalStatus.equals("Married") && age>=21) {
 			return true; //eligible for all
-		}else if (maritalStatus == "Single" && age>=35) {
+		}else if (maritalStatus.equals("Single") && age>=35) {
 			return project.getFlatType().equals("2-Room"); //true if have 2-Room, false if no 2-Room (only eligible for 2-Room)
 		}
 		return false; //X eligible at all
@@ -31,12 +30,12 @@ public class Applicant extends User{
 		//when toggle ON
 		for (Project project : projects) { //run thru all project in project class, only print if applicant meets the 2 condition
 			if (project.isVisible() && isEligible(project)){
-				System.out.println(project);				
+				System.out.println(project.getProjectName() + " - " + project.getFlatType());				
 				}
 			}
         //when toggle OFF
 	    if (appliedProject!=null) {
-	    	System.out.println("Applied Project: " + appliedProject + " [Applicationc Status: " + applicationStatus + "]");
+	    	System.out.println("Applied Project: " + appliedProject.getProjectName() + " [Applicationc Status: " + applicationStatus + "]");
 	    }
 	}
 		 
@@ -53,7 +52,7 @@ public class Applicant extends User{
     	//calling attribute
     	this.appliedProject = project;
     	this.applicationStatus = "Pending";
-    	System.out.println("Application submitted for " + project.getProjectName());
+    	System.out.println("Application submitted for " + project.getProjectName()+ " has been submitted successfully!");
     }
     
     public void viewApplicationStatus() {
@@ -70,7 +69,7 @@ public class Applicant extends User{
     	}else {
     		System.out.println("Application for " + appliedProject.getProjectName()+ " withdrawal.");
     		this.appliedProject = null;
-    		this.applicationStatus = "None";
+    		this.applicationStatus = "none";
     	}
    	
     }
@@ -80,12 +79,11 @@ public class Applicant extends User{
         String enquiry = sc.nextLine();
         enquiries.add(enquiry);
         System.out.println("Enquiry submitted successfully.");
-        sc.close();
     }
     public void viewEnquries() {
     	System.out.println("Your enquiries:");
     	for (int i=1; i <=enquiries.size();i++) {
-    		System.out.println((i) + ") " + enquiries.get(i));
+    		System.out.println(i + ") " + enquiries.get(i-1));
     	}	
     }
     public void editEnquiries(int index, String newEnquiry) {
