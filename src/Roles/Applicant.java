@@ -15,7 +15,7 @@ public class Applicant extends User{
 		super(name, ID, age, maritalStatus, "Applicant");
 		this.enquiries = new ArrayList<>();
 	}
-	//methods
+	//methods 
 	public boolean isEligible(Project project) {
 		if (maritalStatus.equals("Married") && age>=21) {
 			return true; //eligible for all
