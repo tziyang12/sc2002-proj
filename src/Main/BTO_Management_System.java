@@ -21,7 +21,7 @@ public class BTO_Management_System {
             String enteredID = sc.nextLine().trim(); //.trim() to remove trailing whitespace
             
             if (!isValidID(enteredID)) {
-            	System.out.println("ERROR! Invalid NRIC format! Plkease enter a valid NRIC.");
+            	System.out.println("ERROR! Invalid NRIC format! Please enter a valid NRIC.");
             	continue;
             }
             System.out.print("Please enter your password");
@@ -92,18 +92,63 @@ public class BTO_Management_System {
     	}	
     }
     private static void applicantDashboard(Applicant applicant, Scanner sc) {
-    	while (true) {
-    		System.out.println
-    	}
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
+        while (true) {
+            System.out.println("\n=== Applicant Dashboard ===");
+            System.out.println("1. View Available Projects");
+            System.out.println("2. Apply for a Project");
+            System.out.println("3. View Application Status");
+            System.out.println("4. Withdraw Application");
+            System.out.println("5. Create enquiries");
+            System.out.println("6. View Application");
+            System.out.println("7. Delete enquiries");
+            System.out.println("8. Change Password");
+            System.out.println("9. Logout");
+            System.out.print("Choose an option: ");
+            int choice = sc.nextInt();
+            sc.nextLine();
+            
+            switch(choice) {
+                case 1:
+                    applicant.viewProject(projects);
+                    break;
+                case 2:
+                    System.out.println("Please enter project name to apply: ");
+                    String projectName = sc.nextLine();
+                    for (Project p : projects) {
+                        if (p.getProjectName().equalsIgnoreCase(projectName)) { 
+                            applicant.applyProject(p);
+                            break;
+                        }
+                    }
+                    break;
+                case 3:
+                    applicant.viewApplicationStatus();
+                    break;
+                case 4:
+                    applicant.withdrawalApplication();
+                    break;
+                case 5:
+                    applicant.addEnquries();
+                    break;
+                case 6:
+                    applicant.viewEnquries();
+                    break;
+                case 7:
+                    applicant.deleteEnquries();
+                    break;
+                case 8:
+                    changePassword(applicant, sc);
+                    break;
+                case 9:
+                    System.out.println("Logout successful.");
+                    return;
+                default:
+                    System.out.println("Invalid option. Please try again.");
+            }
+        }
     }
+}
+    
     
         
     	
@@ -114,4 +159,4 @@ public class BTO_Management_System {
     	
     
 
-}
+
