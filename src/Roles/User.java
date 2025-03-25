@@ -6,7 +6,6 @@ public class User {
 	protected String ID;
 	protected String password = "password";
 	protected String maritalStatus;
-	protected String role; //  Applicant, Officer, Manager
 
 	//Constructor
 	public User(String name, String ID, int age, String maritalStatus, String role) {
@@ -14,7 +13,7 @@ public class User {
 		this.age = age;
 		this.ID = ID;
 		this.maritalStatus = maritalStatus;
-		this.role = role;
+		
 	}
 	public String getName() {return name;}
 	public String getID() { return ID; }
