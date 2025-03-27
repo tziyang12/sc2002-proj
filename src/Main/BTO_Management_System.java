@@ -91,6 +91,7 @@ public class BTO_Management_System {
     		System.out.println("Password changed successfully!");	
     	}	
     }
+    //if code too long after placing everything together, place each user dashboard in seperate classes grouped in same package
     private static void applicantDashboard(Applicant applicant, Scanner sc) {
         while (true) {
             System.out.println("\n=== Applicant Dashboard ===");
