@@ -15,6 +15,8 @@ public class BTO_Management_System {
     	users.add(new Applicant("James", "T2345678D", 30, "Married"));
     	users.add(new Applicant("Rachel", "S3456789E", 25, "Single"));
     	Scanner sc = new Scanner(System.in);
+        
+    	//HELP: should i put this in a separate class for further encapsulation so main page is super clean as user no need to know what is happening?
         while (true) {
         	System.out.println("\nWelcome to the BTO Management System!");
             System.out.print("Please enter your NRIC: ");
