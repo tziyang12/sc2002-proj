@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 
 public class Applicant extends User{
-	private Project appliedProject = null; // Stores the project the applicant has applied for; null if no application exists.
+	private Project appliedProject = null; // Stores the applied project (null if none)
 	private String applicationStatus = "none"; //Pending, Successful, Unsuccessful, Booked
 	private List<String> enquiries;
 	
@@ -15,6 +15,7 @@ public class Applicant extends User{
 		super(name, ID, age, maritalStatus, "Applicant");
 		this.enquiries = new ArrayList<>();
 	}
+    
 	//methods 
 	public boolean isEligible(Project project) {
 		if (maritalStatus.equals("Married") && age>=21) {
@@ -73,47 +74,42 @@ public class Applicant extends User{
     	}
    	
     }
-    public void addEnquries() {
-    	Scanner sc = new Scanner(System.in);
-    	System.out.println("Please enter your enquiry: "); //func implementation placed in class method instead of main for encapsulation  
-        String enquiry = sc.nextLine();
+    //Manage enquiries
+    public void addEnquiry(String enquiry) {
         enquiries.add(enquiry);
         System.out.println("Enquiry submitted successfully.");
     }
-    public void viewEnquries() {
-    	if (enquiries.isEmpty()) {
+
+    public void viewEnquiries() {
+        if (enquiries.isEmpty()) {
             System.out.println("No enquiries available.");
             return;
         }
-    	System.out.println("Your enquiries:");
-    	for (int i=1; i <=enquiries.size();i++) {
-    		System.out.println(i + ") " + enquiries.get(i-1));
-    	}	
-    }
-    public void editEnquiries(int index, String newEnquiry) {
-        if (index<1||index>enquiries.size()){
-        	System.out.println("Invalid enquiry index.");
-        	return;
+        System.out.println("Your enquiries:");
+        for (int i = 0; i < enquiries.size(); i++) {
+            System.out.println((i + 1) + ") " + enquiries.get(i));
         }
-        enquiries.set(index-1, newEnquiry);
+    }
+
+    public boolean editEnquiry(int editIndex, String newEnquiry) {
+        if (editIndex < 1 || editIndex > enquiries.size()) {
+            System.out.println("Invalid enquiry index.");
+            return false;
+        }
+        enquiries.set(editIndex - 1, newEnquiry);
         System.out.println("Enquiry updated.");
+        return true;
     }
-    public void deleteEnquries() {
-    	Scanner sc = new Scanner(System.in);
-    	viewEnquries();
-    	int index;
-    	System.out.println("Please enter the number for the enquiry you want to delete.");
-    	index = sc.nextInt();
-    	sc.close();
-    	if (index<1||index>enquiries.size()) { //handle invalid case
-    		System.out.println("Invalid enquiry index.");
-    		return;
-    	}else {
-    		enquiries.remove(index-1);
-    		System.out.println("Enquiry deleted.");
-    		
-    	}
-    	
+
+    public boolean deleteEnquiry(int deleteIndex) {
+        if (deleteIndex < 1 || deleteIndex > enquiries.size()) {
+            System.out.println("Invalid enquiry index.");
+            return false;
+        }
+        enquiries.remove(deleteIndex - 1);
+        System.out.println("Enquiry deleted.");
+        return true;
     }
+
 	
 }
