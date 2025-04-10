@@ -2,7 +2,6 @@ package Roles;
 
 import Application.Application;
 import Application.ApplicationDatabase;
-import Officer.HDBOfficer;
 import Officer.OfficerDatabase;
 import ProjectManagement.BTOProject;
 import ProjectManagement.FlatType;
