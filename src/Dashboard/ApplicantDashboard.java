@@ -1,10 +1,14 @@
 package Dashboard;  // Ensure proper package name
 
 import Roles.Applicant;
-import ProjectManagement.Project;
+
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
-import Database.ProjectDatabase;
+
+import ProjectManagement.BTOProject;
+import ProjectManagement.FlatType;
+import ProjectManagement.ProjectDatabase;
 
 public class ApplicantDashboard {
     public static void showDashboard(Applicant applicant, Scanner sc) {
@@ -29,19 +33,55 @@ public class ApplicantDashboard {
 
                 switch (choice) {
                     case 1:
-                    	List<Project> projects = ProjectDatabase.getProjects();
-                        for (Project project : projects) {
+                    	List<BTOProject> projects = ProjectDatabase.getProjects();
+                        for (BTOProject project : projects) {
                             if (project.isVisible()) {
-                                System.out.println("Project Name: " + project.getProjectName() + ", Flat Type: " + project.getFlatType());
+                                System.out.println("Project Name: " + project.getProjectName() + ", Available Units: ");
+                                Map<FlatType, Integer> flatUnits = project.getFlatUnits();  // Get all available flat types and counts
+                                for (Map.Entry<FlatType, Integer> entry : flatUnits.entrySet()) {
+                                    System.out.println(entry.getKey() + ": " + entry.getValue() + " units");
+                                }
                             }
+
                         }
                         break;
                     case 2:
-                    	System.out.print("Enter Project Name: ");
+                        System.out.print("Enter Project Name: ");
                         String projectName = sc.nextLine();
-                        Project project = ProjectDatabase.findProjectByName(projectName);
-                        if (project != null && project.isVisible()) {
-                            applicant.applyProject(project);
+                        BTOProject projectToApply = ProjectDatabase.findProjectByName(projectName);
+                        if (projectToApply != null && projectToApply.isVisible()) {
+                            System.out.println("Available flat types: ");
+                            Map<FlatType, Integer> availableFlats = projectToApply.getFlatUnits();
+                            int i = 1;
+                            for (Map.Entry<FlatType, Integer> entry : availableFlats.entrySet()) {
+                                if (entry.getValue() > 0) {
+                                    System.out.println(i + ". " + entry.getKey() + " (" + entry.getValue() + " units)");
+                                    i++;
+                                }
+                            }
+
+                            // Prompt user to select a flat type
+                            System.out.print("Select flat type by number: ");
+                            int flatTypeChoice = sc.nextInt();
+                            sc.nextLine(); // Consume newline
+
+                            // Find the selected flat type based on user input
+                            FlatType selectedFlatType = null;
+                            int index = 1;
+                            for (Map.Entry<FlatType, Integer> entry : availableFlats.entrySet()) {
+                                if (entry.getValue() > 0 && flatTypeChoice == index) {
+                                    selectedFlatType = entry.getKey();
+                                    break;
+                                }
+                                index++;
+                            }
+
+                            if (selectedFlatType != null) {
+                                // Call applyProject with the selected flat type
+                                applicant.applyProject(projectToApply, selectedFlatType);
+                            } else {
+                                System.out.println("Invalid selection. Try again.");
+                            }
                         } else {
                             System.out.println("Project not found or not available for application.");
                         }
