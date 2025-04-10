@@ -3,11 +3,10 @@ package ProjectManagement;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class BTOProject {
 
-    private String projectID;
+    private int projectID; // No longer final, to be set by ProjectDatabase
     private String projectName;
     private String neighbourhood;
     private Map<FlatType, Integer> flatUnits;  // e.g. 2-room: 50, 3-room: 40
@@ -17,9 +16,9 @@ public class BTOProject {
     private boolean visibility; // true = visible, false = hidden
     private int availableOfficerSlots = 10;
 
+    // Constructor that doesn't include projectID, since it will be set by ProjectDatabase
     public BTOProject(String projectName, String neighbourhood, int num2Room, int num3Room,
                       LocalDate applicationStartDate, LocalDate applicationEndDate, String managerUserID) {
-        this.projectID = UUID.randomUUID().toString();
         this.projectName = projectName;
         this.neighbourhood = neighbourhood;
         this.applicationStartDate = applicationStartDate;
@@ -32,8 +31,8 @@ public class BTOProject {
         this.flatUnits.put(FlatType.THREE_ROOM, num3Room);
     }
 
-    // Getters
-    public String getProjectID() {
+    // Getter methods
+    public int getProjectID() {
         return projectID;
     }
 
@@ -49,9 +48,9 @@ public class BTOProject {
         return flatUnits.getOrDefault(type, 0);
     }
 
-	public Map<FlatType, Integer> getFlatUnits() {
-		return flatUnits;
-	}
+    public Map<FlatType, Integer> getFlatUnits() {
+        return flatUnits;
+    }
 
     public LocalDate getApplicationStartDate() {
         return applicationStartDate;
@@ -112,6 +111,11 @@ public class BTOProject {
         if (availableOfficerSlots < 10) {
             availableOfficerSlots++;
         }
+    }
+
+    // Set the projectID
+    public void setProjectID(int projectID) {
+        this.projectID = projectID;
     }
 
     @Override

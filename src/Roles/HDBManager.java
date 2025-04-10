@@ -16,7 +16,7 @@ import java.time.LocalDate;
 
 public class HDBManager extends Account {
 
-    private List<String> managedProjectIDs;
+    private List<Integer> managedProjectIDs;  // Changed to List<Integer> to store Integer project IDs
 
     public HDBManager(String userID, String password, String fullName) {
         super(userID, password, fullName);
@@ -25,8 +25,8 @@ public class HDBManager extends Account {
 
     // Only 1 active project allowed within application period
     public boolean canCreateNewProject() {
-        for (String projectId : managedProjectIDs) {
-            BTOProject project = ProjectDatabase.getProjectById(projectId);
+        for (Integer projectId : managedProjectIDs) {  // Changed String to Integer
+            BTOProject project = ProjectDatabase.getProjectByID(projectId);  // Changed method to getProjectByID
             if (project != null && !project.isApplicationPeriodOver()) {
                 return false;
             }
@@ -44,13 +44,13 @@ public class HDBManager extends Account {
 
         BTOProject project = new BTOProject(name, neighbourhood, num2Room, num3Room, openDate, closeDate, this.userID);
         ProjectDatabase.addProject(project);
-        managedProjectIDs.add(project.getProjectID());
+        managedProjectIDs.add(project.getProjectID());  // No change needed
         return true;
     }
 
-    public boolean editProject(String projectId, String newName, String newNeighbourhood,
+    public boolean editProject(int projectId, String newName, String newNeighbourhood,
                                int new2Room, int new3Room, LocalDate newOpen, LocalDate newClose) {
-        BTOProject project = ProjectDatabase.getProjectById(projectId);
+        BTOProject project = ProjectDatabase.getProjectByID(projectId);  // Changed method to getProjectByID
         if (project == null || !project.getManagerUserID().equals(this.userID)) return false;
 
         project.setProjectName(newName);
@@ -61,41 +61,41 @@ public class HDBManager extends Account {
         return true;
     }
 
-    public boolean deleteProject(String projectId) {
-        BTOProject project = ProjectDatabase.getProjectById(projectId);
+    public boolean deleteProject(int projectId) {
+        BTOProject project = ProjectDatabase.getProjectByID(projectId);  // Changed method to getProjectByID
         if (project != null && project.getManagerUserID().equals(this.userID)) {
-            ProjectDatabase.removeProject(projectId);
-            managedProjectIDs.remove(projectId);
+            ProjectDatabase.removeProject(projectId);  // Changed method to removeProject
+            managedProjectIDs.remove(Integer.valueOf(projectId));  // Changed to Integer.valueOf(projectId)
             return true;
         }
         return false;
     }
 
-    public void toggleVisibility(String projectId, boolean visible) {
-        BTOProject project = ProjectDatabase.getProjectById(projectId);
+    public void toggleVisibility(int projectId, boolean visible) {
+        BTOProject project = ProjectDatabase.getProjectByID(projectId);  // Changed method to getProjectByID
         if (project != null && project.getManagerUserID().equals(this.userID)) {
             project.setVisible(visible);
         }
     }
 
     public List<BTOProject> getAllProjects() {
-        return ProjectDatabase.getAllProjects();
+        return ProjectDatabase.getProjects();  // No change needed here
     }
 
     public List<BTOProject> getMyProjects() {
         List<BTOProject> myProjects = new ArrayList<>();
-        for (String projectId : managedProjectIDs) {
-            BTOProject project = ProjectDatabase.getProjectById(projectId);
+        for (Integer projectId : managedProjectIDs) {  // Changed String to Integer
+            BTOProject project = ProjectDatabase.getProjectByID(projectId);  // Changed method to getProjectByID
             if (project != null) myProjects.add(project);
         }
         return myProjects;
     }
 
-    public void respondToOfficerRegistration(String officerID, String projectID, boolean approve) {
+    public void respondToOfficerRegistration(String officerID, int projectID, boolean approve) {  // Changed projectID to int
         if (approve) {
-            OfficerDatabase.approveOfficer(officerID, projectID);
+            OfficerDatabase.approveOfficer(officerID, projectID);  // Changed projectID to int
         } else {
-            OfficerDatabase.rejectOfficer(officerID, projectID);
+            OfficerDatabase.rejectOfficer(officerID, projectID);  // Changed projectID to int
         }
     }
 
