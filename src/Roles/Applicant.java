@@ -1,12 +1,17 @@
 package Roles;
-import ProjectManagement.Project;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+
+import ProjectManagement.BTOProject;
+import ProjectManagement.FlatType;
 
 
 public class Applicant extends User{
-	private Project appliedProject = null; // Stores the applied project (null if none)
+	private BTOProject appliedProject = null; // Stores the applied project (null if none)
+    private FlatType appliedFlatType = null;  // Stores the specific flat type applied
 	private String applicationStatus = "none"; //Pending, Successful, Unsuccessful, Booked
 	private List<String> enquiries;
 	
@@ -17,59 +22,79 @@ public class Applicant extends User{
 	}
     
 	//methods 
-	public boolean isEligible(Project project) {
-		if (maritalStatus.equals("Married") && age>=21) {
-			return true; //eligible for all
-		}else if (maritalStatus.equals("Single") && age>=35) {
-			return project.getFlatType().equals("2-Room"); //true if have 2-Room, false if no 2-Room (only eligible for 2-Room)
-		}
-		return false; //X eligible at all
-	}
+	public boolean isEligible(BTOProject project, FlatType type) {
+        if (!project.isVisible()) return false;
+
+        int unitsAvailable = project.getNumUnits(type);
+        if (unitsAvailable <= 0) return false;
+
+        if (maritalStatus.equals("Married") && age >= 21) {
+            return true;
+        } else if (maritalStatus.equals("Single") && age >= 35) {
+            return type == FlatType.TWO_ROOM;
+        }
+
+        return false;
+    }
 	
-	public void viewProject(List<Project> projects) { //Parameter: List of projects
-		System.out.println("Available Porjects:");
-		//when toggle ON
-		for (Project project : projects) { //run thru all project in project class, only print if applicant meets the 2 condition
-			if (project.isVisible() && isEligible(project)){
-				System.out.println(project.getProjectName() + " - " + project.getFlatType());				
-				}
-			}
-        //when toggle OFF
-	    if (appliedProject!=null) {
-	    	System.out.println("Applied Project: " + appliedProject.getProjectName() + " [Applicationc Status: " + applicationStatus + "]");
-	    }
-	}
+	public void viewProject(List<BTOProject> projects) {
+        System.out.println("Available Projects:");
+
+        for (BTOProject project : projects) {
+            if (!project.isVisible()) continue;
+
+            System.out.println("== " + project.getProjectName() + " (" + project.getNeighbourhood() + ") ==");
+
+            for (Map.Entry<FlatType, Integer> entry : project.getFlatUnits().entrySet()) {
+                FlatType type = entry.getKey();
+                int count = entry.getValue();
+                if (isEligible(project, type)) {
+                    System.out.println(" - " + type + ": " + count + " units available");
+                }
+            }
+        }
+
+        if (appliedProject != null) {
+            System.out.println("\nApplied Project: " + appliedProject.getProjectName()
+                    + " (" + appliedFlatType + ") [Status: " + applicationStatus + "]");
+        }
+    }
 		 
-    public void applyProject(Project project) { //Parameter: Project applicant want to apply for
-    	if (appliedProject!=null) {
-    		System.out.println("You have already applied for a project.");
-    		System.out.println("Note: Each applicant can only apply for one project.");
-    		return;
-    	}
-    	if (!isEligible(project)) {
-    		System.out.println("You do not meet the eligibility criteria for this project.");
-    		return;
-    	}
-    	//calling attribute
-    	this.appliedProject = project;
-    	this.applicationStatus = "Pending";
-    	System.out.println("Application submitted for " + project.getProjectName()+ " has been submitted successfully!");
+    public void applyProject(BTOProject project, FlatType flatType) {
+        if (appliedProject != null) {
+            System.out.println("You have already applied for a project.");
+            System.out.println("Note: Each applicant can only apply for one project.");
+            return;
+        }
+
+        if (!isEligible(project, flatType)) {
+            System.out.println("You do not meet the eligibility criteria for this flat type.");
+            return;
+        }
+
+        this.appliedProject = project;
+        this.appliedFlatType = flatType;
+        this.applicationStatus = "Pending";
+
+        System.out.println("Application submitted for " + project.getProjectName()
+                + " (" + flatType + ") has been submitted successfully!");
     }
     
     public void viewApplicationStatus() {
-    	if (appliedProject == null) {
-    		System.out.println("No application found.");		
-    	}else {
-    		System.out.println("Application Status for " + appliedProject.getProjectName() + ": " + applicationStatus);
-    	}
+        if (appliedProject == null) {
+            System.out.println("No application found.");
+        } else {
+            System.out.println("Application Status for " + appliedProject.getProjectName() + " (" + appliedFlatType + "): " + applicationStatus);
+        }
     }
     
     public void withdrawalApplication() {
     	if (appliedProject == null) {
     		System.out.println("No application to withdraw.");
     	}else {
-    		System.out.println("Application for " + appliedProject.getProjectName()+ " withdrawal.");
+    		System.out.println("Application for " + appliedProject.getProjectName() + " (" + appliedFlatType + ") withdrawal.");
     		this.appliedProject = null;
+            this.appliedFlatType = null;
     		this.applicationStatus = "none";
     	}
    	
@@ -111,5 +136,19 @@ public class Applicant extends User{
         return true;
     }
 
-	
+    public String getApplicationStatus() {
+        return applicationStatus;
+    }
+
+    public void setApplicationStatus(String status) {
+        this.applicationStatus = status;
+    }
+
+    public BTOProject getAppliedProject() {
+        return appliedProject;
+    }
+
+    public FlatType getAppliedFlatType() {
+        return appliedFlatType;
+    }
 }
