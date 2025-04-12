@@ -29,10 +29,10 @@ public class ApplicantDashboard {
                 }
                 int choice = sc.nextInt();
                 sc.nextLine(); // Consume the newline
-
+                //utilized enhanced switch statement learned
                 switch (choice) {
-                    case 1:
-                    	List<BTOProject> projects = ProjectDatabase.getProjects();
+                    case 1 -> {
+                        List<BTOProject> projects = ProjectDatabase.getProjects();
                         for (BTOProject project : projects) {
                             if (project.isVisible()) {
                                 System.out.println("Project Name: " + project.getProjectName() + ", Available Units: ");
@@ -41,10 +41,9 @@ public class ApplicantDashboard {
                                     System.out.println(entry.getKey() + ": " + entry.getValue() + " units");
                                 }
                             }
-
                         }
-                        break;
-                    case 2:
+                    }
+                    case 2 -> {
                         System.out.print("Enter Project Name: ");
                         String projectName = sc.nextLine();
                         BTOProject projectToApply = ProjectDatabase.findProjectByName(projectName);
@@ -84,21 +83,15 @@ public class ApplicantDashboard {
                         } else {
                             System.out.println("Project not found or not available for application.");
                         }
-                        break;
-                    case 3:
-                        applicant.viewApplicationStatus();
-                        break;
-                    case 4:
-                        applicant.withdrawalApplication(); // Corrected method name
-                        break;
-                    case 5:
-                        EnquiryDashboard.manageEnquiry(applicant, sc);
-                        break;
-                    case 6:
+                    }
+                    case 3 -> applicant.viewApplicationStatus();
+                    case 4 -> applicant.withdrawalApplication();
+                    case 5 -> EnquiryDashboard.manageEnquiry(applicant, sc);
+                    case 6 -> {
                         System.out.println("Logging out...");
                         return;
-                    default:
-                        System.out.println("Invalid choice. Try again.");
+                    }
+                    default -> System.out.println("Invalid choice. Try again.");
                 }
             } catch (Exception e) {
                 System.out.println("An error occurred: " + e.getMessage());
