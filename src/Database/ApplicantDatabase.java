@@ -1,6 +1,6 @@
 package Database;
 
-import Users.Applicant;
+import Roles.Applicant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,11 +9,11 @@ public class ApplicantDatabase {
 
     // Static block to initialize applicants with their details (name, NRIC, age, marital status, password)
     static {
-        applicantList.add(new Applicant("John", "S1234567A", 35, "Single", "password"));
-        applicantList.add(new Applicant("Sarah", "T7654321B", 40, "Married", "password"));
-        applicantList.add(new Applicant("Grace", "S9876543C", 37, "Married", "password"));
-        applicantList.add(new Applicant("James", "T2345678D", 30, "Married", "password"));
-        applicantList.add(new Applicant("Rachel", "S3456789E", 25, "Single", "password"));
+        applicantList.add(new Applicant("John", "S1234567A", 35, "Single"));
+        applicantList.add(new Applicant("Sarah", "T7654321B", 40, "Married"));
+        applicantList.add(new Applicant("Grace", "S9876543C", 37, "Married"));
+        applicantList.add(new Applicant("James", "T2345678D", 30, "Married"));
+        applicantList.add(new Applicant("Rachel", "S3456789E", 25, "Single"));
     }
 
     // Method to retrieve all applicants
@@ -24,7 +24,7 @@ public class ApplicantDatabase {
     // Method to find an applicant by NRIC
     public static Applicant findApplicantByNric(String nric) {
         for (Applicant applicant : applicantList) {
-            if (applicant.getNric().equalsIgnoreCase(nric)) {
+            if (applicant.getID().equalsIgnoreCase(nric)) {
                 return applicant;
             }
         }

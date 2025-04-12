@@ -1,4 +1,4 @@
-package Main;
+package BTO_Management_System;
 
 import Database.ApplicantDatabase;
 import Dashboard.ApplicantDashboard;

@@ -1,14 +1,13 @@
 package Dashboard;  // Ensure proper package name
 
-import Roles.Applicant;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-
 import ProjectManagement.BTOProject;
 import ProjectManagement.FlatType;
 import ProjectManagement.ProjectDatabase;
+
+import Roles.Applicant;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 
 public class ApplicantDashboard {
     public static void showDashboard(Applicant applicant, Scanner sc) {
