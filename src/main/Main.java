@@ -6,6 +6,7 @@ import data.DataLoader;
 import model.project.Project;
 import model.user.Applicant;
 import model.user.User;
+import ui.ApplicantMenu;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -58,78 +59,7 @@ public class Main {
                 System.out.println("Login successful. Welcome, " + loggedInUser.getName());
 
                 if (loggedInUser instanceof Applicant) {
-                    Applicant applicant = (Applicant) loggedInUser;
-                    ApplicantController applicantController = new ApplicantController();
-
-                    while (true) {
-                        System.out.println("\n--- Applicant Menu ---");
-                        System.out.println("1. View Eligible Projects");
-                        System.out.println("2. Apply for a Project");
-                        System.out.println("3. Withdraw Application");
-                        System.out.println("4. View Application Status");
-                        System.out.println("5. Submit Enquiry");
-                        System.out.println("6. View Enquiries");
-                        System.out.println("7. Logout");
-                        System.out.print("Enter choice: ");
-
-                        int choice;
-                        try {
-                            choice = Integer.parseInt(scanner.nextLine());
-                        } catch (NumberFormatException e) {
-                            System.out.println("Invalid input. Please enter a number.");
-                            continue;
-                        }
-
-                        switch (choice) {
-                            case 1:
-                                applicantController.viewProjects(applicant, projects);
-                                break;
-                            case 2:
-                                System.out.print("Enter project name to apply: ");
-                                String projectName = scanner.nextLine();
-
-                                System.out.print("Enter flat type (TWO_ROOM / THREE_ROOM): ");
-                                String flatType = scanner.nextLine().toUpperCase();
-
-                                Project selected = projects.stream()
-                                        .filter(p -> p.getProjectName().equalsIgnoreCase(projectName))
-                                        .findFirst()
-                                        .orElse(null);
-
-                                if (selected == null) {
-                                    System.out.println("Project not found.");
-                                } else {
-                                    try {
-                                        applicantController.applyForProject(applicant, selected,
-                                                Enum.valueOf(model.project.FlatType.class, flatType));
-                                    } catch (IllegalArgumentException e) {
-                                        System.out.println("Invalid flat type.");
-                                    }
-                                }
-                                break;
-                            case 3:
-                                applicantController.withdrawApplication(applicant);
-                                break;
-                            case 4:
-                                applicantController.viewApplicationStatus(applicant);
-                                break;
-                            case 5:
-                                System.out.print("Enter your enquiry: ");
-                                String enquiry = scanner.nextLine();
-                                applicantController.submitEnquiry(applicant, enquiry);
-                                break;
-                            case 6:
-                                applicantController.viewEnquiries(applicant);
-                                break;
-                            case 7:
-                                System.out.println("Logging out...");
-                                break;
-                            default:
-                                System.out.println("Invalid choice. Try again.");
-                        }
-
-                        if (choice == 7) break;
-                    }
+                    new ApplicantMenu().show((Applicant) loggedInUser, projects);
                 } else {
                     System.out.println("This user type is not yet supported in Main.java.");
                 }
