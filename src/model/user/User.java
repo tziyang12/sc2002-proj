@@ -7,12 +7,14 @@ import model.user.enums.MaritalStatus;
  * Contains common attributes like NRIC, password, age, and marital status.
  */
 public abstract class User {
+    private String name;
     private String nric;
     private String password;
     private int age;
     private MaritalStatus maritalStatus;
 
-    public User(String nric, String password, int age, MaritalStatus maritalStatus) {
+    public User(String name, String nric, String password, int age, MaritalStatus maritalStatus) {
+        this.name = name;
         this.nric = nric;
         this.password = password;
         this.age = age;
@@ -20,6 +22,14 @@ public abstract class User {
     }
 
     // Getters and Setters
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getNric() {
         return nric;
     }

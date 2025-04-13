@@ -18,8 +18,8 @@ public class Applicant extends User {
     private ApplicationStatus applicationStatus = ApplicationStatus.NONE;
     private List<String> enquiries;
 
-    public Applicant(String nric, String password, int age, MaritalStatus maritalStatus) {
-        super(nric, password, age, maritalStatus);
+    public Applicant(String name, String nric, String password, int age, MaritalStatus maritalStatus) {
+        super(name, nric, password, age, maritalStatus);
         this.enquiries = new ArrayList<>();
     }
 
