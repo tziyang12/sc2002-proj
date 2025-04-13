@@ -1,10 +1,10 @@
-package Dashboard;  // Ensure proper package name
+package old.Dashboard;  // Ensure proper package name
 
-import ProjectManagement.BTOProject;
-import ProjectManagement.FlatType;
-import ProjectManagement.ProjectDatabase;
+import model.project.Project;
+import model.project.FlatType;
+import model.user.Applicant;
+import old.ProjectManagement.ProjectDatabase;
 
-import Roles.Applicant;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -32,8 +32,8 @@ public class ApplicantDashboard {
                 //utilized enhanced switch statement learned
                 switch (choice) {
                     case 1 -> {
-                        List<BTOProject> projects = ProjectDatabase.getProjects();
-                        for (BTOProject project : projects) {
+                        List<Project> projects = ProjectDatabase.getProjects();
+                        for (Project project : projects) {
                             if (project.isVisible()) {
                                 System.out.println("Project Name: " + project.getProjectName() + ", Available Units: ");
                                 Map<FlatType, Integer> flatUnits = project.getFlatUnits();  // Get all available flat types and counts
@@ -46,7 +46,7 @@ public class ApplicantDashboard {
                     case 2 -> {
                         System.out.print("Enter Project Name: ");
                         String projectName = sc.nextLine();
-                        BTOProject projectToApply = ProjectDatabase.findProjectByName(projectName);
+                        Project projectToApply = ProjectDatabase.findProjectByName(projectName);
                         if (projectToApply != null && projectToApply.isVisible()) {
                             System.out.println("Available flat types: ");
                             Map<FlatType, Integer> availableFlats = projectToApply.getFlatUnits();

@@ -1,4 +1,4 @@
-package ProjectManagement;
+package model.project;
 
 public enum FlatType {
     TWO_ROOM,

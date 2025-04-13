@@ -1,14 +1,16 @@
-package ProjectManagement;
+package old.ProjectManagement;
 
 import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import model.project.Project;
+
 public class ProjectDatabase {
 
     // List to store all projects
-    private static List<BTOProject> projects = new ArrayList<>();
+    private static List<Project> projects = new ArrayList<>();
     private static int projectIDCounter = 1000; // Start ID from 1000, can be any number
 
     // Method to load data from the CSV file
@@ -46,7 +48,7 @@ public class ProjectDatabase {
                 int projectID = generateProjectID();
     
                 // Create a new BTOProject object without projectID
-                BTOProject project = new BTOProject(projectName, neighbourhood, numType1, numType2,
+                Project project = new Project(projectName, neighbourhood, numType1, numType2,
                         applicationStartDate, applicationEndDate, managerUserID);
     
                 // Set the projectID for the BTOProject
@@ -63,13 +65,13 @@ public class ProjectDatabase {
     
 
     // Method to retrieve all projects
-    public static List<BTOProject> getProjects() {
+    public static List<Project> getProjects() {
         return projects;
     }
 
     // Method to find a project by name
-    public static BTOProject findProjectByName(String projectName) {
-        for (BTOProject project : projects) {
+    public static Project findProjectByName(String projectName) {
+        for (Project project : projects) {
             if (project.getProjectName().equalsIgnoreCase(projectName)) {
                 return project;
             }
@@ -78,8 +80,8 @@ public class ProjectDatabase {
     }
 
     // Method to get a project by its unique ID
-    public static BTOProject getProjectByID(int projectID) {
-        for (BTOProject project : projects) {
+    public static Project getProjectByID(int projectID) {
+        for (Project project : projects) {
             if (project.getProjectID() == projectID) {
                 return project;
             }
@@ -88,7 +90,7 @@ public class ProjectDatabase {
     }
 
     // Method to add a new project to the list
-    public static void addProject(BTOProject project) {
+    public static void addProject(Project project) {
         // Add the new project to the list
         projects.add(project);
         System.out.println("Project " + project.getProjectName() + " has been added successfully.");
@@ -96,7 +98,7 @@ public class ProjectDatabase {
     
     // Method to remove a project by its ID
     public static boolean removeProject(int projectID) {
-        BTOProject projectToRemove = getProjectByID(projectID);
+        Project projectToRemove = getProjectByID(projectID);
         if (projectToRemove != null) {
             projects.remove(projectToRemove);
             System.out.println("Project with ID " + projectID + " has been removed successfully.");

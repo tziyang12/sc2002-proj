@@ -1,10 +1,11 @@
-package BTO_Management_System;
+package old.BTO_Management_System;
 
-import Database.ApplicantDatabase;
-import Dashboard.ApplicantDashboard;
-import Roles.User;
-import Roles.Applicant;
-import Services.AuthenticationService;
+import model.user.Applicant;
+import model.user.User;
+import old.Dashboard.ApplicantDashboard;
+import old.Database.ApplicantDatabase;
+import service.AuthenticationService;
+
 import java.util.Scanner;
 
 public class BTO_Management_System {

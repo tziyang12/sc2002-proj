@@ -1,6 +1,7 @@
-package Dashboard;
-import Roles.Applicant;
+package old.Dashboard;
 import java.util.Scanner;
+
+import model.user.Applicant;
 
 public class EnquiryDashboard {
     static void manageEnquiry(Applicant applicant, Scanner sc) {

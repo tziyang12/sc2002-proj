@@ -1,6 +1,9 @@
-package ProjectManagement;
+package old.ProjectManagement;
 
 import java.util.*;
+
+import model.project.Project;
+
 import java.time.LocalDate;
 
 public class ProjectUtils {
@@ -11,8 +14,8 @@ public class ProjectUtils {
     }
 
     // Check if the project name is unique (in the context of the given projects list)
-    public static boolean isUniqueProjectName(String projectName, List<BTOProject> projects) {
-        for (BTOProject project : projects) {
+    public static boolean isUniqueProjectName(String projectName, List<Project> projects) {
+        for (Project project : projects) {
             if (project.getProjectName().equalsIgnoreCase(projectName)) {
                 return false; // Duplicate name found
             }
@@ -26,9 +29,9 @@ public class ProjectUtils {
     }
 
     // Filter projects by neighbourhood
-    public static List<BTOProject> filterProjectsByNeighbourhood(List<BTOProject> projects, String neighbourhood) {
-        List<BTOProject> filteredProjects = new ArrayList<>();
-        for (BTOProject project : projects) {
+    public static List<Project> filterProjectsByNeighbourhood(List<Project> projects, String neighbourhood) {
+        List<Project> filteredProjects = new ArrayList<>();
+        for (Project project : projects) {
             if (project.getNeighbourhood().equalsIgnoreCase(neighbourhood)) {
                 filteredProjects.add(project);
             }
@@ -37,19 +40,19 @@ public class ProjectUtils {
     }
 
     // Sort projects by application start date
-    public static List<BTOProject> sortProjectsByStartDate(List<BTOProject> projects) {
-        projects.sort(Comparator.comparing(BTOProject::getApplicationStartDate));
+    public static List<Project> sortProjectsByStartDate(List<Project> projects) {
+        projects.sort(Comparator.comparing(Project::getApplicationStartDate));
         return projects;
     }
 
     // Sort projects by project name
-    public static List<BTOProject> sortProjectsByName(List<BTOProject> projects) {
-        projects.sort(Comparator.comparing(BTOProject::getProjectName));
+    public static List<Project> sortProjectsByName(List<Project> projects) {
+        projects.sort(Comparator.comparing(Project::getProjectName));
         return projects;
     }
 
     // Example: Helper method to check if a project is open for application
-    public static boolean isProjectOpenForApplication(BTOProject project) {
+    public static boolean isProjectOpenForApplication(Project project) {
         LocalDate today = LocalDate.now();
         return !project.getApplicationStartDate().isAfter(today) && !project.getApplicationEndDate().isBefore(today);
     }

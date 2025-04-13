@@ -1,7 +1,8 @@
-package Services;
+package service;
 
-import Roles.User;
 import java.util.Scanner;
+
+import model.user.User;
 
 public class PasswordServices {
 

@@ -1,4 +1,4 @@
-package Roles;
+package model.user;
 
 public abstract class Account {
     protected String userID;

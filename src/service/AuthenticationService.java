@@ -1,11 +1,12 @@
-package Services;
+package service;
 
-import Database.ApplicantDatabase;
-import Roles.Applicant;
-import Roles.User;
+import model.user.Applicant;
+import model.user.User;
+import old.Dashboard.ApplicantDashboard;
+import old.Database.ApplicantDatabase;
+
 import java.util.Scanner;
 import java.util.regex.Pattern;
-import Dashboard.ApplicantDashboard;
 
 public class AuthenticationService {
 	private ApplicantDatabase applicantDB;

@@ -1,8 +1,9 @@
-package Database;
+package old.Database;
 
-import Roles.Applicant;
 import java.util.ArrayList;
 import java.util.List;
+
+import model.user.Applicant;
 
 public class ApplicantDatabase {
     private static List<Applicant> applicantList = new ArrayList<>();  // Holds all applicants

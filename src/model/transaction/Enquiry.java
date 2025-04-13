@@ -1,4 +1,4 @@
-package Enquiry;
+package model.transaction;
 
 public class Enquiry {
     

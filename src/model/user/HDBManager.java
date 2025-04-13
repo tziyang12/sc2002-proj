@@ -1,13 +1,13 @@
-package Roles;
+package model.user;
 
-import Application.Application;
-import Application.ApplicationDatabase;
-import Officer.OfficerDatabase;
-import ProjectManagement.BTOProject;
-import ProjectManagement.FlatType;
-import ProjectManagement.ProjectDatabase;
-import Enquiry.Enquiry;
-import Enquiry.EnquiryDatabase;
+import model.project.Project;
+import model.transaction.Enquiry;
+import old.Application.Application;
+import old.Application.ApplicationDatabase;
+import old.Enquiry.EnquiryDatabase;
+import old.Officer.OfficerDatabase;
+import old.ProjectManagement.ProjectDatabase;
+import model.project.FlatType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ public class HDBManager extends Account {
     // Only 1 active project allowed within application period
     public boolean canCreateNewProject() {
         for (Integer projectId : managedProjectIDs) {  // Changed String to Integer
-            BTOProject project = ProjectDatabase.getProjectByID(projectId);  // Changed method to getProjectByID
+            Project project = ProjectDatabase.getProjectByID(projectId);  // Changed method to getProjectByID
             if (project != null && !project.isApplicationPeriodOver()) {
                 return false;
             }
@@ -41,7 +41,7 @@ public class HDBManager extends Account {
             return false;
         }
 
-        BTOProject project = new BTOProject(name, neighbourhood, num2Room, num3Room, openDate, closeDate, this.userID);
+        Project project = new Project(name, neighbourhood, num2Room, num3Room, openDate, closeDate, this.userID);
         ProjectDatabase.addProject(project);
         managedProjectIDs.add(project.getProjectID());  // No change needed
         return true;
@@ -49,7 +49,7 @@ public class HDBManager extends Account {
 
     public boolean editProject(int projectId, String newName, String newNeighbourhood,
                                int new2Room, int new3Room, LocalDate newOpen, LocalDate newClose) {
-        BTOProject project = ProjectDatabase.getProjectByID(projectId);  // Changed method to getProjectByID
+        Project project = ProjectDatabase.getProjectByID(projectId);  // Changed method to getProjectByID
         if (project == null || !project.getManagerUserID().equals(this.userID)) return false;
 
         project.setProjectName(newName);
@@ -61,7 +61,7 @@ public class HDBManager extends Account {
     }
 
     public boolean deleteProject(int projectId) {
-        BTOProject project = ProjectDatabase.getProjectByID(projectId);  // Changed method to getProjectByID
+        Project project = ProjectDatabase.getProjectByID(projectId);  // Changed method to getProjectByID
         if (project != null && project.getManagerUserID().equals(this.userID)) {
             ProjectDatabase.removeProject(projectId);  // Changed method to removeProject
             managedProjectIDs.remove(Integer.valueOf(projectId));  // Changed to Integer.valueOf(projectId)
@@ -71,20 +71,20 @@ public class HDBManager extends Account {
     }
 
     public void toggleVisibility(int projectId, boolean visible) {
-        BTOProject project = ProjectDatabase.getProjectByID(projectId);  // Changed method to getProjectByID
+        Project project = ProjectDatabase.getProjectByID(projectId);  // Changed method to getProjectByID
         if (project != null && project.getManagerUserID().equals(this.userID)) {
             project.setVisible(visible);
         }
     }
 
-    public List<BTOProject> getAllProjects() {
+    public List<Project> getAllProjects() {
         return ProjectDatabase.getProjects();  // No change needed here
     }
 
-    public List<BTOProject> getMyProjects() {
-        List<BTOProject> myProjects = new ArrayList<>();
+    public List<Project> getMyProjects() {
+        List<Project> myProjects = new ArrayList<>();
         for (Integer projectId : managedProjectIDs) {  // Changed String to Integer
-            BTOProject project = ProjectDatabase.getProjectByID(projectId);  // Changed method to getProjectByID
+            Project project = ProjectDatabase.getProjectByID(projectId);  // Changed method to getProjectByID
             if (project != null) myProjects.add(project);
         }
         return myProjects;

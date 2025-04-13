@@ -1,8 +1,9 @@
-package Database;
+package old.Database;
 
-import ProjectManagement.Project;
 import java.util.ArrayList;
 import java.util.List;
+
+import model.project.Project;
 
 public class ProjectDatabase {
     private static List<Project> projectList = new ArrayList<>();  // Holds all projects
