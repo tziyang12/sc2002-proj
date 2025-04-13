@@ -1,36 +1,27 @@
 package controller;
 
-import model.project.Project;
 import model.project.FlatType;
-import model.transaction.ApplicationStatus;
+import model.project.Project;
 import model.user.Applicant;
+import model.transaction.ApplicationStatus;
+
+import java.util.List;
+import java.util.Scanner;
 
 public class ApplicantController {
+    private final ProjectController projectController = new ProjectController();
+    private final EnquiryController enquiryController = new EnquiryController();
 
-    public boolean applyForProject(Applicant applicant, Project project, FlatType flatType) {
-        if (applicant.hasApplied()) {
-            System.out.println("You have already applied for a project.");
-            return false;
-        }
+    public void viewProjects(Applicant applicant, List<Project> projects) {
+        projectController.showEligibleProjects(applicant, projects);
+    }
 
-        if (!applicant.isEligible(project, flatType)) {
-            System.out.println("You do not meet the eligibility criteria.");
-            return false;
-        }
-
-        applicant.apply(project, flatType);
-        System.out.println("Application submitted for " + project.getProjectName() + " (" + flatType + ")");
-        return true;
+    public void applyForProject(Applicant applicant, Project project, FlatType type) {
+        projectController.applyForProject(applicant, project, type);
     }
 
     public void withdrawApplication(Applicant applicant) {
-        if (!applicant.hasApplied()) {
-            System.out.println("No application found to withdraw.");
-            return;
-        }
-
-        System.out.println("Withdrawing application for " + applicant.getAppliedProject().getProjectName() + "...");
-        applicant.withdrawApplication();
+        projectController.withdrawApplication(applicant); // delegate to ProjectController
     }
 
     public void viewApplicationStatus(Applicant applicant) {
@@ -38,9 +29,25 @@ public class ApplicantController {
             System.out.println("No application found.");
         } else {
             System.out.println("Application Status for " +
-                applicant.getAppliedProject().getProjectName() + " (" +
-                applicant.getAppliedFlatType() + "): " +
-                applicant.getApplicationStatus());
+                    applicant.getAppliedProject().getProjectName() + " (" +
+                    applicant.getAppliedFlatType() + "): " +
+                    applicant.getApplicationStatus());
         }
+    }
+
+    public void submitEnquiry(Applicant applicant, String enquiry) {
+        enquiryController.submitEnquiry(applicant, enquiry);
+    }
+
+    public void editEnquiry(Applicant applicant, int index, String updated) {
+        enquiryController.editEnquiry(applicant, index, updated);
+    }
+
+    public void deleteEnquiry(Applicant applicant, int index) {
+        enquiryController.deleteEnquiry(applicant, index);
+    }
+
+    public void viewEnquiries(Applicant applicant) {
+        enquiryController.viewEnquiries(applicant);
     }
 }

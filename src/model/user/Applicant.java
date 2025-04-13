@@ -50,19 +50,15 @@ public class Applicant extends User {
                 return false;
         }
     }
-
-    public void apply(Project project, FlatType type) {
+    
+    public void setAppliedProject(Project project) {
         this.appliedProject = project;
-        this.appliedFlatType = type;
-        this.applicationStatus = ApplicationStatus.PENDING;
     }
     
-    public void withdrawApplication() {
-        this.appliedProject = null;
-        this.appliedFlatType = null;
-        this.applicationStatus = ApplicationStatus.NONE;
+    public void setAppliedFlatType(FlatType type) {
+        this.appliedFlatType = type;
     }
-
+    
     public ApplicationStatus getApplicationStatus() {
         return applicationStatus;
     }

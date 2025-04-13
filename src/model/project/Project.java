@@ -1,34 +1,36 @@
-package ProjectManagement;
+package model.project;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BTOProject {
+public class Project {
 
-    private int projectID; // No longer final, to be set by ProjectDatabase
+    private int projectID;
     private String projectName;
     private String neighbourhood;
-    private Map<FlatType, Integer> flatUnits;  // e.g. 2-room: 50, 3-room: 40
+    private Map<FlatType, Integer> flatUnits;  // Track number of units directly
     private LocalDate applicationStartDate;
     private LocalDate applicationEndDate;
-    private String managerUserID; // HDB Manager who created this
-    private boolean visibility; // true = visible, false = hidden
+    private String managerUserID;
+    private boolean visibility;
     private int availableOfficerSlots = 10;
 
-    // Constructor that doesn't include projectID, since it will be set by ProjectDatabase
-    public BTOProject(String projectName, String neighbourhood, int num2Room, int num3Room,
-                      LocalDate applicationStartDate, LocalDate applicationEndDate, String managerUserID) {
+    // Constructor that accepts LocalDate for application start and end dates
+    public Project(String projectName, String neighbourhood, LocalDate applicationStartDate, LocalDate applicationEndDate, String managerUserID) {
         this.projectName = projectName;
         this.neighbourhood = neighbourhood;
         this.applicationStartDate = applicationStartDate;
         this.applicationEndDate = applicationEndDate;
         this.managerUserID = managerUserID;
         this.visibility = true;
-
         this.flatUnits = new HashMap<>();
-        this.flatUnits.put(FlatType.TWO_ROOM, num2Room);
-        this.flatUnits.put(FlatType.THREE_ROOM, num3Room);
+    }
+
+    // Method to add flat units (number of units for each flat type)
+    public void addFlatUnit(FlatType type, int units) {
+        flatUnits.put(type, units);
     }
 
     // Getter methods
@@ -77,42 +79,6 @@ public class BTOProject {
         return today.isAfter(applicationEndDate);
     }
 
-    // Setters (used for editProject)
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
-    }
-
-    public void setNeighbourhood(String neighbourhood) {
-        this.neighbourhood = neighbourhood;
-    }
-
-    public void setNumUnits(FlatType type, int count) {
-        flatUnits.put(type, count);
-    }
-
-    public void setApplicationPeriod(LocalDate start, LocalDate end) {
-        this.applicationStartDate = start;
-        this.applicationEndDate = end;
-    }
-
-    public void setVisible(boolean visibility) {
-        this.visibility = visibility;
-    }
-
-    public boolean assignOfficerSlot() {
-        if (availableOfficerSlots > 0) {
-            availableOfficerSlots--;
-            return true;
-        }
-        return false;
-    }
-
-    public void releaseOfficerSlot() {
-        if (availableOfficerSlots < 10) {
-            availableOfficerSlots++;
-        }
-    }
-
     // Set the projectID
     public void setProjectID(int projectID) {
         this.projectID = projectID;
@@ -129,5 +95,11 @@ public class BTOProject {
                 "\nVisible: " + (visibility ? "Yes" : "No") +
                 "\nHDB Manager: " + managerUserID +
                 "\nAvailable Officer Slots: " + availableOfficerSlots;
+    }
+
+    // Utility method to parse date strings into LocalDate
+    public static LocalDate parseDate(String dateStr) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        return LocalDate.parse(dateStr, formatter);
     }
 }

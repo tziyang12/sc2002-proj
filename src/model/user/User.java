@@ -51,7 +51,10 @@ public abstract class User {
     public void setMaritalStatus(MaritalStatus maritalStatus) {
         this.maritalStatus = maritalStatus;
     }
-
+	
+	public boolean login(String inputNric, String inputPassword) {
+        return this.nric.equals(inputNric) && this.password.equals(inputPassword);
+    }
     /**
      * Returns the role of the user.
      * To be implemented by subclasses.
