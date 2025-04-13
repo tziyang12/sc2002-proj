@@ -3,10 +3,8 @@ package controller;
 import model.project.FlatType;
 import model.project.Project;
 import model.user.Applicant;
-import model.transaction.ApplicationStatus;
 
 import java.util.List;
-import java.util.Scanner;
 
 public class ApplicantController {
     private final ProjectController projectController = new ProjectController();
