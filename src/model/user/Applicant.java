@@ -2,6 +2,7 @@ package model.user;
 
 import model.project.Project;
 import model.transaction.ApplicationStatus;
+import model.transaction.Enquiry;
 import model.project.FlatType;
 import model.user.enums.MaritalStatus;
 
@@ -16,7 +17,7 @@ public class Applicant extends User {
     private Project appliedProject = null;
     private FlatType appliedFlatType = null;
     private ApplicationStatus applicationStatus = ApplicationStatus.NONE;
-    private List<String> enquiries;
+    private List<Enquiry> enquiries;
 
     public Applicant(String name, String nric, String password, int age, MaritalStatus maritalStatus) {
         super(name, nric, password, age, maritalStatus);
@@ -77,7 +78,7 @@ public class Applicant extends User {
 
     // === Enquiry Management ===
     
-    public List<String> getEnquiries() {
+    public List<Enquiry> getEnquiries() {
         return enquiries;
     }
 }

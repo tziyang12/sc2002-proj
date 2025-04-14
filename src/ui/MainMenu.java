@@ -3,6 +3,7 @@ package ui;
 import controller.AuthenticationController;
 import model.project.Project;
 import model.user.Applicant;
+import model.user.HDBOfficer;
 import model.user.User;
 
 import java.util.List;
@@ -40,7 +41,14 @@ public class MainMenu {
 
         CLIView.printMessage("Login successful. Welcome, " + loggedInUser.getName());
 
-        if (loggedInUser instanceof Applicant applicant) {
+        if (loggedInUser instanceof HDBOfficer officer) {
+            List<Applicant> applicantList = allUsers.stream()
+                    .filter(u -> u instanceof Applicant)
+                    .map(u -> (Applicant) u)
+                    .toList();
+
+            new OfficerMenu(officer, projects, applicantList).showMenu();
+        } else if (loggedInUser instanceof Applicant applicant) {
             new ApplicantMenu().show(applicant, projects);
         } else {
             CLIView.printError("This user type is not yet supported.");

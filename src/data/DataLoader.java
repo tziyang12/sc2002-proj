@@ -4,6 +4,7 @@ import model.project.Project;
 import model.project.FlatType;
 import model.user.Applicant;
 import model.user.enums.MaritalStatus;
+import model.user.HDBOfficer;
 
 import java.io.*;
 import java.time.LocalDate;
@@ -93,4 +94,25 @@ public class DataLoader {
         return projects;
     }
 
+    public List<HDBOfficer> loadOfficers(String filePath) {
+        List<HDBOfficer> officers = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            br.readLine(); // Skip header
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(",");
+                String name = data[0];
+                String nric = data[1];
+                int age = Integer.parseInt(data[2]);
+                MaritalStatus maritalStatus = MaritalStatus.valueOf(data[3].toUpperCase());
+                String password = data[4];
+    
+                officers.add(new HDBOfficer(name, nric, password, age, maritalStatus));
+            }
+        } catch (IOException e) {
+            System.out.println("Error loading officers: " + e.getMessage());
+        }
+        return officers;
+    }
+    
 }
