@@ -21,7 +21,7 @@ public class Project {
     private LocalDate applicationEndDate;
     private String managerUserID;
     private boolean visibility;
-    private int availableOfficerSlots = 10; 
+    private int maxOfficerSlots;
     
     // List to track applicants
     private List<Applicant> applicants;
@@ -29,12 +29,13 @@ public class Project {
     private List<Enquiry> enquiries;
 
     // Constructor that accepts LocalDate for application start and end dates
-    public Project(String projectName, String neighbourhood, LocalDate applicationStartDate, LocalDate applicationEndDate, String managerUserID) {
+    public Project(String projectName, String neighbourhood, LocalDate applicationStartDate, LocalDate applicationEndDate, String managerUserID, int maxOfficerSlots) {
         this.projectName = projectName;
         this.neighbourhood = neighbourhood;
         this.applicationStartDate = applicationStartDate;
         this.applicationEndDate = applicationEndDate;
         this.managerUserID = managerUserID;
+        this.maxOfficerSlots = maxOfficerSlots;
         this.visibility = true;
         this.flatUnits = new HashMap<>();
         this.applicants = new ArrayList<>();
@@ -99,8 +100,8 @@ public class Project {
         return managerUserID;
     }
 
-    public int getAvailableOfficerSlots() {
-        return availableOfficerSlots;
+    public int getMaxOfficerSlots() {
+        return maxOfficerSlots;
     }
 
     public boolean isApplicationPeriodOver() {
@@ -123,7 +124,7 @@ public class Project {
                 "\nApplication Period: " + applicationStartDate + " to " + applicationEndDate +
                 "\nVisible: " + (visibility ? "Yes" : "No") +
                 "\nHDB Manager: " + managerUserID +
-                "\nAvailable Officer Slots: " + availableOfficerSlots;
+                "\nAvailable Officer Slots: " + maxOfficerSlots;
     }
 
     // Utility method to parse date strings into LocalDate

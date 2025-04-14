@@ -36,60 +36,89 @@ public class DataLoader {
     }
 
     // Load projects from ProjectList.csv
-    public static List<Project> loadProjects(String filePath) throws IOException {
+    public static List<Project> loadProjects(String filePath, List<HDBOfficer> allOfficers) throws IOException {
         List<Project> projects = new ArrayList<>();
-
+    
         BufferedReader reader = new BufferedReader(new FileReader(filePath));
         String line;
         reader.readLine();  // Skip the header line
-
+    
         while ((line = reader.readLine()) != null) {
-            String[] columns = line.split(",");
-
-            String projectName = columns[0];
-            String neighborhood = columns[1];
-            String type1 = columns[2];
-            int numUnitsType1 = Integer.parseInt(columns[3]);
-            int sellingPriceType1 = Integer.parseInt(columns[4]);
-            String type2 = columns[5];
-            int numUnitsType2 = Integer.parseInt(columns[6]);
-            int sellingPriceType2 = Integer.parseInt(columns[7]);
-            LocalDate openingDate = Project.parseDate(columns[8]);
-            LocalDate closingDate = Project.parseDate(columns[9]);
-            String manager = columns[10];
-
-            FlatType flatType1;
-            FlatType flatType2;
-            
-            switch (type1) {
-                case "2-Room":
-                    flatType1 = FlatType.TWO_ROOM;
-                    break;
-                case "3-Room":
-                    flatType1 = FlatType.THREE_ROOM;
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unknown flat type: " + type1);
+            // Initialize variables
+            List<String> columns = new ArrayList<>();
+            StringBuilder currentField = new StringBuilder();
+            boolean insideQuotes = false;
+            char[] charArray = line.toCharArray();
+    
+            // Iterate over each character in the line
+            for (int i = 0; i < charArray.length; i++) {
+                char c = charArray[i];
+    
+                if (c == '"' && (i == 0 || charArray[i - 1] != '\\')) {
+                    // Toggle the insideQuotes flag when encountering a quote
+                    insideQuotes = !insideQuotes;
+                } else if (c == ',' && !insideQuotes) {
+                    // If outside quotes and a comma, it's a delimiter for a new field
+                    columns.add(currentField.toString().trim());
+                    currentField.setLength(0);  // Clear the current field
+                } else {
+                    // Append the character to the current field
+                    currentField.append(c);
+                }
             }
-            
-            switch (type2) {
-                case "2-Room":
-                    flatType2 = FlatType.TWO_ROOM;
-                    break;
-                case "3-Room":
-                    flatType2 = FlatType.THREE_ROOM;
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unknown flat type: " + type2);
+    
+            // Add the last field (after the last comma)
+            columns.add(currentField.toString().trim());
+    
+            // Now parse the fields
+            String projectName = columns.get(0);
+            String neighborhood = columns.get(1);
+            String type1 = columns.get(2);
+            int numUnitsType1 = Integer.parseInt(columns.get(3));
+            int sellingPriceType1 = Integer.parseInt(columns.get(4));
+            String type2 = columns.get(5);
+            int numUnitsType2 = Integer.parseInt(columns.get(6));
+            int sellingPriceType2 = Integer.parseInt(columns.get(7));
+            LocalDate openingDate = Project.parseDate(columns.get(8));
+            LocalDate closingDate = Project.parseDate(columns.get(9));
+            String manager = columns.get(10);
+            int maxOfficerSlots = Integer.parseInt(columns.get(11));
+    
+            List<String> officerNames = new ArrayList<>();
+            if (columns.size() > 12 && !columns.get(12).trim().isEmpty()) {
+                String officerString = columns.get(12);
+                String[] officers = officerString.split(",");
+                for (String officer : officers) {
+                    officerNames.add(officer.trim());
+                }
             }
-
-            Project project = new Project(projectName, neighborhood, openingDate, closingDate, manager);
+            // Find HDBOfficer objects based on officer names
+            List<HDBOfficer> officerObjects = new ArrayList<>();
+            for (String officerName : officerNames) {
+                for (HDBOfficer officer : allOfficers) {
+                    if (officer.getName().equalsIgnoreCase(officerName.trim())) {
+                        officerObjects.add(officer);
+                        break;
+                    }
+                }
+            }
+            // Create project and add officers
+            Project project = new Project(projectName, neighborhood, openingDate, closingDate, manager, maxOfficerSlots);
+            
+            // Add the officer objects to the project
+            for (HDBOfficer officer : officerObjects) {
+                project.addOfficer(officer);
+            }
+    
+            // Add flat units
+            FlatType flatType1 = parseFlatType(type1);
+            FlatType flatType2 = parseFlatType(type2);
             project.addFlatUnit(flatType1, numUnitsType1);
             project.addFlatUnit(flatType2, numUnitsType2);
-
+    
             projects.add(project);
         }
-
+    
         reader.close();
         return projects;
     }
@@ -113,6 +142,17 @@ public class DataLoader {
             System.out.println("Error loading officers: " + e.getMessage());
         }
         return officers;
+    }
+
+    private static FlatType parseFlatType(String type) {
+        switch (type) {
+            case "2-Room":
+                return FlatType.TWO_ROOM;
+            case "3-Room":
+                return FlatType.THREE_ROOM;
+            default:
+                throw new IllegalArgumentException("Unknown flat type: " + type);
+        }
     }
     
 }

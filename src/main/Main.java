@@ -20,8 +20,8 @@ public class Main {
 
         try {
             applicants = new DataLoader().loadApplicants("src/data/ApplicantList.csv");
-            projects = DataLoader.loadProjects("src/data/ProjectList.csv");
             officers = new DataLoader().loadOfficers("src/data/OfficerList.csv");
+            projects = DataLoader.loadProjects("src/data/ProjectList.csv", officers);
             allUsers.addAll(applicants); // Add other user types later
             allUsers.addAll(officers); // Add other user types later
         } catch (IOException e) {
