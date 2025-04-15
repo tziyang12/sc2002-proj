@@ -3,6 +3,7 @@ package data;
 import model.project.Project;
 import model.project.FlatType;
 import model.user.Applicant;
+import model.user.HDBManager;
 import model.user.enums.MaritalStatus;
 import model.user.HDBOfficer;
 
@@ -155,5 +156,28 @@ public class DataLoader {
                 throw new IllegalArgumentException("Unknown flat type: " + type);
         }
     }
+
+    public List<HDBManager> loadHDBManagers(String filePath) {
+    List<HDBManager> managers = new ArrayList<>();
+    try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+        String line;
+        br.readLine(); // Skip header
+        while ((line = br.readLine()) != null) {
+            String[] data = line.split(",");
+            String name = data[0];
+            String nric = data[1];
+            int age = Integer.parseInt(data[2]);
+            MaritalStatus maritalStatus = MaritalStatus.valueOf(data[3].toUpperCase());
+            String password = data[4];
+
+            // Create and add the manager
+            HDBManager manager = new HDBManager(name, nric, password, age, maritalStatus);
+            managers.add(manager);
+        }
+    } catch (IOException e) {
+        System.out.println("Error loading HDB Managers: " + e.getMessage());
+    }
+    return managers;
+}
     
 }

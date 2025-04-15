@@ -68,12 +68,24 @@ public class Project {
         return projectID;
     }
 
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
     public String getProjectName() {
         return projectName;
     }
 
+    public void setNeighbourhood(String neighbourhood) {
+        this.neighbourhood = neighbourhood;
+    }
+
     public String getNeighbourhood() {
         return neighbourhood;
+    }
+
+    public void setNumUnits(FlatType type, int units) {
+        flatUnits.put(type, units);
     }
 
     public int getNumUnits(FlatType type) {
@@ -84,6 +96,11 @@ public class Project {
         return flatUnits;
     }
 
+    public void setApplicationPeriod(LocalDate startDate, LocalDate endDate) {
+        this.applicationStartDate = startDate;
+        this.applicationEndDate = endDate;
+    }
+
     public LocalDate getApplicationStartDate() {
         return applicationStartDate;
     }
@@ -92,12 +109,24 @@ public class Project {
         return applicationEndDate;
     }
 
+    public void setVisible(boolean visibility) {
+        this.visibility = visibility;
+    }
+
     public boolean isVisible() {
         return visibility;
     }
 
+    public void setManagerUserID(String managerUserID) {
+        this.managerUserID = managerUserID;
+    }
+
     public String getManagerUserID() {
         return managerUserID;
+    }
+
+    public void setMaxOfficerSlots(int maxOfficerSlots) {
+        this.maxOfficerSlots = maxOfficerSlots;
     }
 
     public int getMaxOfficerSlots() {
@@ -160,5 +189,15 @@ public class Project {
             }
         }
         return null;  // Return null if not found
+    }
+
+    public void decreaseRemainingFlats(FlatType flatType) {
+        if (flatUnits.containsKey(flatType) && flatUnits.get(flatType) > 0) {
+            int remainingFlats = flatUnits.get(flatType);
+            flatUnits.put(flatType, remainingFlats - 1); // Decrement available flats
+            System.out.println("One flat of type " + flatType + " has been booked. Remaining flats: " + (remainingFlats - 1));
+        } else {
+            System.out.println("No flats available for type " + flatType + " in this project.");
+        }
     }
 }

@@ -1,5 +1,6 @@
 package controller;
 
+import model.project.FlatType;
 import model.project.Project;
 import model.transaction.OfficerRegistrationStatus;
 import model.user.HDBOfficer;
@@ -132,6 +133,27 @@ public class OfficerController {
         }
     }
     
+    public boolean changeApplicationStatusToBooked(Applicant applicant) {
+        if (applicant.getApplicationStatus() == ApplicationStatus.SUCCESSFUL) {
+            // 1. Set the application status to "BOOKED"
+            applicant.setApplicationStatus(ApplicationStatus.BOOKED); 
+            
+            // 2. Update the number of remaining flats for the selected flat type in the project
+            Project project = applicant.getAppliedProject(); // Get the project the applicant applied for
+            if (project != null) {
+                FlatType flatType = applicant.getAppliedFlatType(); // Get the selected flat type
+                project.decreaseRemainingFlats(flatType); // Decrease the number of flats for the selected flat type
+            }
+
+            // 3. Update applicant's profile with the flat type they chose
+            System.out.println("Applicant's status changed to BOOKED. Flat type selected: " + applicant.getAppliedFlatType());
+            return true;
+        } else {
+            System.out.println("Applicant's status cannot be changed to BOOKED because they are not SUCCESSFUL.");
+            return false;
+        }
+    }
+
 
     // Generate receipt for successful applicant booking
     public void generateBookingReceipt(HDBOfficer officer, Applicant applicant) {
