@@ -1,16 +1,20 @@
 package model.transaction;
 
+import model.project.Project;
+
 public class Enquiry {
     private int enquiryId;
     private String enquiryMessage;
     private String replyMessage;
     private boolean isReplied;
+    private Project project;
 
     // Constructor
-    public Enquiry(int enquiryId, String enquiryMessage) {
+    public Enquiry(int enquiryId, String enquiryMessage, Project project) {
         this.enquiryId = enquiryId;
         this.enquiryMessage = enquiryMessage;
         this.isReplied = false; // Initially, no reply
+        this.project = project;
     }
 
     // Getters and Setters
@@ -20,6 +24,10 @@ public class Enquiry {
 
     public String getEnquiryMessage() {
         return enquiryMessage;
+    }
+
+    public Project getProject() {
+        return project;
     }
 
     public String getReplyMessage() {
@@ -38,6 +46,9 @@ public class Enquiry {
 
     @Override
     public String toString() {
-        return "Enquiry ID: " + enquiryId + "\nMessage: " + enquiryMessage + "\nReply: " + (isReplied ? replyMessage : "No reply yet");
+        return "Enquiry ID: " + enquiryId +
+               "\nProject: " + (project != null ? project.getProjectName() : "N/A") +
+               "\nMessage: " + enquiryMessage +
+               "\nReply: " + ((replyMessage == null || replyMessage.isEmpty()) ? "No reply yet." : replyMessage);
     }
 }

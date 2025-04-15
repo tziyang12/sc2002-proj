@@ -6,9 +6,40 @@ import model.user.HDBOfficer;
 import model.user.Applicant;
 import model.transaction.ApplicationStatus;
 import model.transaction.Enquiry;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class OfficerController {
+
+    public static boolean canRegisterForProject(HDBOfficer officer, Project newProject) {
+    LocalDate newStart = newProject.getApplicationStartDate();
+    LocalDate newEnd = newProject.getApplicationEndDate();
+
+    for (Project assigned : officer.getAssignedProjects()) {
+        LocalDate assignedStart = assigned.getApplicationStartDate();
+        LocalDate assignedEnd = assigned.getApplicationEndDate();
+
+        // Check for overlap
+        boolean overlap = !(newEnd.isBefore(assignedStart) || newStart.isAfter(assignedEnd));
+        if (overlap) {
+            return false;
+            }
+        }
+    return true;
+    }
+
+    public List<Project> getAssignedProjects(HDBOfficer officer, List<Project> projectList) {
+        List<Project> assignedProjects = new ArrayList<>();
+        for (Project project : projectList) {
+            List<HDBOfficer> assignedOfficers = project.getOfficers();
+            if (assignedOfficers != null && assignedOfficers.contains(officer)) {
+                assignedProjects.add(project);
+            }
+        }
+        return assignedProjects;
+    }
 
     // Register an officer to handle a project
     public boolean registerOfficerToProject(HDBOfficer officer, Project project) {
@@ -53,69 +84,62 @@ public class OfficerController {
 
     // View the enquiries related to the officer's project
     public void viewEnquiries(HDBOfficer officer) {
-        if (officer.getAssignedProject() == null) {
-            System.out.println("Officer is not handling any project.");
+        List<Project> assignedProjects = officer.getAssignedProjects();
+
+        if (assignedProjects == null || assignedProjects.isEmpty()) {
+            System.out.println("Officer is not handling any projects.");
             return;
         }
-
-        List<Enquiry> enquiries = officer.getAssignedProject().getEnquiries();
-        if (enquiries.isEmpty()) {
-            System.out.println("No enquiries for the project " + officer.getAssignedProject().getProjectName());
-        } else {
-            System.out.println("Enquiries for project " + officer.getAssignedProject().getProjectName() + ":");
-            for (Enquiry enquiry : enquiries) {
-                System.out.println(enquiry);
+    
+        for (Project project : assignedProjects) {
+            List<Enquiry> enquiries = project.getEnquiries();
+            System.out.println("\nEnquiries for project: " + project.getProjectName());
+    
+            if (enquiries.isEmpty()) {
+                System.out.println("No enquiries.");
+            } else {
+                for (Enquiry enquiry : enquiries) {
+                    System.out.println(enquiry);
+                }
             }
         }
     }
 
     // Reply to an enquiry from an applicant
-    public void replyToEnquiry(HDBOfficer officer, int enquiryId, String replyMessage) {
-        if (officer.getAssignedProject() == null) {
-            System.out.println("Officer is not handling any project.");
+    public void replyToEnquiry(HDBOfficer officer, Project project, int enquiryId, String replyMessage) {
+        if (!officer.getAssignedProjects().contains(project)) {
+            System.out.println("You are not assigned to this project.");
             return;
         }
-
-        Enquiry enquiry = officer.getAssignedProject().getEnquiryById(enquiryId); // Ensure this method exists in Project class
+    
+        Enquiry enquiry = project.getEnquiryById(enquiryId);
         if (enquiry != null) {
-            enquiry.setReply(replyMessage); // Ensure the Enquiry class has a setReply() method
+            enquiry.setReply(replyMessage);
             System.out.println("Replied to enquiry: " + enquiry.getEnquiryMessage());
         } else {
             System.out.println("Enquiry not found.");
         }
     }
-
-    // Update flat booking status for successful applicants
-    public void updateApplicantBookingStatus(HDBOfficer officer, Applicant applicant) {
-        if (officer.getAssignedProject() == null) {
-            System.out.println("Officer is not handling any project.");
-            return;
-        }
-
-        if (!applicant.getApplicationStatus().equals(ApplicationStatus.SUCCESSFUL)) {
-            System.out.println("Applicant's application is not successful.");
-            return;
-        }
-
-        // Update the applicant's project status to 'Booked'
-        applicant.setApplicationStatus(ApplicationStatus.BOOKED);
-        System.out.println("Applicant " + applicant.getName() + " has been successfully booked for project " +
-                officer.getAssignedProject().getProjectName());
-    }
+    
 
     // Generate receipt for successful applicant booking
     public void generateBookingReceipt(HDBOfficer officer, Applicant applicant) {
-        if (applicant.getApplicationStatus().equals(ApplicationStatus.BOOKED)) {
-            System.out.println("\n[Booking Receipt]");
-            System.out.println("Applicant Name: " + applicant.getName());
-            System.out.println("NRIC: " + applicant.getNric());
-            System.out.println("Age: " + applicant.getAge());
-            System.out.println("Marital Status: " + applicant.getMaritalStatus());
-            System.out.println("Flat Type: " + applicant.getAppliedFlatType());
-            System.out.println("Project: " + officer.getAssignedProject().getProjectName());
-            System.out.println("Booking Status: Booked");
-        } else {
+        Project project = applicant.getAppliedProject(); // or applicant.getProject(), however you store it
+    
+        if (project == null || !applicant.getApplicationStatus().equals(ApplicationStatus.BOOKED)) {
             System.out.println("No booking details available.");
+            return;
         }
+    
+        System.out.println("\n[Booking Receipt]");
+        System.out.println("Applicant Name: " + applicant.getName());
+        System.out.println("NRIC: " + applicant.getNric());
+        System.out.println("Age: " + applicant.getAge());
+        System.out.println("Marital Status: " + applicant.getMaritalStatus());
+        System.out.println("Flat Type: " + applicant.getAppliedFlatType());
+        System.out.println("Project: " + project.getProjectName());
+        System.out.println("Booking Status: Booked");
     }
+    
+    
 }

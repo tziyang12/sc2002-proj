@@ -34,7 +34,7 @@ public class ApplicantController {
     }
 
     public void submitEnquiry(Applicant applicant, String enquiry) {
-        enquiryController.submitEnquiry(applicant, enquiry);
+        enquiryController.submitEnquiry(applicant, enquiry, applicant.getAppliedProject());
     }
 
     public void editEnquiry(Applicant applicant, int index, String updated) {

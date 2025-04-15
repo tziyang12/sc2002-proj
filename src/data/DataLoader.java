@@ -108,6 +108,7 @@ public class DataLoader {
             // Add the officer objects to the project
             for (HDBOfficer officer : officerObjects) {
                 project.addOfficer(officer);
+                officer.assignProject(project);
             }
     
             // Add flat units

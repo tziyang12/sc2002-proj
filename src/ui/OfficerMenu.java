@@ -2,6 +2,7 @@ package ui;
 
 import controller.OfficerController;
 import model.user.HDBOfficer;
+import old.Application.ApplicationDatabase;
 import model.user.Applicant;
 import model.project.Project;
 import model.transaction.Enquiry;
@@ -61,9 +62,8 @@ public class OfficerMenu {
             System.out.println("3. Register to handle a project");
             System.out.println("4. View project enquiries");
             System.out.println("5. Reply to an enquiry");
-            System.out.println("6. Update applicant booking status");
-            System.out.println("7. Generate booking receipt");
-            System.out.println("8. Back");
+            System.out.println("6. Generate booking receipt");
+            System.out.println("7. Back");
             System.out.print("Select an option: ");
     
             int choice = scanner.nextInt();
@@ -75,9 +75,8 @@ public class OfficerMenu {
                 case 3 -> registerOfficerToProject(scanner);
                 case 4 -> viewEnquiries();
                 case 5 -> replyToEnquiry(scanner);
-                case 6 -> updateApplicantBookingStatus(scanner);
-                case 7 -> generateBookingReceipt();
-                case 8 -> { return; } // Back to main menu
+                case 6 -> generateBookingReceipt();
+                case 7 -> { return; } // Back to main menu
                 default -> System.out.println("Invalid choice. Try again.");
             }
         }
@@ -85,20 +84,28 @@ public class OfficerMenu {
 
     private void viewProjectsAvailableForOfficer() {
         System.out.println("\n--- Projects Available for Officer Registration ---");
-    
+
         boolean found = false;
-    
+        String officerID = currentOfficer.getNric();  // Assuming this is inside an Officer subclass
+
         for (Project project : projectList) {
-            String manager = project.getManagerUserID();
-            if (manager == null || manager.isEmpty()) {
-                found = true;
-                System.out.println("- " + project.getProjectName() + " in " + project.getNeighbourhood() +
-                        " (Opening: " + project.getApplicationStartDate() + ", Closing: " + project.getApplicationEndDate() + ")");
-            }
+            // Skip if officer is already assigned
+            boolean alreadyAssigned = project.getOfficers().stream()
+                .anyMatch(officer -> officer.getNric().equals(officerID));
+            if (alreadyAssigned) continue;
+
+            // // Skip if officer has already applied as an applicant
+            // if (ApplicationDatabase.hasApplied(officerID, project.getProjectID())) continue;
+
+
+            // If passed both conditions, show project
+            found = true;
+            System.out.println("- " + project.getProjectName() + " in " + project.getNeighbourhood() +
+                    " (Opening: " + project.getApplicationStartDate() + ", Closing: " + project.getApplicationEndDate() + ")");
         }
-    
+
         if (!found) {
-            System.out.println("No unassigned projects available at the moment.");
+            System.out.println("No projects available for officer registration at the moment.");
         }
     }
     
@@ -120,22 +127,19 @@ public class OfficerMenu {
 
     private void viewAssignedProject() {
         System.out.println("\n--- Your Assigned Project(s) ---");
-        boolean found = false;
-    
-        for (Project project : projectList) {
-            List<HDBOfficer> assignedOfficers = project.getOfficers();
-            if (assignedOfficers != null && assignedOfficers.contains(currentOfficer)) {
-                found = true;
+        List<Project> assignedProjects = officerController.getAssignedProjects(currentOfficer, projectList);
+        
+        if (!assignedProjects.isEmpty()) {
+            for (Project project : assignedProjects) {
                 System.out.println("• " + project.getProjectName() + " in " + project.getNeighbourhood());
                 System.out.println("  Application Period: " + project.getApplicationStartDate() + " to " + project.getApplicationEndDate());
                 System.out.println();
             }
-        }
-    
-        if (!found) {
+        } else {
             System.out.println("You are not currently registered to any project.");
         }
-    }    
+    }
+    
     
 
     private void viewEnquiries() {
@@ -143,27 +147,23 @@ public class OfficerMenu {
     }
 
     private void replyToEnquiry(Scanner scanner) {
+        System.out.print("Enter project name: ");
+        String projectName = scanner.nextLine();
+        Project project = findProjectByName(projectName);
         System.out.print("Enter enquiry ID to reply to: ");
+        if (!scanner.hasNextInt()) {
+            System.out.println("Invalid input. Please enter a number for enquiry ID.");
+            scanner.nextLine(); // consume the invalid input
+            return;
+        }
         int enquiryId = scanner.nextInt();
         scanner.nextLine();  // Consume newline
         System.out.print("Enter your reply: ");
         String replyMessage = scanner.nextLine();
 
-        officerController.replyToEnquiry(currentOfficer, enquiryId, replyMessage);
+        officerController.replyToEnquiry(currentOfficer, project, enquiryId, replyMessage);
     }
 
-    private void updateApplicantBookingStatus(Scanner scanner) {
-        System.out.print("Enter applicant NRIC to update booking status: ");
-        String applicantNRIC = scanner.nextLine();
-        // Retrieve the applicant (you can retrieve by name or some identifier)
-        Applicant applicant = findApplicantByNric(applicantNRIC);
-
-        if (applicant != null) {
-            officerController.updateApplicantBookingStatus(currentOfficer, applicant);
-        } else {
-            System.out.println("Applicant not found.");
-        }
-    }
 
     private void generateBookingReceipt() {
         System.out.print("Enter applicant name to generate booking receipt: ");
