@@ -32,7 +32,6 @@ public class HDBManager extends User {
     }
 
     // === Project Management ===
-
     public boolean canCreateNewProject(List<Project> allProjects) {
         LocalDate today = LocalDate.now();
         for (Project project : allProjects) {

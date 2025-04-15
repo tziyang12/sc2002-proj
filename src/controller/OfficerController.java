@@ -15,20 +15,23 @@ import java.util.List;
 public class OfficerController {
 
     public static boolean canRegisterForProject(HDBOfficer officer, Project newProject) {
-    LocalDate newStart = newProject.getApplicationStartDate();
-    LocalDate newEnd = newProject.getApplicationEndDate();
+        LocalDate newStart = newProject.getApplicationStartDate();
+        LocalDate newEnd = newProject.getApplicationEndDate();
 
-    for (Project assigned : officer.getAssignedProjects()) {
-        LocalDate assignedStart = assigned.getApplicationStartDate();
-        LocalDate assignedEnd = assigned.getApplicationEndDate();
+        List<Project> allOfficerProjects = new ArrayList<>();
+        allOfficerProjects.addAll(officer.getAssignedProjects());
+        allOfficerProjects.addAll(officer.getAppliedProjects());
 
-        // Check for overlap
-        boolean overlap = !(newEnd.isBefore(assignedStart) || newStart.isAfter(assignedEnd));
-        if (overlap) {
-            return false;
+        for (Project assigned : officer.getAssignedProjects()) {
+            LocalDate start = assigned.getApplicationStartDate();
+            LocalDate end = assigned.getApplicationEndDate();
+
+            // Check for overlap
+            if (!(newEnd.isBefore(start) || newStart.isAfter(end))) {
+                return false; // Overlapping
             }
         }
-    return true;
+        return true;
     }
 
     public List<Project> getAssignedProjects(HDBOfficer officer, List<Project> projectList) {
@@ -63,6 +66,7 @@ public class OfficerController {
         }
 
         // Register officer if criteria are met
+        officer.applyProject(project);
         officer.setRegistrationStatus(OfficerRegistrationStatus.PENDING);
         System.out.println("Officer registration for project " + project.getProjectName() + " is pending.");
         return true;
