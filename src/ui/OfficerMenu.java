@@ -60,10 +60,11 @@ public class OfficerMenu {
             System.out.println("1. View projects available for officer registration");
             System.out.println("2. View assigned project");
             System.out.println("3. Register to handle a project");
-            System.out.println("4. View project enquiries");
-            System.out.println("5. Reply to an enquiry");
-            System.out.println("6. Generate booking receipt");
-            System.out.println("7. Back");
+            System.out.println("4. View project registration status");
+            System.out.println("5. View project enquiries");
+            System.out.println("6. Reply to an enquiry");
+            System.out.println("7. Generate booking receipt");
+            System.out.println("8. Back");
             System.out.print("Select an option: ");
     
             int choice = scanner.nextInt();
@@ -73,10 +74,11 @@ public class OfficerMenu {
                 case 1 -> viewProjectsAvailableForOfficer();
                 case 2 -> viewAssignedProject();
                 case 3 -> registerOfficerToProject(scanner);
-                case 4 -> viewEnquiries();
-                case 5 -> replyToEnquiry(scanner);
-                case 6 -> generateBookingReceipt();
-                case 7 -> { return; } // Back to main menu
+                case 4 -> officerController.viewRegistrationStatus(currentOfficer);
+                case 5 -> viewEnquiries();
+                case 6 -> replyToEnquiry(scanner);
+                case 7 -> generateBookingReceipt();
+                case 8 -> { return; } // Back to main menu
                 default -> System.out.println("Invalid choice. Try again.");
             }
         }
@@ -94,9 +96,14 @@ public class OfficerMenu {
                 .anyMatch(officer -> officer.getNric().equals(officerID));
             if (alreadyAssigned) continue;
 
-            // // Skip if officer has already applied as an applicant
-            // if (ApplicationDatabase.hasApplied(officerID, project.getProjectID())) continue;
+            // Skip if officer has already applied for the project as an applicant
+            if (currentOfficer.getAppliedProject() != null &&
+                currentOfficer.getAppliedProject().getProjectID() == project.getProjectID()) {
+                continue;
+            }
 
+            // Skip if dates overlap
+            if (!OfficerController.canRegisterForProject(currentOfficer, project)) continue;
 
             // If passed both conditions, show project
             found = true;

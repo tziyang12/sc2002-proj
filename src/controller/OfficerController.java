@@ -55,6 +55,12 @@ public class OfficerController {
             return false;
         }
 
+        // Check for project date overlap
+        if (!canRegisterForProject(officer, project)) {
+            System.out.println("Project dates overlap with an existing assigned project.");
+            return false;
+        }
+
         // Register officer if criteria are met
         officer.setRegistrationStatus(OfficerRegistrationStatus.PENDING);
         System.out.println("Officer registration for project " + project.getProjectName() + " is pending.");
@@ -80,6 +86,11 @@ public class OfficerController {
         } else {
             System.out.println("No pending registration to reject.");
         }
+    }
+
+    // View the project registration status of an officer
+    public void viewRegistrationStatus(HDBOfficer officer) {
+        System.out.println("Officer " + officer.getName() + "'s registration status: " + officer.getRegistrationStatus());
     }
 
     // View the enquiries related to the officer's project

@@ -49,6 +49,7 @@ public class ProjectController {
         applicant.setAppliedProject(project);
         applicant.setAppliedFlatType(flatType);
         applicant.setApplicationStatus(ApplicationStatus.PENDING);
+        project.addApplicant(applicant);
 
         System.out.println("Application submitted for " + project.getProjectName()
                 + " (" + flatType + ") has been submitted successfully!");

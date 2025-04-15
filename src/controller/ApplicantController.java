@@ -14,6 +14,8 @@ public class ApplicantController {
         projectController.showEligibleProjects(applicant, projects);
     }
 
+    
+
     public void applyForProject(Applicant applicant, Project project, FlatType type) {
         projectController.applyForProject(applicant, project, type);
     }
