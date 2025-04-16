@@ -51,7 +51,7 @@ public class Application {
     }
 
     public void withdraw() {
-        this.withdrawalRequested = true;
+        this.withdrawalRequested = false;
         this.status = ApplicationStatus.WITHDRAWN;
     }
 

@@ -189,8 +189,85 @@ public class ManagerMenu {
     }
 
     private void manageApplicantApplicationsMenu(Scanner scanner) {
-        // Implement applicant application approval/rejection logic
+        List<Application> applications = managerController.getApplicationsForManagedProjects(manager);
+    
+        if (applications.isEmpty()) {
+            System.out.println("No applications found for your managed projects.");
+            return;
+        }
+    
+        System.out.println("\n=== Applications for Your Projects ===");
+        for (int i = 0; i < applications.size(); i++) {
+            Application app = applications.get(i);
+            System.out.printf("%d. Applicant: %s | Project: %s | FlatType: %s | Status: %s | Withdrawal Requested: %b | Applied on: %s%n",
+                    i + 1,
+                    app.getApplicant().getName(),
+                    app.getProject().getProjectName(),
+                    app.getFlatType(),
+                    app.getStatus(),
+                    app.isWithdrawalRequested(),
+                    app.getApplicationDate()
+            );
+        }
+    
+        System.out.print("\nEnter application number to manage (0 to cancel): ");
+        int choice = scanner.nextInt();
+        scanner.nextLine(); // consume newline
+    
+        if (choice <= 0 || choice > applications.size()) {
+            System.out.println("Cancelled or invalid input.");
+            return;
+        }
+    
+        Application selected = applications.get(choice - 1);
+    
+        System.out.println("\nSelected Application:");
+        System.out.println("Applicant: " + selected.getApplicant().getName());
+        System.out.println("Project: " + selected.getProject().getProjectName());
+        System.out.println("Flat Type: " + selected.getFlatType());
+        System.out.println("Status: " + selected.getStatus());
+        System.out.println("Withdrawal Requested: " + selected.isWithdrawalRequested());
+    
+        System.out.println("\nChoose an action:");
+        System.out.println("1. Approve Application");
+        System.out.println("2. Reject Application");
+        if (selected.isWithdrawalRequested()) {
+            System.out.println("3. Approve Withdrawal");
+            System.out.println("4. Reject Withdrawal");
+        }
+        System.out.print("Enter your choice: ");
+        int action = scanner.nextInt();
+        scanner.nextLine(); // consume newline
+    
+        switch (action) {
+            case 1 -> {
+                managerController.approveApplication(selected);
+                System.out.println("Application approved.");
+            }
+            case 2 -> {
+                managerController.rejectApplication(selected);
+                System.out.println("Application rejected.");
+            }
+            case 3 -> {
+                if (selected.isWithdrawalRequested()) {
+                    managerController.approveWithdrawal(selected);
+                    System.out.println("Withdrawal approved.");
+                } else {
+                    System.out.println("No withdrawal was requested.");
+                }
+            }
+            case 4 -> {
+                if (selected.isWithdrawalRequested()) {
+                    managerController.rejectWithdrawal(selected);
+                    System.out.println("Withdrawal rejected.");
+                } else {
+                    System.out.println("No withdrawal was requested.");
+                }
+            }
+            default -> System.out.println("Invalid choice.");
+        }
     }
+    
 
     private void viewEnquiries() {
         // List<Enquiry> enquiries = managerController.getAllEnquiries(manager.getManagedProjects());

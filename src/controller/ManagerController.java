@@ -5,7 +5,9 @@ import model.project.FlatType;
 import model.transaction.Enquiry;
 import model.user.HDBManager;
 import model.user.HDBOfficer;
+import service.RegistrationService;
 import model.transaction.Application;
+import model.transaction.ApplicationStatus;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -56,6 +58,25 @@ public class ManagerController {
     // public void rejectOfficer(Project project, HDBOfficer officer) {
     //     project.removePendingOfficer(officer);
     // }
+
+    public List<Application> getApplicationsForManagedProjects(HDBManager manager) {
+        List<Application> result = new ArrayList<>();
+        List<Project> managedProjects = manager.getManagedProjects();
+
+        for (Application app : RegistrationService.getAllApplication()) {
+            if (managedProjects.contains(app.getProject())) {
+                result.add(app);
+            }
+        }
+
+        return result;
+    }
+
+    public void approveApplication(Application app) {
+        app.setStatus(ApplicationStatus.SUCCESSFUL);
+        // maybe update booking status too?
+    }
+
 
     public void approveApplication(Project project, Application app) {
         FlatType type = app.getFlatType();
