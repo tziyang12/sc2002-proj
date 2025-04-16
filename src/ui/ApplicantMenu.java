@@ -1,14 +1,18 @@
 package ui;
 
 import controller.ApplicantController;
+import controller.EnquiryController;
 import model.project.FlatType;
 import model.project.Project;
+import model.transaction.Enquiry;
 import model.user.Applicant;
+
 
 import java.util.List;
 
 public class ApplicantMenu {
     private final ApplicantController applicantController = new ApplicantController();
+    private final EnquiryController enquiryController = new EnquiryController();
 
     public void show(Applicant applicant, List<Project> projects) {
         String[] menuOptions = {
@@ -81,7 +85,7 @@ public class ApplicantMenu {
             int choice = CLIView.promptInt("");
 
             switch (choice) {
-                case 1 -> applicantController.viewEnquiries(applicant);
+                case 1 -> viewMyEnquiries(applicant);
                 case 2 -> {
                     int id = CLIView.promptInt("Enter enquiry ID to edit: ");
                     String newMsg = CLIView.prompt("Enter new enquiry message: ");
@@ -97,5 +101,32 @@ public class ApplicantMenu {
                 default -> CLIView.printError("Invalid choice.");
             }
         }
+    }
+
+        private void viewMyEnquiries(Applicant currentApplicant) {
+        List<Enquiry> enquiries = enquiryController.getEnquiriesByApplicant(currentApplicant);
+
+        if (enquiries.isEmpty()) {
+            System.out.println("No enquiries available.");
+            return;
+        }
+
+        System.out.println("\n--- Your Enquiries ---");
+        CLIView.printEnquiryTableHeader();
+
+        for (Enquiry enquiry : enquiries) {
+            String projectName = enquiry.getProject() != null 
+                ? enquiry.getProject().getProjectName() 
+                : "N/A";
+
+            CLIView.printEnquiryRow(
+                projectName,
+                enquiry.getEnquiryId(),
+                enquiry.getEnquiryMessage(),
+                enquiry.getReplyMessage()
+            );
+        }
+
+        CLIView.printEnquiryTableFooter();
     }
 }

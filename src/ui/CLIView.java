@@ -1,7 +1,10 @@
 package ui;
 
 import java.util.Scanner;
+
+import model.project.FlatType;
 import model.project.Project;
+import model.user.HDBOfficer;
 
 public class CLIView {
     private static final Scanner scanner = new Scanner(System.in);
@@ -50,4 +53,81 @@ public class CLIView {
         " (Opening: " + project.getApplicationStartDate() + ", Closing: " + project.getApplicationEndDate() + ")");
     }
     
+    public static void printProjectTableHeader() {
+        System.out.println("\n=== Project List ===");
+    
+        System.out.format("+-----+----------------------+-----------------+---------+---------+--------------+--------------+----------+------------+--------------------+------------+--------------+--------------+%n");
+        System.out.format("| ID  | Project Name         | Neighbourhood   | 2-Room  | 3-Room  | Start Date   | End Date     | Visible  | Manager    | Officers           | OfficerMax | #Enquiries   | #Applicants  |%n");
+        System.out.format("+-----+----------------------+-----------------+---------+---------+--------------+--------------+----------+------------+--------------------+------------+--------------+--------------+%n");
+    }
+    
+    public static void printProjectRow(Project project) {
+        String leftAlignFormat = "| %-3s | %-20s | %-15s | %-7s | %-7s | %-12s | %-12s | %-8s | %-10s | %-18s | %-10s | %-12s | %-12s |%n";
+    
+        int twoRoomUnits = project.getNumUnits(FlatType.TWO_ROOM);
+        int threeRoomUnits = project.getNumUnits(FlatType.THREE_ROOM);
+        String startDate = project.getApplicationStartDate().toString();
+        String endDate = project.getApplicationEndDate().toString();
+        String visible = project.isVisible() ? "Yes" : "No";
+        String managerName = project.getManager() != null ? project.getManager().getName() : "-";
+        int officerMax = project.getMaxOfficerSlots();
+    
+        // Format officer names
+        String officerNames = project.getOfficers().stream()
+                .map(HDBOfficer::getName)
+                .reduce((a, b) -> a + ", " + b)
+                .orElse("-");
+        if (officerNames.length() > 20) {
+            officerNames = officerNames.substring(0, 17) + "...";
+        }
+    
+        int enquiryCount = project.getEnquiries().size();
+        int applicantCount = project.getApplications().size();
+    
+        System.out.format(leftAlignFormat,
+                project.getProjectID(),
+                project.getProjectName(),
+                project.getNeighbourhood(),
+                twoRoomUnits,
+                threeRoomUnits,
+                startDate,
+                endDate,
+                visible,
+                managerName,
+                officerNames,
+                officerMax,
+                enquiryCount,
+                applicantCount
+        );
+    }
+    
+    public static void printProjectTableFooter() {
+        System.out.format("+-----+----------------------+-----------------+---------+---------+--------------+--------------+----------+------------+--------------------+------------+--------------+--------------+%n");
+    }
+
+    public static void printEnquiryTableHeader() {
+        System.out.println("\n=== Enquiries ===");
+        System.out.format("+----------------------+------------+-------------------------------+-------------------------------+%n");
+        System.out.format("| Project Name         | Enquiry ID | Enquiry Message               | Reply Message                 |%n");
+        System.out.format("+----------------------+------------+-------------------------------+-------------------------------+%n");
+    }
+
+    public static void printEnquiryRow(String projectName, int enquiryID, String enquiryMessage, String replyMessage) {
+        String leftAlignFormat = "| %-20s | %-10s | %-29s | %-29s |%n";
+
+        // Truncate messages if too long
+        enquiryMessage = truncate(enquiryMessage, 29);
+        replyMessage = truncate(replyMessage, 29);
+
+        System.out.format(leftAlignFormat, projectName, enquiryID, enquiryMessage, replyMessage);
+    }
+
+    public static void printEnquiryTableFooter() {
+        System.out.format("+----------------------+------------+-------------------------------+-------------------------------+%n");
+    }
+
+    private static String truncate(String input, int maxLength) {
+        if (input == null) return "-";
+        return input.length() > maxLength ? input.substring(0, maxLength - 3) + "..." : input;
+    }
 }

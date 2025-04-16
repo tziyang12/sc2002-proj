@@ -1,12 +1,11 @@
 package ui;
 
 import controller.OfficerController;
+import controller.EnquiryController;
 import model.user.HDBOfficer;
-import old.Application.ApplicationDatabase;
 import model.user.Applicant;
 import model.project.Project;
 import model.transaction.Enquiry;
-import model.transaction.ApplicationStatus;
 
 import java.util.List;
 import java.util.Scanner;
@@ -14,12 +13,14 @@ import java.util.Scanner;
 public class OfficerMenu {
 
     private OfficerController officerController;
+    private EnquiryController enquiryController;
     private HDBOfficer currentOfficer;
     private List<Project> projectList;
     private List<Applicant> applicantList;
 
     public OfficerMenu(HDBOfficer officer, List<Project> projects, List<Applicant> applicants) {
         this.officerController = new OfficerController();
+        this.enquiryController = new EnquiryController();
         this.currentOfficer = officer;
         this.projectList = projects;
         this.applicantList = applicants;
@@ -134,11 +135,13 @@ public class OfficerMenu {
     private void viewAssignedProject() {
         System.out.println("\n--- Your Assigned Project(s) ---");
         List<Project> assignedProjects = currentOfficer.getAssignedProjects();
-        
+    
         if (!assignedProjects.isEmpty()) {
+            CLIView.printProjectTableHeader();
             for (Project project : assignedProjects) {
-                CLIView.printProject(project);
+                CLIView.printProjectRow(project);
             }
+            CLIView.printProjectTableFooter();
         } else {
             System.out.println("You are not currently registered to any project.");
         }
@@ -147,7 +150,30 @@ public class OfficerMenu {
     
 
     private void viewEnquiries() {
-        officerController.viewEnquiries(currentOfficer);
+        List<Enquiry> enquiries = enquiryController.getEnquiriesForOfficer(currentOfficer);
+
+        if (enquiries.isEmpty()) {
+            System.out.println("No enquiries available.");
+            return;
+        }
+
+        System.out.println("\n--- Your Enquiries ---");
+        CLIView.printEnquiryTableHeader();
+
+        for (Enquiry enquiry : enquiries) {
+            String projectName = enquiry.getProject() != null 
+                ? enquiry.getProject().getProjectName() 
+                : "N/A";
+
+            CLIView.printEnquiryRow(
+                projectName,
+                enquiry.getEnquiryId(),
+                enquiry.getEnquiryMessage(),
+                enquiry.getReplyMessage()
+            );
+        }
+
+        CLIView.printEnquiryTableFooter();
     }
 
     private void replyToEnquiry(Scanner scanner) {

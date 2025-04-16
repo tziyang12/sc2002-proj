@@ -1,8 +1,11 @@
 package controller;
 
 import model.user.Applicant;
+import model.user.HDBOfficer;
 import model.transaction.Enquiry;
 import model.project.Project;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class EnquiryController {
@@ -22,18 +25,27 @@ public class EnquiryController {
     
     }
 
-    // Applicant views their own enquiries
-    public void viewEnquiries(Applicant applicant) {
-        List<Enquiry> enquiries = applicant.getEnquiries();
-        if (enquiries.isEmpty()) {
-            System.out.println("No enquiries available.");
-            return;
-        }
+    public List<Enquiry> getEnquiriesByApplicant(Applicant applicant) {
+        return applicant.getEnquiries(); // already stored in Applicant
+    }
 
-        System.out.println("Your enquiries:");
-        for (int i = 0; i < enquiries.size(); i++) {
-            System.out.println((i + 1) + ") " + enquiries.get(i));
+
+    // Officer-level view of enquiries
+    public List<Enquiry> getEnquiriesForOfficer(HDBOfficer officer) {
+        List<Enquiry> result = new ArrayList<>();
+        for (Project project : officer.getAssignedProjects()) {
+            result.addAll(project.getEnquiries()); // Assuming project holds a list of enquiries
         }
+        return result;
+    }
+
+    // Manger-level view of all enquiries
+    public List<Enquiry> getAllEnquiries(List<Project> allProjects) {
+        List<Enquiry> result = new ArrayList<>();
+        for (Project project : allProjects) {
+            result.addAll(project.getEnquiries());
+        }
+        return result;
     }
 
     // Applicant edits an existing enquiry

@@ -1,13 +1,13 @@
 package ui;
 
 import controller.ManagerController;
+import controller.EnquiryController;
 import model.project.Project;
 import model.user.HDBManager;
 import model.user.HDBOfficer;
 import model.transaction.Application;
 import model.transaction.Enquiry;
 import model.project.FlatType;
-import model.transaction.OfficerRegistrationStatus;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,11 +17,13 @@ public class ManagerMenu {
 
     private HDBManager manager;
     private ManagerController managerController;
+    private EnquiryController enquiryController;
     private List<Project> allProjects;
 
     public ManagerMenu(HDBManager manager, List<Project> allProjects) {
         this.manager = manager;
         this.managerController = new ManagerController();
+        this.enquiryController = new EnquiryController();
         this.allProjects = allProjects;
     }
 
@@ -107,20 +109,20 @@ public class ManagerMenu {
     }
 
     private void viewAllProjects() {
-        printProjectTableHeader();
+        CLIView.printProjectTableHeader();
         for (Project project : allProjects) {
-            printProjectRow(project);
+            CLIView.printProjectRow(project);
         }
-        printProjectTableFooter();
+        CLIView.printProjectTableFooter();
     }
     
     private void viewMyProjects() {
         List<Project> myProjects = managerController.getManagedProjects(manager);
-        printProjectTableHeader();
+        CLIView.printProjectTableHeader();
         for (Project project : myProjects) {
-            printProjectRow(project);
+            CLIView.printProjectRow(project);
         }
-        printProjectTableFooter();
+        CLIView.printProjectTableFooter();
     }
     
 
@@ -275,20 +277,59 @@ public class ManagerMenu {
     }
     
     private void viewAllEnquiries() {
-        List<Enquiry> enquiries = managerController.getAllEnquiries(allProjects);
-        System.out.println("\n=== All Enquiries ===");
-        for (Enquiry enquiry : enquiries) {
-            System.out.println(enquiry);
+        List<Enquiry> enquiries = enquiryController.getAllEnquiries(allProjects);
+
+        if (enquiries.isEmpty()) {
+            System.out.println("No enquiries available.");
+            return;
         }
+
+        System.out.println("\n--- Your Enquiries ---");
+        CLIView.printEnquiryTableHeader();
+
+        for (Enquiry enquiry : enquiries) {
+            String projectName = enquiry.getProject() != null 
+                ? enquiry.getProject().getProjectName() 
+                : "N/A";
+
+            CLIView.printEnquiryRow(
+                projectName,
+                enquiry.getEnquiryId(),
+                enquiry.getEnquiryMessage(),
+                enquiry.getReplyMessage()
+            );
+        }
+
+        CLIView.printEnquiryTableFooter();
     }
 
     private void viewManagedEnquiries() {
-        List<Enquiry> enquiries = managerController.getAllEnquiries(manager.getManagedProjects());
-        System.out.println("\n=== Managed Project Enquiries ===");
-        for (Enquiry enquiry : enquiries) {
-            System.out.println(enquiry);
+        List<Enquiry> enquiries = enquiryController.getAllEnquiries(manager.getManagedProjects());
+
+        if (enquiries.isEmpty()) {
+            System.out.println("No enquiries available.");
+            return;
         }
+
+        System.out.println("\n--- Your Enquiries ---");
+        CLIView.printEnquiryTableHeader();
+
+        for (Enquiry enquiry : enquiries) {
+            String projectName = enquiry.getProject() != null 
+                ? enquiry.getProject().getProjectName() 
+                : "N/A";
+
+            CLIView.printEnquiryRow(
+                projectName,
+                enquiry.getEnquiryId(),
+                enquiry.getEnquiryMessage(),
+                enquiry.getReplyMessage()
+            );
+        }
+
+        CLIView.printEnquiryTableFooter();
     }
+    
 
     private void generateReportMenu(Scanner scanner) {
         // System.out.println("Generate report based on:");
@@ -319,57 +360,4 @@ public class ManagerMenu {
         }
         return null;
     }
-
-    private void printProjectTableHeader() {
-        System.out.println("\n=== Project List ===");
-    
-        System.out.format("+-----+----------------------+-----------------+---------+---------+--------------+--------------+----------+------------+--------------------+------------+--------------+--------------+%n");
-        System.out.format("| ID  | Project Name         | Neighbourhood   | 2-Room  | 3-Room  | Start Date   | End Date     | Visible  | Manager    | Officers           | OfficerMax | #Enquiries   | #Applicants  |%n");
-        System.out.format("+-----+----------------------+-----------------+---------+---------+--------------+--------------+----------+------------+--------------------+------------+--------------+--------------+%n");
-    }
-    
-    private void printProjectRow(Project project) {
-        String leftAlignFormat = "| %-3s | %-20s | %-15s | %-7s | %-7s | %-12s | %-12s | %-8s | %-10s | %-18s | %-10s | %-12s | %-12s |%n";
-    
-        int twoRoomUnits = project.getNumUnits(FlatType.TWO_ROOM);
-        int threeRoomUnits = project.getNumUnits(FlatType.THREE_ROOM);
-        String startDate = project.getApplicationStartDate().toString();
-        String endDate = project.getApplicationEndDate().toString();
-        String visible = project.isVisible() ? "Yes" : "No";
-        String managerName = project.getManager() != null ? project.getManager().getName() : "-";
-        int officerMax = project.getMaxOfficerSlots();
-    
-        // Format officer names
-        String officerNames = project.getOfficers().stream()
-                .map(HDBOfficer::getName)
-                .reduce((a, b) -> a + ", " + b)
-                .orElse("-");
-        if (officerNames.length() > 20) {
-            officerNames = officerNames.substring(0, 17) + "...";
-        }
-    
-        int enquiryCount = project.getEnquiries().size();
-        int applicantCount = project.getApplications().size();
-    
-        System.out.format(leftAlignFormat,
-                project.getProjectID(),
-                project.getProjectName(),
-                project.getNeighbourhood(),
-                twoRoomUnits,
-                threeRoomUnits,
-                startDate,
-                endDate,
-                visible,
-                managerName,
-                officerNames,
-                officerMax,
-                enquiryCount,
-                applicantCount
-        );
-    }
-    
-    private void printProjectTableFooter() {
-        System.out.format("+-----+----------------------+-----------------+---------+---------+--------------+--------------+----------+------------+--------------------+------------+--------------+--------------+%n");
-    }
-    
 }

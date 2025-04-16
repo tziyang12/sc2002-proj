@@ -51,8 +51,4 @@ public class ApplicantController {
     public void deleteEnquiry(Applicant applicant, int index) {
         enquiryController.deleteEnquiry(applicant, index);
     }
-
-    public void viewEnquiries(Applicant applicant) {
-        enquiryController.viewEnquiries(applicant);
-    }
 }
