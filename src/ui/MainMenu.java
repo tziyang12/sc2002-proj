@@ -52,7 +52,7 @@ public class MainMenu {
         } else if (loggedInUser instanceof Applicant applicant) {
             new ApplicantMenu().show(applicant, projects);
         } else if (loggedInUser instanceof HDBManager manager) {
-            new ManagerMenu(manager, projects).showMenu();
+            new ManagerMenu(manager, projects, allUsers).showMenu();
             CLIView.printMessage("Manager menu is not implemented yet.");
         } else {
             CLIView.printError("This user type is not yet supported.");

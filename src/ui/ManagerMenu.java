@@ -1,15 +1,21 @@
 package ui;
 
 import controller.ManagerController;
+import controller.AuthenticationController;
 import controller.EnquiryController;
 import model.project.Project;
 import model.user.HDBManager;
 import model.user.HDBOfficer;
+import model.user.User;
+import service.UserService;
 import model.transaction.Application;
 import model.transaction.Enquiry;
+import model.transaction.OfficerProjectRegistration;
+import model.transaction.OfficerRegistrationStatus;
 import model.project.FlatType;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -19,12 +25,14 @@ public class ManagerMenu {
     private ManagerController managerController;
     private EnquiryController enquiryController;
     private List<Project> allProjects;
+    private List<User> allUsers;
 
-    public ManagerMenu(HDBManager manager, List<Project> allProjects) {
+    public ManagerMenu(HDBManager manager, List<Project> allProjects, List<User> allUsers) {
         this.manager = manager;
         this.managerController = new ManagerController();
         this.enquiryController = new EnquiryController();
         this.allProjects = allProjects;
+        this.allUsers = allUsers;
     }
 
     public void showMenu() {
@@ -193,8 +201,85 @@ public class ManagerMenu {
     }
 
     private void manageOfficerRegistrationsMenu(Scanner scanner) {
-        // Implement officer registration approval/rejection logic
+        List<Project> managerProjects = manager.getManagedProjects();
+
+        UserService userService = new UserService(allUsers);
+        List<HDBOfficer> allOfficers = userService.getOfficersForManager(manager);
+
+        if (managerProjects.isEmpty()) {
+            System.out.println("You are not assigned to any projects.");
+            return;
+        }
+
+        // Step 1: View officer registrations
+        managerController.viewOfficerRegistrations(managerProjects, allOfficers);
+
+        // Step 2: Choose a project
+        System.out.println("\nSelect a project to manage officer registrations:");
+        for (int i = 0; i < managerProjects.size(); i++) {
+            System.out.println((i + 1) + ". " + managerProjects.get(i).getProjectName());
+        }
+        System.out.print("Enter choice (0 to return): ");
+        int projectChoice = scanner.nextInt();
+        scanner.nextLine(); // consume newline
+
+        if (projectChoice == 0 || projectChoice < 1 || projectChoice > managerProjects.size()) {
+            return;
+        }
+
+        Project selectedProject = managerProjects.get(projectChoice - 1);
+
+        // Step 3: Display officers with PENDING registrations for that project
+        List<HDBOfficer> pendingOfficers = new ArrayList<>();
+        for (HDBOfficer officer : allOfficers) {
+            for (OfficerProjectRegistration reg : officer.getRegisteredProjects()) {
+                if (reg.getProject().equals(selectedProject) &&
+                    reg.getRegistrationStatus() == OfficerRegistrationStatus.PENDING) {
+                    pendingOfficers.add(officer);
+                }
+            }
+        }
+
+        if (pendingOfficers.isEmpty()) {
+            System.out.println("No pending officer registrations for this project.");
+            return;
+        }
+
+        System.out.println("\nPending Officer Registrations:");
+        for (int i = 0; i < pendingOfficers.size(); i++) {
+            System.out.println((i + 1) + ". " + pendingOfficers.get(i).getName());
+        }
+
+        // Step 4: Select officer to approve/reject
+        System.out.print("Select an officer to approve/reject (0 to return): ");
+        int officerChoice = scanner.nextInt();
+        scanner.nextLine(); // consume newline
+
+        if (officerChoice == 0 || officerChoice < 1 || officerChoice > pendingOfficers.size()) {
+            return;
+        }
+
+        HDBOfficer selectedOfficer = pendingOfficers.get(officerChoice - 1);
+
+        // Step 5: Approve or reject
+        System.out.print("Approve or Reject? (A/R): ");
+        String decision = scanner.nextLine().trim().toUpperCase();
+
+        if (decision.equals("A")) {
+            if (selectedProject.getAvailableOfficerSlots() > 0) {
+                managerController.approveOfficer(selectedProject, selectedOfficer);
+                System.out.println("Officer approved and assigned.");
+            } else {
+                System.out.println("No available officer slots in this project.");
+            }
+        } else if (decision.equals("R")) {
+            managerController.rejectOfficer(selectedProject, selectedOfficer);
+            System.out.println("Officer registration rejected.");
+        } else {
+            System.out.println("Invalid input.");
+        }
     }
+
 
     private void manageApplicantApplicationsMenu(Scanner scanner) {
         List<Application> applications = managerController.getApplicationsForManagedProjects(manager);

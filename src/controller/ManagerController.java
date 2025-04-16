@@ -3,6 +3,8 @@ package controller;
 import model.project.Project;
 import model.project.FlatType;
 import model.transaction.Enquiry;
+import model.transaction.OfficerProjectRegistration;
+import model.transaction.OfficerRegistrationStatus;
 import model.user.HDBManager;
 import model.user.HDBOfficer;
 import model.transaction.Application;
@@ -52,16 +54,46 @@ public class ManagerController {
         project.setVisible(visible);
     }
 
-    public void approveOfficer(Project project, HDBOfficer officer) {
-        if (project.getAvailableOfficerSlots() > 0) {
-            project.addOfficer(officer);
+    // Officer Registration Logic
+
+    public void viewOfficerRegistrations(List<Project> managerProjects, List<HDBOfficer> allOfficers) {
+        System.out.println("======= Officer Registrations for Your Projects =======");
+
+        for (Project project : managerProjects) {
+            System.out.println("\nProject: " + project.getProjectName());
+
+            boolean hasAnyRegistration = false;
+
+            for (HDBOfficer officer : allOfficers) {
+                for (OfficerProjectRegistration registration : officer.getRegisteredProjects()) {
+                    if (registration.getProject().equals(project)) {
+                        System.out.println("Officer: " + officer.getName() +
+                                           " | Status: " + registration.getRegistrationStatus());
+                        hasAnyRegistration = true;
+                    }
+                }
+            }
+
+            if (!hasAnyRegistration) {
+                System.out.println("No officers have registered for this project.");
+            }
         }
     }
 
-    // public void rejectOfficer(Project project, HDBOfficer officer) {
-    //     project.removePendingOfficer(officer);
-    // }
+    public void approveOfficer(Project project, HDBOfficer officer) {
+        if (project.getAvailableOfficerSlots() > 0) {
+            project.addOfficer(officer);
+            officer.assignProject(project);
+            officer.setProjectRegistrationStatus(project, OfficerRegistrationStatus.APPROVED);
+        }
+    }
 
+    public void rejectOfficer(Project project, HDBOfficer officer) {
+        officer.setProjectRegistrationStatus(project, OfficerRegistrationStatus.REJECTED);
+    }
+
+    // Application Logic
+    
     public List<Application> getApplicationsForManagedProjects(HDBManager manager) {
         List<Application> result = new ArrayList<>();
     
@@ -76,7 +108,6 @@ public class ManagerController {
         app.setStatus(ApplicationStatus.SUCCESSFUL);
         // maybe update booking status too?
     }
-
 
     public void approveApplication(Project project, Application app) {
         FlatType type = app.getFlatType();
