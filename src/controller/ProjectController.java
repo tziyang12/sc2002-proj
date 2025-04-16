@@ -16,13 +16,12 @@ public class ProjectController {
         for (Project project : projects) {
             if (!project.isVisible()) continue;
 
-            System.out.println("== " + project.getProjectName() + " (" + project.getNeighbourhood() + ") ==");
-
             for (Map.Entry<FlatType, Integer> entry : project.getFlatUnits().entrySet()) {
                 FlatType type = entry.getKey();
                 int count = entry.getValue();
 
                 if (applicant.isEligible(project, type)) {
+                    System.out.println("== " + project.getProjectName() + " (" + project.getNeighbourhood() + ") ==");
                     System.out.println(" - " + type + ": " + count + " units available");
                 }
             }

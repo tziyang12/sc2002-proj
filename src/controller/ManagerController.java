@@ -53,9 +53,9 @@ public class ManagerController {
         }
     }
 
-    public void rejectOfficer(Project project, HDBOfficer officer) {
-        project.removePendingOfficer(officer);
-    }
+    // public void rejectOfficer(Project project, HDBOfficer officer) {
+    //     project.removePendingOfficer(officer);
+    // }
 
     public void approveApplication(Project project, Application app) {
         FlatType type = app.getFlatType();

@@ -25,9 +25,9 @@ public class Main {
             officers = new DataLoader().loadOfficers("src/data/OfficerList.csv");
             managers = new DataLoader().loadHDBManagers("src/data/ManagerList.csv");
             projects = DataLoader.loadProjects("src/data/ProjectList.csv", officers);
-            allUsers.addAll(applicants); // Add other user types later
-            allUsers.addAll(officers); // Add other user types later
-            allUsers.addAll(managers); // Add other user types later
+            allUsers.addAll(applicants); 
+            allUsers.addAll(officers);
+            allUsers.addAll(managers); 
         } catch (IOException e) {
             System.out.println("Failed to load data files.");
             e.printStackTrace();
