@@ -133,6 +133,10 @@ public class Project {
         return maxOfficerSlots;
     }
 
+    public int getAvailableOfficerSlots() {
+        return maxOfficerSlots - officers.size();
+    }
+
     public boolean isApplicationPeriodOver() {
         LocalDate today = LocalDate.now();
         return today.isAfter(applicationEndDate);
