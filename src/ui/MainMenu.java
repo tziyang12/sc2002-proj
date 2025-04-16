@@ -4,6 +4,7 @@ import controller.AuthenticationController;
 import model.project.Project;
 import model.user.Applicant;
 import model.user.HDBOfficer;
+import model.user.HDBManager;
 import model.user.User;
 
 import java.util.List;
@@ -50,6 +51,9 @@ public class MainMenu {
             new OfficerMenu(officer, projects, applicantList).showMenu();
         } else if (loggedInUser instanceof Applicant applicant) {
             new ApplicantMenu().show(applicant, projects);
+        } else if (loggedInUser instanceof HDBManager manager) {
+            //new ManagerMenu(manager, allUsers).showMenu();
+            CLIView.printMessage("Manager menu is not implemented yet.");
         } else {
             CLIView.printError("This user type is not yet supported.");
         }

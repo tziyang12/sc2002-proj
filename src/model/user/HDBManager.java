@@ -32,15 +32,22 @@ public class HDBManager extends User {
     }
 
     // === Project Management ===
-    public boolean canCreateNewProject(List<Project> allProjects) {
-        LocalDate today = LocalDate.now();
+    public boolean canCreateNewProject(List<Project> allProjects, LocalDate newOpen, LocalDate newClose) {
         for (Project project : allProjects) {
-            if (managedProjectIDs.contains(project.getProjectID())
-                    && !project.isApplicationPeriodOver(today)) {
-                return false;
+            if (managedProjectIDs.contains(project.getProjectID())) {
+                LocalDate existingOpen = project.getApplicationStartDate();
+                LocalDate existingClose = project.getApplicationEndDate();
+                
+                // Check for overlap: if max(start1, start2) <= min(end1, end2)
+                LocalDate latestStart = newOpen.isAfter(existingOpen) ? newOpen : existingOpen;
+                LocalDate earliestEnd = newClose.isBefore(existingClose) ? newClose : existingClose;
+    
+                if (!latestStart.isAfter(earliestEnd)) {
+                    return false; // Overlapping periods found
+                }
             }
         }
-        return true;
+        return true; // No overlaps
     }
 
     public boolean createProject(String name, String neighborhood,
