@@ -4,20 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.project.Project;
+import model.transaction.OfficerProjectRegistration;
 import model.transaction.OfficerRegistrationStatus;
 import model.user.enums.MaritalStatus;
 
 public class HDBOfficer extends Applicant {
-    private List<Project> assignedProjects = new ArrayList<>(); 
-    private List<Project> registeredProjects = new ArrayList<>(); // projects they applied to, pending approval
-    private OfficerRegistrationStatus registrationStatus;
+    private List<OfficerProjectRegistration> registeredProjects = new ArrayList<>(); // changed to list of OfficerProjectRegistration
+    private List<Project> assignedProjects = new ArrayList<>(); // projects they are assigned to after approval
 
     public HDBOfficer(String name, String nric, String password, int age, MaritalStatus maritalStatus) {
-        super(name, nric, password, age, maritalStatus); // ✅ now matches Applicant constructor
-        this.registrationStatus = OfficerRegistrationStatus.NONE;
+        super(name, nric, password, age, maritalStatus);
     }
 
-    public List<Project> getRegisteredProjects() {
+    public List<OfficerProjectRegistration> getRegisteredProjects() {
         return registeredProjects;
     }
 
@@ -25,10 +24,24 @@ public class HDBOfficer extends Applicant {
         return assignedProjects;
     }
 
-    // Add projects to appliedProjects list (input is a single project)
-    public void applyProject(Project project) {
-        if (!registeredProjects.contains(project)) {
-            registeredProjects.add(project);
+    // Add project to registered projects with a status
+    public void applyForProject(Project project) {
+        OfficerProjectRegistration newRegistration = new OfficerProjectRegistration(project, OfficerRegistrationStatus.PENDING);
+        if (!registeredProjects.contains(newRegistration)) {
+            registeredProjects.add(newRegistration);
+        }
+    }
+
+    // Set registration status for a particular project
+    public void setProjectRegistrationStatus(Project project, OfficerRegistrationStatus status) {
+        for (OfficerProjectRegistration registration : registeredProjects) {
+            if (registration.getProject().equals(project)) {
+                registration.setRegistrationStatus(status);
+                if (status == OfficerRegistrationStatus.APPROVED) {
+                    assignProject(project);
+                }
+                break;
+            }
         }
     }
 
@@ -38,26 +51,11 @@ public class HDBOfficer extends Applicant {
         }
     }
 
-    public void removeRegisteredProject(Project project) {
-        registeredProjects.remove(project);
-    }
-
     public boolean isHandlingProject(Project project) {
-        return assignedProjects.contains(project) &&
-               registrationStatus == OfficerRegistrationStatus.APPROVED;
-    }
-
-    public OfficerRegistrationStatus getRegistrationStatus() {
-        return registrationStatus;
-    }
-
-    public void setRegistrationStatus(OfficerRegistrationStatus status) {
-        this.registrationStatus = status;
-    }
-
-    public boolean hasPendingOrApprovedRegistration() {
-        return registrationStatus == OfficerRegistrationStatus.PENDING ||
-               registrationStatus == OfficerRegistrationStatus.APPROVED;
+        return assignedProjects.contains(project) && 
+               registeredProjects.stream()
+                                 .anyMatch(registration -> registration.getProject().equals(project) &&
+                                                           registration.getRegistrationStatus() == OfficerRegistrationStatus.APPROVED);
     }
 
     @Override
@@ -68,8 +66,8 @@ public class HDBOfficer extends Applicant {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("[HDB Officer] NRIC: %s | Age: %d | Status: %s | Assigned Projects: ",
-                getNric(), getAge(), registrationStatus));
+        sb.append(String.format("[HDB Officer] NRIC: %s | Age: %d | Assigned Projects: ",
+                getNric(), getAge()));
         if (assignedProjects.isEmpty()) {
             sb.append("None");
         } else {
@@ -80,6 +78,4 @@ public class HDBOfficer extends Applicant {
         }
         return sb.toString();
     }
-
-    // Add methods for replying to enquiries, viewing applicant BTO status, booking flats, etc.
 }

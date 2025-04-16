@@ -5,6 +5,7 @@ import model.project.Project;
 import model.transaction.Application;
 import model.transaction.ApplicationStatus;
 import model.transaction.Enquiry;
+import model.transaction.OfficerProjectRegistration;
 import model.transaction.OfficerRegistrationStatus;
 import model.user.Applicant;
 import model.user.HDBOfficer;
@@ -15,18 +16,15 @@ import java.util.List;
 
 public class OfficerController {
 
+    // Check if officer can register for a new project, ensuring no date conflicts with already assigned projects
     public static boolean canRegisterForProject(HDBOfficer officer, Project newProject) {
         LocalDate newStart = newProject.getApplicationStartDate();
         LocalDate newEnd = newProject.getApplicationEndDate();
-
-        List<Project> allOfficerProjects = new ArrayList<>();
-        allOfficerProjects.addAll(officer.getAssignedProjects());
-        allOfficerProjects.addAll(officer.getRegisteredProjects());
-
-        for (Project assigned : officer.getAssignedProjects()) {
-            LocalDate start = assigned.getApplicationStartDate();
-            LocalDate end = assigned.getApplicationEndDate();
-
+    
+        for (Project assignedProject : officer.getAssignedProjects()) {
+            LocalDate start = assignedProject.getApplicationStartDate();
+            LocalDate end = assignedProject.getApplicationEndDate();
+    
             if (!(newEnd.isBefore(start) || newStart.isAfter(end))) {
                 return false;
             }
@@ -37,18 +35,21 @@ public class OfficerController {
     public List<Project> getAvailableProjects(HDBOfficer officer, List<Project> projectList) {
         List<Project> availableProjects = new ArrayList<>();
         for (Project project : projectList) {
-            if (!project.hasApplicant(officer) && !officer.getAssignedProjects().contains(project)) {
+            if (!project.hasApplicant(officer) && officer.getAssignedProjects().stream().noneMatch(p -> p.getProjectName().equals(project.getProjectName()))) {
                 availableProjects.add(project);
             }
         }
         return availableProjects;
     }
+
+    // Get assigned projects for an officer
     public List<Project> getAssignedProjects(HDBOfficer officer) {
         return officer.getAssignedProjects();
     }
-    
+
+    // Register officer for a new project
     public boolean registerOfficerToProject(HDBOfficer officer, Project project) {
-        if (officer.hasPendingOrApprovedRegistration()) {
+        if (officer.isHandlingProject(project)) {
             System.out.println("Officer is already registered for another project or has a pending registration.");
             return false;
         }
@@ -63,40 +64,52 @@ public class OfficerController {
             return false;
         }
 
-        officer.applyProject(project);
-        officer.setRegistrationStatus(OfficerRegistrationStatus.PENDING);
+        officer.applyForProject(project);
+        officer.setProjectRegistrationStatus(project, OfficerRegistrationStatus.PENDING);
         System.out.println("Officer registration for project " + project.getProjectName() + " is pending.");
         return true;
     }
 
+    // Approve officer's registration for a project
     public void approveRegistration(HDBOfficer officer, Project project) {
-        if (officer.getRegistrationStatus() == OfficerRegistrationStatus.PENDING) {
-            officer.assignProject(project);
-            officer.setRegistrationStatus(OfficerRegistrationStatus.APPROVED);
-            System.out.println("Officer " + officer.getName() + " has been approved for project " + project.getProjectName());
-        } else {
-            System.out.println("Registration is either not pending or already approved.");
+        for (OfficerProjectRegistration registration : officer.getRegisteredProjects()) {
+            if (registration.getProject().equals(project) && registration.getRegistrationStatus() == OfficerRegistrationStatus.PENDING) {
+                officer.setProjectRegistrationStatus(project, OfficerRegistrationStatus.APPROVED);
+                officer.assignProject(project);
+                System.out.println("Officer " + officer.getName() + " has been approved for project " + project.getProjectName());
+                return;
+            }
         }
+        System.out.println("No pending registration found for this project.");
     }
 
-    public void rejectRegistration(HDBOfficer officer) {
-        if (officer.getRegistrationStatus() == OfficerRegistrationStatus.PENDING) {
-            officer.setRegistrationStatus(OfficerRegistrationStatus.REJECTED);
-            System.out.println("Officer " + officer.getName() + "'s registration has been rejected.");
-        } else {
-            System.out.println("No pending registration to reject.");
+    // Reject officer's registration for a project
+    public void rejectRegistration(HDBOfficer officer, Project project) {
+        for (OfficerProjectRegistration registration : officer.getRegisteredProjects()) {
+            if (registration.getProject().equals(project) && registration.getRegistrationStatus() == OfficerRegistrationStatus.PENDING) {
+                officer.setProjectRegistrationStatus(project, OfficerRegistrationStatus.REJECTED);
+                System.out.println("Officer " + officer.getName() + "'s registration for project " + project.getProjectName() + " has been rejected.");
+                return;
+            }
         }
+        System.out.println("No pending registration found for this project.");
     }
 
+    // View officer's registration status for projects
     public void viewRegistrationStatus(HDBOfficer officer) {
-        System.out.println("Officer " + officer.getName() + "'s registration status: " + officer.getRegistrationStatus());
+        System.out.println("======= Officer Registration Status =======");
+        for (OfficerProjectRegistration registration : officer.getRegisteredProjects()) {
+            Project project = registration.getProject();
+            System.out.println("Project: " + project.getProjectName() + " | Status: " + registration.getRegistrationStatus());
+        }
     }
 
+    // View enquiries for the officer's assigned projects
     public void viewEnquiries(HDBOfficer officer) {
         List<Project> assignedProjects = officer.getAssignedProjects();
         System.out.println("======= Enquiries =======");
 
-        if (assignedProjects == null || assignedProjects.isEmpty()) {
+        if (assignedProjects.isEmpty()) {
             System.out.println("Officer is not handling any projects.");
             return;
         }
@@ -115,6 +128,7 @@ public class OfficerController {
         }
     }
 
+    // Reply to a specific enquiry for a project
     public void replyToEnquiry(HDBOfficer officer, Project project, int enquiryId, String replyMessage) {
         if (!officer.getAssignedProjects().contains(project)) {
             System.out.println("You are not assigned to this project.");
@@ -130,6 +144,7 @@ public class OfficerController {
         }
     }
 
+    // Change an applicant's status to 'BOOKED'
     public boolean changeApplicationStatusToBooked(Applicant applicant) {
         Application app = applicant.getApplication();
         if (app != null && app.getStatus() == ApplicationStatus.SUCCESSFUL) {
@@ -149,6 +164,7 @@ public class OfficerController {
         }
     }
 
+    // Generate a booking receipt for a successful applicant
     public void generateBookingReceipt(HDBOfficer officer, Applicant applicant) {
         Application app = applicant.getApplication();
 
