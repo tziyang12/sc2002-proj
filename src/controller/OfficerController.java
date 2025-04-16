@@ -64,35 +64,24 @@ public class OfficerController {
             return false;
         }
 
+            // Check if the officer has a rejected registration already
+        for (OfficerProjectRegistration reg : officer.getRegisteredProjects()) {
+            if (reg.getProject().equals(project)) {
+                OfficerRegistrationStatus status = reg.getRegistrationStatus();
+
+                if (status == OfficerRegistrationStatus.REJECTED) {
+                    // Reapply by updating the status only after all checks pass
+                    reg.setRegistrationStatus(OfficerRegistrationStatus.PENDING);
+                    System.out.println("Officer has reapplied to project " + project.getProjectName() + ".");
+                    return true;
+                }
+            }
+        }
+
         officer.applyForProject(project);
         officer.setProjectRegistrationStatus(project, OfficerRegistrationStatus.PENDING);
         System.out.println("Officer registration for project " + project.getProjectName() + " is pending.");
         return true;
-    }
-
-    // Approve officer's registration for a project
-    public void approveRegistration(HDBOfficer officer, Project project) {
-        for (OfficerProjectRegistration registration : officer.getRegisteredProjects()) {
-            if (registration.getProject().equals(project) && registration.getRegistrationStatus() == OfficerRegistrationStatus.PENDING) {
-                officer.setProjectRegistrationStatus(project, OfficerRegistrationStatus.APPROVED);
-                officer.assignProject(project);
-                System.out.println("Officer " + officer.getName() + " has been approved for project " + project.getProjectName());
-                return;
-            }
-        }
-        System.out.println("No pending registration found for this project.");
-    }
-
-    // Reject officer's registration for a project
-    public void rejectRegistration(HDBOfficer officer, Project project) {
-        for (OfficerProjectRegistration registration : officer.getRegisteredProjects()) {
-            if (registration.getProject().equals(project) && registration.getRegistrationStatus() == OfficerRegistrationStatus.PENDING) {
-                officer.setProjectRegistrationStatus(project, OfficerRegistrationStatus.REJECTED);
-                System.out.println("Officer " + officer.getName() + "'s registration for project " + project.getProjectName() + " has been rejected.");
-                return;
-            }
-        }
-        System.out.println("No pending registration found for this project.");
     }
 
     // View officer's registration status for projects
