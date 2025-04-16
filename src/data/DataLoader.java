@@ -37,13 +37,15 @@ public class DataLoader {
     }
 
     // Load projects from ProjectList.csv
-    public static List<Project> loadProjects(String filePath, List<HDBOfficer> allOfficers) throws IOException {
+    public static List<Project> loadProjects(String filePath, List<HDBOfficer> allOfficers, List<HDBManager> allManagers) throws IOException {
         List<Project> projects = new ArrayList<>();
     
         BufferedReader reader = new BufferedReader(new FileReader(filePath));
         String line;
         reader.readLine();  // Skip the header line
-    
+        int projectid = 1; // Initialize project ID
+
+        // Read each line of the CSV file
         while ((line = reader.readLine()) != null) {
             // Initialize variables
             List<String> columns = new ArrayList<>();
@@ -82,9 +84,9 @@ public class DataLoader {
             int sellingPriceType2 = Integer.parseInt(columns.get(7));
             LocalDate openingDate = Project.parseDate(columns.get(8));
             LocalDate closingDate = Project.parseDate(columns.get(9));
-            String manager = columns.get(10);
+            String managerName = columns.get(10);
             int maxOfficerSlots = Integer.parseInt(columns.get(11));
-    
+            
             List<String> officerNames = new ArrayList<>();
             if (columns.size() > 12 && !columns.get(12).trim().isEmpty()) {
                 String officerString = columns.get(12);
@@ -103,20 +105,41 @@ public class DataLoader {
                     }
                 }
             }
+
+            HDBManager matchedManager = null;
+
+            for (HDBManager m : allManagers) {
+                if (m.getName().equalsIgnoreCase(managerName.trim())) {
+                    matchedManager = m;
+                    break;
+                }
+            }
             // Create project and add officers
-            Project project = new Project(projectName, neighborhood, openingDate, closingDate, manager, maxOfficerSlots);
+            Project project = new Project(projectName, neighborhood, openingDate, closingDate, maxOfficerSlots);
             
+            project.setProjectID(projectid++);
+            
+            if (matchedManager != null) {
+                project.setManager(matchedManager);
+                matchedManager.addManagedProject(project);
+            } else {
+                System.out.println("Warning: No matching HDBManager found for project '" + projectName + "' with manager name '" + managerName + "'.");
+            }
             // Add the officer objects to the project
             for (HDBOfficer officer : officerObjects) {
                 project.addOfficer(officer);
                 officer.assignProject(project);
             }
-    
+
+            
             // Add flat units
             FlatType flatType1 = parseFlatType(type1);
             FlatType flatType2 = parseFlatType(type2);
             project.addFlatUnit(flatType1, numUnitsType1);
             project.addFlatUnit(flatType2, numUnitsType2);
+            // Add flat prices
+            project.addFlatPrice(flatType1, sellingPriceType1);
+            project.addFlatPrice(flatType2, sellingPriceType2);
     
             projects.add(project);
         }
@@ -140,6 +163,7 @@ public class DataLoader {
     
                 officers.add(new HDBOfficer(name, nric, password, age, maritalStatus));
             }
+
         } catch (IOException e) {
             System.out.println("Error loading officers: " + e.getMessage());
         }
@@ -171,9 +195,9 @@ public class DataLoader {
             String password = data[4];
 
             // Create and add the manager
-            HDBManager manager = new HDBManager(name, nric, password, age, maritalStatus);
-            managers.add(manager);
+            managers.add(new HDBManager(name, nric, password, age, maritalStatus));
         }
+
     } catch (IOException e) {
         System.out.println("Error loading HDB Managers: " + e.getMessage());
     }

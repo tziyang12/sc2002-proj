@@ -22,6 +22,11 @@ public class Enquiry {
         return enquiryId;
     }
 
+    public String setEnquiryMessage(String enquiryMessage) {
+        this.enquiryMessage = enquiryMessage;
+        return this.enquiryMessage;
+    }
+
     public String getEnquiryMessage() {
         return enquiryMessage;
     }

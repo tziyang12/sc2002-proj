@@ -2,6 +2,7 @@ package model.user;
 
 import model.project.Project;
 import model.transaction.Application;
+import model.transaction.ApplicationStatus;
 import model.transaction.Enquiry;
 import model.project.FlatType;
 import model.user.enums.MaritalStatus;
@@ -31,6 +32,19 @@ public class Applicant extends User {
 
     public boolean hasApplied() {
         return application != null;
+    }
+
+    public boolean canWithdraw() {
+    return application != null &&
+           (application.getStatus() == ApplicationStatus.PENDING ||
+            application.getStatus() == ApplicationStatus.SUCCESSFUL ||
+            application.getStatus() == ApplicationStatus.BOOKED);
+    }
+
+    public void requestWithdrawal() {
+        if (application != null) {
+            application.requestWithdrawal(); // You can rename `withdraw()` to be more specific
+        }
     }
 
     public boolean isEligible(Project project, FlatType type) {
@@ -65,5 +79,17 @@ public class Applicant extends User {
 
     public List<Enquiry> getEnquiries() {
         return enquiries;
+    }
+
+    public void addEnquiry(Enquiry enquiry) {
+        enquiries.add(enquiry);
+    }
+
+    public void removeEnquiry(Enquiry enquiry) {
+        enquiries.remove(enquiry);
+    }
+
+    public void updateEnquiry(Enquiry enquiry, String newMessage) {
+        enquiry.setEnquiryMessage(newMessage);
     }
 }

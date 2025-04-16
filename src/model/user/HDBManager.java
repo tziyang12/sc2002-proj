@@ -3,7 +3,6 @@ package model.user;
 import model.user.enums.MaritalStatus;
 import model.project.Project;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +30,17 @@ public class HDBManager extends User {
 
     @Override
     public String toString() {
-        return super.toString() + "\nRole: HDB Manager";
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("[HDB Officer] NRIC: %s | Age: %d | Marital Status: %s | Managed Projects: ",
+                getNric(), getAge(), getMaritalStatus()));
+        if (managedProjects.isEmpty()) {
+            sb.append("None");
+        } else {
+            for (Project p : managedProjects) {
+                sb.append(p.getProjectName()).append(", ");
+            }
+            sb.setLength(sb.length() - 2); // remove trailing comma
+        }
+        return sb.toString();
     }
 }

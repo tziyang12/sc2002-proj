@@ -8,8 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 import model.transaction.Enquiry;
+import model.transaction.Application;
 import model.user.Applicant;
 import model.user.HDBOfficer;
+import model.user.HDBManager;
 
 public class Project {
 
@@ -17,75 +19,99 @@ public class Project {
     private String projectName;
     private String neighbourhood;
     private Map<FlatType, Integer> flatUnits;  // Track number of units directly
+    private Map<FlatType, Double> flatPrices; // Track prices of units
     private LocalDate applicationStartDate;
     private LocalDate applicationEndDate;
-    private String managerUserID;
     private boolean visibility;
     private int maxOfficerSlots;
     
     // List to track applicants
-    private List<Applicant> applicants;
+    private List<Application> applications;
     private List<HDBOfficer> officers;
     private List<Enquiry> enquiries;
+    private HDBManager manager;
 
-    // Constructor that accepts LocalDate for application start and end dates
-    public Project(String projectName, String neighbourhood, LocalDate applicationStartDate, LocalDate applicationEndDate, String managerUserID, int maxOfficerSlots) {
+    // Constructor
+    public Project(String projectName, String neighbourhood, LocalDate applicationStartDate, LocalDate applicationEndDate, int maxOfficerSlots) {
         this.projectName = projectName;
         this.neighbourhood = neighbourhood;
         this.applicationStartDate = applicationStartDate;
         this.applicationEndDate = applicationEndDate;
-        this.managerUserID = managerUserID;
         this.maxOfficerSlots = maxOfficerSlots;
         this.visibility = true;
         this.flatUnits = new HashMap<>();
-        this.applicants = new ArrayList<>();
+        this.flatPrices = new HashMap<>();
+        this.applications = new ArrayList<>();
         this.officers = new ArrayList<>();
         this.enquiries = new ArrayList<>();
     }
 
-    // Method to add flat units (number of units for each flat type)
+    // Adders
     public void addFlatUnit(FlatType type, int units) {
         flatUnits.put(type, units);
     }
 
-    // Add an officer to the project
+    public void addFlatPrice(FlatType type, double price) {
+        flatPrices.put(type, price);
+    }
+
     public void addOfficer(HDBOfficer officer) {
         officers.add(officer);
     }
 
-    // Add an applicant to the project
-    public void addApplicant(Applicant applicant) {
-        applicants.add(applicant);
+    public void addApplication(Application application) {
+        applications.add(application);
     }
 
-    // Check if an officer has already applied for the project
-    public boolean hasApplicant(HDBOfficer officer) {
-        return applicants.contains(officer);
+    public void addEnquiry(Enquiry enquiry) {
+        enquiries.add(enquiry);
     }
 
-    // Getter methods
-    public int getProjectID() {
-        return projectID;
+    // Setters
+    public void setProjectID(int projectID) {
+        this.projectID = projectID;
     }
 
     public void setProjectName(String projectName) {
         this.projectName = projectName;
     }
 
-    public String getProjectName() {
-        return projectName;
-    }
-
     public void setNeighbourhood(String neighbourhood) {
         this.neighbourhood = neighbourhood;
     }
 
-    public String getNeighbourhood() {
-        return neighbourhood;
-    }
-
     public void setNumUnits(FlatType type, int units) {
         flatUnits.put(type, units);
+    }
+
+    public void setApplicationPeriod(LocalDate startDate, LocalDate endDate) {
+        this.applicationStartDate = startDate;
+        this.applicationEndDate = endDate;
+    }
+
+    public void setVisible(boolean visibility) {
+        this.visibility = visibility;
+    }
+
+    public void setManager(HDBManager manager) {
+        this.manager = manager;
+    }
+
+    public void setMaxOfficerSlots(int maxOfficerSlots) {
+        this.maxOfficerSlots = maxOfficerSlots;
+    }
+
+    // Getters
+    public int getProjectID() {
+        return projectID;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public String getNeighbourhood() {
+        return neighbourhood;
     }
 
     public int getNumUnits(FlatType type) {
@@ -96,9 +122,8 @@ public class Project {
         return flatUnits;
     }
 
-    public void setApplicationPeriod(LocalDate startDate, LocalDate endDate) {
-        this.applicationStartDate = startDate;
-        this.applicationEndDate = endDate;
+    public double getFlatPrice(FlatType type) {
+        return flatPrices.getOrDefault(type, 0.0);
     }
 
     public LocalDate getApplicationStartDate() {
@@ -109,24 +134,12 @@ public class Project {
         return applicationEndDate;
     }
 
-    public void setVisible(boolean visibility) {
-        this.visibility = visibility;
-    }
-
     public boolean isVisible() {
         return visibility;
     }
 
-    public void setManagerUserID(String managerUserID) {
-        this.managerUserID = managerUserID;
-    }
-
-    public String getManagerUserID() {
-        return managerUserID;
-    }
-
-    public void setMaxOfficerSlots(int maxOfficerSlots) {
-        this.maxOfficerSlots = maxOfficerSlots;
+    public HDBManager getManager() {
+        return manager;
     }
 
     public int getMaxOfficerSlots() {
@@ -137,62 +150,36 @@ public class Project {
         return maxOfficerSlots - officers.size();
     }
 
-    public boolean isApplicationPeriodOver() {
-        LocalDate today = LocalDate.now();
-        return today.isAfter(applicationEndDate);
-    }
-
-    // Set the projectID
-    public void setProjectID(int projectID) {
-        this.projectID = projectID;
-    }
-
-    @Override
-    public String toString() {
-        return "Project ID: " + projectID +
-                "\nProject Name: " + projectName +
-                "\nNeighbourhood: " + neighbourhood +
-                "\n2-Room Units: " + getNumUnits(FlatType.TWO_ROOM) +
-                "\n3-Room Units: " + getNumUnits(FlatType.THREE_ROOM) +
-                "\nApplication Period: " + applicationStartDate + " to " + applicationEndDate +
-                "\nVisible: " + (visibility ? "Yes" : "No") +
-                "\nHDB Manager: " + managerUserID +
-                "\nAvailable Officer Slots: " + maxOfficerSlots;
-    }
-
-    // Utility method to parse date strings into LocalDate
-    public static LocalDate parseDate(String dateStr) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        return LocalDate.parse(dateStr, formatter);
-    }
-
-    // Getters for applicants and officers
-    public List<Applicant> getApplicants() {
-        return applicants;
+    public List<Application> getApplications() {
+        return applications;
     }
 
     public List<HDBOfficer> getOfficers() {
         return officers;
     }
 
-    // Method to get all enquiries for the project
     public List<Enquiry> getEnquiries() {
         return enquiries;
     }
 
-    // Method to add an enquiry to the project
-    public void addEnquiry(Enquiry enquiry) {
-        enquiries.add(enquiry);
-    }
-
-    // Method to get an enquiry by its ID
     public Enquiry getEnquiryById(int enquiryId) {
         for (Enquiry enquiry : enquiries) {
             if (enquiry.getEnquiryId() == enquiryId) {
                 return enquiry;
             }
         }
-        return null;  // Return null if not found
+        return null;
+    }
+
+    // Utility / Checkers
+    public boolean hasApplicant(Applicant applicant) {
+        return applications.stream()
+            .anyMatch(app -> app.getApplicant().equals(applicant));
+    }
+
+    public boolean isApplicationPeriodOver() {
+        LocalDate today = LocalDate.now();
+        return today.isAfter(applicationEndDate);
     }
 
     public void decreaseRemainingFlats(FlatType flatType) {
@@ -203,5 +190,24 @@ public class Project {
         } else {
             System.out.println("No flats available for type " + flatType + " in this project.");
         }
+    }
+
+    public static LocalDate parseDate(String dateStr) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        return LocalDate.parse(dateStr, formatter);
+    }
+
+    // toString override
+    @Override
+    public String toString() {
+        return "Project ID: " + projectID +
+                "\nProject Name: " + projectName +
+                "\nNeighbourhood: " + neighbourhood +
+                "\n2-Room Units: " + getNumUnits(FlatType.TWO_ROOM) +
+                "\n3-Room Units: " + getNumUnits(FlatType.THREE_ROOM) +
+                "\nApplication Period: " + applicationStartDate + " to " + applicationEndDate +
+                "\nVisible: " + (visibility ? "Yes" : "No") +
+                "\nHDB Manager: " + manager.getName() +
+                "\nAvailable Officer Slots: " + maxOfficerSlots;
     }
 }

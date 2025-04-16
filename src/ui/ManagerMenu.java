@@ -39,8 +39,9 @@ public class ManagerMenu {
             System.out.println("6. Toggle Project Visibility");
             System.out.println("7. View and Manage Officer Registrations");
             System.out.println("8. View and Manage Applicant Applications");
-            System.out.println("9. View Enquiries");
-            System.out.println("10. Generate Report");
+            System.out.println("9. View All Enquiries");
+            System.out.println("10. View Managed Project Enquiries");
+            System.out.println("11. Generate Report");
             System.out.println("0. Exit");
 
             System.out.print("Enter your choice: ");
@@ -56,8 +57,9 @@ public class ManagerMenu {
                 case 6 -> toggleProjectVisibilityMenu(scanner);
                 case 7 -> manageOfficerRegistrationsMenu(scanner);
                 case 8 -> manageApplicantApplicationsMenu(scanner);
-                case 9 -> viewEnquiries();
-                case 10 -> generateReportMenu(scanner);
+                case 9 -> viewAllEnquiries();
+                case 10 -> viewManagedEnquiries();
+                case 11 -> generateReportMenu(scanner);
                 case 0 -> {
                     exit = true;
                     System.out.println("Exiting...");
@@ -90,10 +92,11 @@ public class ManagerMenu {
         int maxOfficerSlots = scanner.nextInt();
         scanner.nextLine();  // Consume the newline
 
-        Project newProject = new Project(name, neighborhood, openDate, closeDate, manager.getNric(), maxOfficerSlots);
+        Project newProject = new Project(name, neighborhood, openDate, closeDate, maxOfficerSlots);
         newProject.addFlatUnit(FlatType.TWO_ROOM, num2Room);
         newProject.addFlatUnit(FlatType.THREE_ROOM, num3Room);
         newProject.setVisible(true);  // Set project to visible by default
+        newProject.setManager(manager);  // Set the manager for the project
 
         if (managerController.canCreateNewProject(manager, newProject)) {
             managerController.createProject(manager, newProject);
@@ -104,19 +107,22 @@ public class ManagerMenu {
     }
 
     private void viewAllProjects() {
-        System.out.println("\n=== All Projects ===");
+        printProjectTableHeader();
         for (Project project : allProjects) {
-            System.out.println(project);
+            printProjectRow(project);
         }
+        printProjectTableFooter();
     }
-
+    
     private void viewMyProjects() {
-        // List<Project> myProjects = managerController.viewMyProjects(manager.getManagedProjects());
-        // System.out.println("\n=== My Projects ===");
-        // for (Project project : myProjects) {
-        //     System.out.println(project);
-        // }
+        List<Project> myProjects = managerController.getManagedProjects(manager);
+        printProjectTableHeader();
+        for (Project project : myProjects) {
+            printProjectRow(project);
+        }
+        printProjectTableFooter();
     }
+    
 
     private void editProjectMenu(Scanner scanner) {
         System.out.print("Enter Project ID to Edit: ");
@@ -268,13 +274,20 @@ public class ManagerMenu {
         }
     }
     
+    private void viewAllEnquiries() {
+        List<Enquiry> enquiries = managerController.getAllEnquiries(allProjects);
+        System.out.println("\n=== All Enquiries ===");
+        for (Enquiry enquiry : enquiries) {
+            System.out.println(enquiry);
+        }
+    }
 
-    private void viewEnquiries() {
-        // List<Enquiry> enquiries = managerController.getAllEnquiries(manager.getManagedProjects());
-        // System.out.println("\n=== All Enquiries ===");
-        // for (Enquiry enquiry : enquiries) {
-        //     System.out.println(enquiry);
-        // }
+    private void viewManagedEnquiries() {
+        List<Enquiry> enquiries = managerController.getAllEnquiries(manager.getManagedProjects());
+        System.out.println("\n=== Managed Project Enquiries ===");
+        for (Enquiry enquiry : enquiries) {
+            System.out.println(enquiry);
+        }
     }
 
     private void generateReportMenu(Scanner scanner) {
@@ -299,10 +312,64 @@ public class ManagerMenu {
 
     private Project findProjectById(int projectId) {
         for (Project project : manager.getManagedProjects()) {
+            System.out.println("Project ID: " + project.getProjectID());
             if (project.getProjectID() == projectId) {
                 return project;
             }
         }
         return null;
     }
+
+    private void printProjectTableHeader() {
+        System.out.println("\n=== Project List ===");
+    
+        System.out.format("+-----+----------------------+-----------------+---------+---------+--------------+--------------+----------+------------+--------------------+------------+--------------+--------------+%n");
+        System.out.format("| ID  | Project Name         | Neighbourhood   | 2-Room  | 3-Room  | Start Date   | End Date     | Visible  | Manager    | Officers           | OfficerMax | #Enquiries   | #Applicants  |%n");
+        System.out.format("+-----+----------------------+-----------------+---------+---------+--------------+--------------+----------+------------+--------------------+------------+--------------+--------------+%n");
+    }
+    
+    private void printProjectRow(Project project) {
+        String leftAlignFormat = "| %-3s | %-20s | %-15s | %-7s | %-7s | %-12s | %-12s | %-8s | %-10s | %-18s | %-10s | %-12s | %-12s |%n";
+    
+        int twoRoomUnits = project.getNumUnits(FlatType.TWO_ROOM);
+        int threeRoomUnits = project.getNumUnits(FlatType.THREE_ROOM);
+        String startDate = project.getApplicationStartDate().toString();
+        String endDate = project.getApplicationEndDate().toString();
+        String visible = project.isVisible() ? "Yes" : "No";
+        String managerName = project.getManager() != null ? project.getManager().getName() : "-";
+        int officerMax = project.getMaxOfficerSlots();
+    
+        // Format officer names
+        String officerNames = project.getOfficers().stream()
+                .map(HDBOfficer::getName)
+                .reduce((a, b) -> a + ", " + b)
+                .orElse("-");
+        if (officerNames.length() > 20) {
+            officerNames = officerNames.substring(0, 17) + "...";
+        }
+    
+        int enquiryCount = project.getEnquiries().size();
+        int applicantCount = project.getApplications().size();
+    
+        System.out.format(leftAlignFormat,
+                project.getProjectID(),
+                project.getProjectName(),
+                project.getNeighbourhood(),
+                twoRoomUnits,
+                threeRoomUnits,
+                startDate,
+                endDate,
+                visible,
+                managerName,
+                officerNames,
+                officerMax,
+                enquiryCount,
+                applicantCount
+        );
+    }
+    
+    private void printProjectTableFooter() {
+        System.out.format("+-----+----------------------+-----------------+---------+---------+--------------+--------------+----------+------------+--------------------+------------+--------------+--------------+%n");
+    }
+    
 }

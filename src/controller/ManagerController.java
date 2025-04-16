@@ -5,7 +5,6 @@ import model.project.FlatType;
 import model.transaction.Enquiry;
 import model.user.HDBManager;
 import model.user.HDBOfficer;
-import service.RegistrationService;
 import model.transaction.Application;
 import model.transaction.ApplicationStatus;
 
@@ -25,6 +24,10 @@ public class ManagerController {
             if (!latestStart.isAfter(earliestEnd)) return false;
         }
         return true;
+    }
+
+    public List<Project> getManagedProjects(HDBManager manager) {
+        return manager.getManagedProjects();
     }
 
     public void createProject(HDBManager manager, Project project) {
@@ -61,14 +64,11 @@ public class ManagerController {
 
     public List<Application> getApplicationsForManagedProjects(HDBManager manager) {
         List<Application> result = new ArrayList<>();
-        List<Project> managedProjects = manager.getManagedProjects();
-
-        for (Application app : RegistrationService.getAllApplication()) {
-            if (managedProjects.contains(app.getProject())) {
-                result.add(app);
-            }
+    
+        for (Project project : manager.getManagedProjects()) {
+            result.addAll(project.getApplications());
         }
-
+    
         return result;
     }
 
@@ -98,7 +98,12 @@ public class ManagerController {
         app.cancelWithdrawalRequest();
     }
 
-    public List<Enquiry> getAllEnquiries(List<Enquiry> all) {
-        return all;
+    public List<Enquiry> getAllEnquiries(List<Project> projects) {
+        List<Enquiry> allEnquiries = new ArrayList<>();
+        for (Project project : projects) {
+            allEnquiries.addAll(project.getEnquiries());
+        }
+        return allEnquiries;
     }
+    
 }

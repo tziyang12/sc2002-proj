@@ -48,7 +48,7 @@ public class ProjectController {
 
         Application app = new Application(applicant, project, flatType);
         applicant.setApplication(app);
-        project.addApplicant(applicant);
+        project.addApplication(app);
 
         System.out.println("Application submitted for " + project.getProjectName()
                 + " (" + flatType + ") has been submitted successfully!");

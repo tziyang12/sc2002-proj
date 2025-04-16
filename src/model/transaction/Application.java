@@ -63,6 +63,10 @@ public class Application {
         return withdrawalRequested;
     }
 
+    public void requestWithdrawal() {
+        this.withdrawalRequested = true;
+    }
+
     public LocalDate getApplicationDate() {
         return applicationDate;
     }

@@ -94,6 +94,7 @@ public class OfficerController {
 
     public void viewEnquiries(HDBOfficer officer) {
         List<Project> assignedProjects = officer.getAssignedProjects();
+        System.out.println("======= Enquiries =======");
 
         if (assignedProjects == null || assignedProjects.isEmpty()) {
             System.out.println("Officer is not handling any projects.");
@@ -102,7 +103,7 @@ public class OfficerController {
 
         for (Project project : assignedProjects) {
             List<Enquiry> enquiries = project.getEnquiries();
-            System.out.println("\nEnquiries for project: " + project.getProjectName());
+            System.out.println("\n=======" + project.getProjectName() + "=======");
 
             if (enquiries.isEmpty()) {
                 System.out.println("No enquiries.");
