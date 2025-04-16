@@ -1,7 +1,7 @@
 package model.user;
 
 import model.project.Project;
-import model.transaction.ApplicationStatus;
+import model.transaction.Application;
 import model.transaction.Enquiry;
 import model.project.FlatType;
 import model.user.enums.MaritalStatus;
@@ -14,9 +14,7 @@ import java.util.List;
  * Handles state regarding application and enquiry history.
  */
 public class Applicant extends User {
-    private Project appliedProject = null;
-    private FlatType appliedFlatType = null;
-    private ApplicationStatus applicationStatus = ApplicationStatus.NONE;
+    private Application application = null;
     private List<Enquiry> enquiries;
 
     public Applicant(String name, String nric, String password, int age, MaritalStatus maritalStatus) {
@@ -24,16 +22,15 @@ public class Applicant extends User {
         this.enquiries = new ArrayList<>();
     }
 
-    // Role info for role-based access
     @Override
     public String getRole() {
         return "Applicant";
     }
 
-    // === Application Info ===
+    // === Application Logic ===
 
     public boolean hasApplied() {
-        return appliedProject != null;
+        return application != null;
     }
 
     public boolean isEligible(Project project, FlatType type) {
@@ -51,33 +48,21 @@ public class Applicant extends User {
                 return false;
         }
     }
-    
-    public void setAppliedProject(Project project) {
-        this.appliedProject = project;
-    }
-    
-    public void setAppliedFlatType(FlatType type) {
-        this.appliedFlatType = type;
-    }
-    
-    public ApplicationStatus getApplicationStatus() {
-        return applicationStatus;
-    }
-    
-    public void setApplicationStatus(ApplicationStatus status) {
-        this.applicationStatus = status;
+
+    public void setApplication(Application application) {
+        this.application = application;
     }
 
-    public Project getAppliedProject() {
-        return appliedProject;
+    public Application getApplication() {
+        return application;
     }
 
-    public FlatType getAppliedFlatType() {
-        return appliedFlatType;
+    public void clearApplication() {
+        this.application = null;
     }
 
     // === Enquiry Management ===
-    
+
     public List<Enquiry> getEnquiries() {
         return enquiries;
     }

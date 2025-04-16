@@ -1,6 +1,7 @@
 package ui;
 
 import java.util.Scanner;
+import model.project.Project;
 
 public class CLIView {
     private static final Scanner scanner = new Scanner(System.in);
@@ -43,4 +44,10 @@ public class CLIView {
     public static void printMessage(String message) {
         System.out.println(message);
     }
+
+    public static void printProject(Project project){
+        System.out.println("• " + project.getProjectName() + " in " + project.getNeighbourhood() +
+        " (Opening: " + project.getApplicationStartDate() + ", Closing: " + project.getApplicationEndDate() + ")");
+    }
+    
 }

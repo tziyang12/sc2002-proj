@@ -9,7 +9,7 @@ import model.user.enums.MaritalStatus;
 
 public class HDBOfficer extends Applicant {
     private List<Project> assignedProjects = new ArrayList<>(); 
-    private List<Project> appliedProjects = new ArrayList<>(); // projects they applied to, pending approval
+    private List<Project> registeredProjects = new ArrayList<>(); // projects they applied to, pending approval
     private OfficerRegistrationStatus registrationStatus;
 
     public HDBOfficer(String name, String nric, String password, int age, MaritalStatus maritalStatus) {
@@ -17,18 +17,19 @@ public class HDBOfficer extends Applicant {
         this.registrationStatus = OfficerRegistrationStatus.NONE;
     }
 
-    public List<Project> getAppliedProjects() {
-        return appliedProjects;
-    }
-    // Add projects to appliedProjects list (input is a single project)
-    public void applyProject(Project project) {
-        if (!appliedProjects.contains(project)) {
-            appliedProjects.add(project);
-        }
+    public List<Project> getRegisteredProjects() {
+        return registeredProjects;
     }
 
     public List<Project> getAssignedProjects() {
         return assignedProjects;
+    }
+
+    // Add projects to appliedProjects list (input is a single project)
+    public void applyProject(Project project) {
+        if (!registeredProjects.contains(project)) {
+            registeredProjects.add(project);
+        }
     }
 
     public void assignProject(Project project) {
@@ -37,8 +38,8 @@ public class HDBOfficer extends Applicant {
         }
     }
 
-    public void removeAppliedProject(Project project) {
-        appliedProjects.remove(project);
+    public void removeRegisteredProject(Project project) {
+        registeredProjects.remove(project);
     }
 
     public boolean isHandlingProject(Project project) {

@@ -5,7 +5,7 @@ import java.util.Map;
 
 import model.project.FlatType;
 import model.project.Project;
-import model.transaction.ApplicationStatus;
+import model.transaction.Application;
 import model.user.Applicant;
 
 public class ProjectController {
@@ -29,8 +29,9 @@ public class ProjectController {
         }
 
         if (applicant.hasApplied()) {
-            System.out.println("\nYou have applied for: " + applicant.getAppliedProject().getProjectName()
-                    + " (" + applicant.getAppliedFlatType() + ") [Status: " + applicant.getApplicationStatus() + "]");
+            Application app = applicant.getApplication();
+            System.out.println("\nYou have applied for: " + app.getProject().getProjectName()
+                    + " (" + app.getFlatType() + ") [Status: " + app.getStatus() + "]");
         }
     }
 
@@ -46,9 +47,8 @@ public class ProjectController {
             return;
         }
 
-        applicant.setAppliedProject(project);
-        applicant.setAppliedFlatType(flatType);
-        applicant.setApplicationStatus(ApplicationStatus.PENDING);
+        Application app = new Application(applicant, project, flatType);
+        applicant.setApplication(app);
         project.addApplicant(applicant);
 
         System.out.println("Application submitted for " + project.getProjectName()
@@ -59,12 +59,12 @@ public class ProjectController {
         if (!applicant.hasApplied()) {
             System.out.println("No application to withdraw.");
         } else {
-            System.out.println("Application for " + applicant.getAppliedProject().getProjectName()
-                    + " (" + applicant.getAppliedFlatType() + ") has been withdrawn.");
+            Application app = applicant.getApplication();
 
-            applicant.setAppliedProject(null);
-            applicant.setAppliedFlatType(null);
-            applicant.setApplicationStatus(ApplicationStatus.NONE);
+            System.out.println("Application for " + app.getProject().getProjectName()
+                    + " (" + app.getFlatType() + ") has been withdrawn.");
+
+            applicant.setApplication(null);
         }
     }
 
@@ -72,8 +72,9 @@ public class ProjectController {
         if (!applicant.hasApplied()) {
             System.out.println("No application found.");
         } else {
-            System.out.println("Application Status for " + applicant.getAppliedProject().getProjectName()
-                    + " (" + applicant.getAppliedFlatType() + "): " + applicant.getApplicationStatus());
+            Application app = applicant.getApplication();
+            System.out.println("Application Status for " + app.getProject().getProjectName()
+                    + " (" + app.getFlatType() + "): " + app.getStatus());
         }
     }
 }

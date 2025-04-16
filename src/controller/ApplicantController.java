@@ -2,6 +2,7 @@ package controller;
 
 import model.project.FlatType;
 import model.project.Project;
+import model.transaction.Application;
 import model.user.Applicant;
 
 import java.util.List;
@@ -28,16 +29,22 @@ public class ApplicantController {
         if (!applicant.hasApplied()) {
             System.out.println("No application found.");
         } else {
+            Application app = applicant.getApplication();
             System.out.println("Application Status for " +
-                    applicant.getAppliedProject().getProjectName() + " (" +
-                    applicant.getAppliedFlatType() + "): " +
-                    applicant.getApplicationStatus());
+                    app.getProject().getProjectName() + " (" +
+                    app.getFlatType() + "): " +
+                    app.getStatus());
         }
     }
 
     public void submitEnquiry(Applicant applicant, String enquiry) {
-        enquiryController.submitEnquiry(applicant, enquiry, applicant.getAppliedProject());
+        if (!applicant.hasApplied()) {
+            System.out.println("You need to apply for a project before submitting an enquiry.");
+            return;
+        }
+        enquiryController.submitEnquiry(applicant, enquiry, applicant.getApplication().getProject());
     }
+
 
     public void editEnquiry(Applicant applicant, int index, String updated) {
         enquiryController.editEnquiry(applicant, index, updated);

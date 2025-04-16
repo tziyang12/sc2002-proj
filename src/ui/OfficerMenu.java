@@ -97,8 +97,8 @@ public class OfficerMenu {
             if (alreadyAssigned) continue;
 
             // Skip if officer has already applied for the project as an applicant
-            if (currentOfficer.getAppliedProject() != null &&
-                currentOfficer.getAppliedProject().getProjectID() == project.getProjectID()) {
+            if (currentOfficer.getApplication() != null &&
+                currentOfficer.getApplication().getProject() == project) {
                 continue;
             }
 
@@ -107,8 +107,7 @@ public class OfficerMenu {
 
             // If passed both conditions, show project
             found = true;
-            System.out.println("- " + project.getProjectName() + " in " + project.getNeighbourhood() +
-                    " (Opening: " + project.getApplicationStartDate() + ", Closing: " + project.getApplicationEndDate() + ")");
+            CLIView.printProject(project);
         }
 
         if (!found) {
@@ -134,13 +133,11 @@ public class OfficerMenu {
 
     private void viewAssignedProject() {
         System.out.println("\n--- Your Assigned Project(s) ---");
-        List<Project> assignedProjects = officerController.getAssignedProjects(currentOfficer, projectList);
+        List<Project> assignedProjects = currentOfficer.getAssignedProjects();
         
         if (!assignedProjects.isEmpty()) {
             for (Project project : assignedProjects) {
-                System.out.println("• " + project.getProjectName() + " in " + project.getNeighbourhood());
-                System.out.println("  Application Period: " + project.getApplicationStartDate() + " to " + project.getApplicationEndDate());
-                System.out.println();
+                CLIView.printProject(project);
             }
         } else {
             System.out.println("You are not currently registered to any project.");
