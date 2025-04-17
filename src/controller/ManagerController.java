@@ -136,5 +136,31 @@ public class ManagerController {
         }
         return allEnquiries;
     }
+
+    public void generateApplicantReport(HDBManager manager, String filterCategory, String filterType) {
+        // This method would generate a report based on the filter category and type after selecting which project
+        // to filter on. The report could be a simple console output or a more complex file generation.
+        System.out.println("Generating report for " + manager.getName() + "...");
+        List<Application> applications = getApplicationsForManagedProjects(manager);
+        if (applications.isEmpty()) {
+            System.out.println("No applications found.");
+            return;
+        }
+        System.out.println("Applications for " + manager.getName() + ":");
+
+        // Filter applications based on the filterCategory and filterType
+        // Help me craft the filter logic
+        // For example, if filterCategory is "status" and filterType is "PENDING", filter the applications accordingly
+
+
+
+        for (Application app : applications) {
+            System.out.println("Applicant: " + app.getApplicant().getName() +
+                               " | Project: " + app.getProject().getProjectName() +
+                               " | Flat Type: " + app.getFlatType() +
+                               " | Status: " + app.getStatus());
+        }
+        System.out.println("Report generated successfully.");
+    }
     
 }

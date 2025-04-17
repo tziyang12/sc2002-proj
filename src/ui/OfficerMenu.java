@@ -74,7 +74,6 @@ public class OfficerMenu {
             CLIView.printHeader("HDB Officer Menu");
             CLIView.printMenu(menuOptions);
             int choice = CLIView.promptInt("");
-            scanner.nextLine(); // Consume newline
     
             switch (choice) {
                 case 1 -> viewProjectsAvailableForOfficer();

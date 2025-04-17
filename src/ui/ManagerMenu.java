@@ -417,23 +417,22 @@ public class ManagerMenu {
     
 
     private void generateReportMenu(Scanner scanner) {
-        // System.out.println("Generate report based on:");
-        // System.out.println("1. Marital Status");
-        // System.out.println("2. Flat Type");
-        // System.out.print("Enter your choice: ");
-        // int choice = scanner.nextInt();
+        System.out.println("Generate report based on:");
+        System.out.println("1. Marital Status");
+        System.out.println("2. Flat Type");
+        System.out.print("Enter your choice: ");
+        int choice = scanner.nextInt();
 
-        // if (choice == 1) {
-        //     System.out.print("Enter Marital Status: ");
-        //     String maritalStatus = scanner.next();
-        //     List<String> report = managerController.generateApplicantReport("maritalStatus", maritalStatus);
-        //     System.out.println(report);
-        // } else if (choice == 2) {
-        //     System.out.print("Enter Flat Type: ");
-        //     String flatType = scanner.next();
-        //     List<String> report = managerController.generateApplicantReport("flatType", flatType);
-        //     System.out.println(report);
-        // }
+        if (choice == 1) {
+            System.out.print("Enter Marital Status: ");
+            String maritalStatus = scanner.next();
+            managerController.generateApplicantReport(manager, "maritalStatus", maritalStatus);
+
+        } else if (choice == 2) {
+            System.out.print("Enter Flat Type: ");
+            String flatType = scanner.next();
+            managerController.generateApplicantReport(manager, "flatType", flatType);
+        }
     }
 
     private Project findProjectById(int projectId) {
