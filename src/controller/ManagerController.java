@@ -9,6 +9,7 @@ import model.user.HDBManager;
 import model.user.HDBOfficer;
 import model.transaction.Application;
 import model.transaction.ApplicationStatus;
+import service.ProjectService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -17,6 +18,14 @@ import java.util.List;
 public class ManagerController {
 
     public boolean canCreateNewProject(HDBManager manager, Project newProject) {
+        // Check if project name exists in ProjectRepository
+        for (Project existing : ProjectService.getAllProjects()) {
+            if (existing.getProjectName().equals(newProject.getProjectName())) {
+                return false;
+            }
+        }
+
+        // Check if the new project overlaps with any existing projects managed by the manager
         for (Project existing : manager.getManagedProjects()) {
             LocalDate latestStart = newProject.getApplicationStartDate().isAfter(existing.getApplicationStartDate())
                     ? newProject.getApplicationStartDate() : existing.getApplicationStartDate();
@@ -34,20 +43,24 @@ public class ManagerController {
 
     public void createProject(HDBManager manager, Project project) {
         manager.addManagedProject(project);
-        // You could also call ProjectService.addProject(project) here
+        ProjectService.createProject(project);
     }
 
-    public void editProject(Project project, String newName, String newNeighbourhood, int new2Room, int new3Room, LocalDate newOpen, LocalDate newClose) {
+    public void editProject(Project project, String newName, String newNeighbourhood, int new2Room, int new3Room, double new2RoomPrice, double new3RoomPrice, LocalDate newOpen, LocalDate newClose, int newmaxOfficer, Boolean newVisible) {
         project.setProjectName(newName);
         project.setNeighbourhood(newNeighbourhood);
         project.setNumUnits(FlatType.TWO_ROOM, new2Room);
         project.setNumUnits(FlatType.THREE_ROOM, new3Room);
+        project.setFlatPrice(FlatType.TWO_ROOM, new2RoomPrice);
+        project.setFlatPrice(FlatType.THREE_ROOM, new3RoomPrice);
+        project.setMaxOfficerSlots(newmaxOfficer);
+        project.setVisible(newVisible);
         project.setApplicationPeriod(newOpen, newClose);
     }
 
-    public void deleteProject(HDBManager manager, Project project, List<Project> allProjects) {
-        allProjects.remove(project);
+    public void deleteProject(HDBManager manager, Project project) {
         manager.getManagedProjects().remove(project);
+        ProjectService.deleteProject(project);
     }
 
     public void toggleVisibility(Project project, boolean visible) {

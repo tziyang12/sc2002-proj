@@ -84,6 +84,10 @@ public class Project {
         flatUnits.put(type, units);
     }
 
+    public void setFlatPrice(FlatType type, double price) {
+        flatPrices.put(type, price);
+    }
+
     public void setApplicationPeriod(LocalDate startDate, LocalDate endDate) {
         this.applicationStartDate = startDate;
         this.applicationEndDate = endDate;
@@ -185,7 +189,7 @@ public class Project {
     public boolean isClosed() {
         return isApplicationPeriodOver();
     }
-    
+
     // Check if a project is available for registration (e.g., not yet fully assigned or restricted)
     public boolean isAvailableForRegistration() {
         // Implement your specific logic here, e.g.

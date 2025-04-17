@@ -1,13 +1,13 @@
 package ui;
 
 import controller.ManagerController;
-import controller.AuthenticationController;
 import controller.EnquiryController;
 import model.project.Project;
 import model.user.HDBManager;
 import model.user.HDBOfficer;
 import model.user.User;
 import service.UserService;
+import service.ProjectService;
 import model.transaction.Application;
 import model.transaction.Enquiry;
 import model.transaction.OfficerProjectRegistration;
@@ -80,34 +80,41 @@ public class ManagerMenu {
     }
 
     private void createProjectMenu(Scanner scanner) {
+        // Prompt for new details
         System.out.print("Enter Project Name: ");
         String name = scanner.nextLine();
-
+    
         System.out.print("Enter Neighborhood: ");
         String neighborhood = scanner.nextLine();
-
+    
         System.out.print("Enter Number of 2-Room Flats: ");
-        int num2Room = scanner.nextInt();
-
+        String newTwoRoomFlats = scanner.nextLine();
+        int num2Room = ProjectService.parseInt(newTwoRoomFlats, 0); // Default to 0 if input is blank
+    
         System.out.print("Enter Number of 3-Room Flats: ");
-        int num3Room = scanner.nextInt();
-
+        String newThreeRoomFlats = scanner.nextLine();
+        int num3Room = ProjectService.parseInt(newThreeRoomFlats, 0); // Default to 0 if input is blank
+    
         System.out.print("Enter Application Opening Date (YYYY-MM-DD): ");
-        LocalDate openDate = LocalDate.parse(scanner.next());
-
+        String newOpeningDate = scanner.nextLine();
+        LocalDate openDate = ProjectService.parseDate(newOpeningDate, LocalDate.now()); // Default to current date if blank
+    
         System.out.print("Enter Application Closing Date (YYYY-MM-DD): ");
-        LocalDate closeDate = LocalDate.parse(scanner.next());
-
+        String newClosingDate = scanner.nextLine();
+        LocalDate closeDate = ProjectService.parseDate(newClosingDate, LocalDate.now().plusMonths(1)); // Default to 1 month from now if blank
+    
         System.out.print("Enter Max Officer Slots: ");
-        int maxOfficerSlots = scanner.nextInt();
-        scanner.nextLine();  // Consume the newline
-
+        String newMaxOfficerSlots = scanner.nextLine();
+        int maxOfficerSlots = ProjectService.parseInt(newMaxOfficerSlots, 1); // Default to 1 if input is blank
+    
+        // Create the new project
         Project newProject = new Project(name, neighborhood, openDate, closeDate, maxOfficerSlots);
         newProject.addFlatUnit(FlatType.TWO_ROOM, num2Room);
         newProject.addFlatUnit(FlatType.THREE_ROOM, num3Room);
         newProject.setVisible(true);  // Set project to visible by default
         newProject.setManager(manager);  // Set the manager for the project
-
+    
+        // Check if the project can be created
         if (managerController.canCreateNewProject(manager, newProject)) {
             managerController.createProject(manager, newProject);
             System.out.println("New project created successfully!");
@@ -135,59 +142,113 @@ public class ManagerMenu {
     
 
     private void editProjectMenu(Scanner scanner) {
-        System.out.print("Enter Project ID to Edit: ");
-        int projectId = scanner.nextInt();
-        scanner.nextLine();  // Consume the newline
+        System.out.print("Enter Project Name to Edit: ");
+        String projectName = scanner.nextLine();
 
-        Project projectToEdit = findProjectById(projectId);
+        Project projectToEdit = findProjectByName(projectName);
         if (projectToEdit == null) {
             System.out.println("Project not found!");
             return;
         }
+        // Given that the project is found, we can proceed to edit it
+        // Display current project details
+        System.out.println("Current Project Details:");
+        CLIView.printProjectTableHeader();
+        CLIView.printProjectRow(projectToEdit);
+        CLIView.printProjectTableFooter();
 
-        System.out.print("Enter new Project Name: ");
-        String newName = scanner.nextLine();
+        System.out.println("Enter new details (leave blank to keep current values):");
+        // Prompt for new details
+        String newName = CLIView.prompt("Enter project name: ");
+        if (newName.isBlank()) {
+            newName = projectToEdit.getProjectName();  // Keep old value if input is blank
+        }
 
-        System.out.print("Enter new Neighborhood: ");
-        String newNeighborhood = scanner.nextLine();
+        // Enter Neighborhood (blank to keep current)
+        String newNeighborhood = CLIView.prompt("Enter neighborhood: ");
+        if (newNeighborhood.isBlank()) {
+            newNeighborhood = projectToEdit.getNeighbourhood();  // Keep old value if input is blank
+        }
 
-        System.out.print("Enter new Number of 2-Room Flats: ");
-        int new2Room = scanner.nextInt();
+        // Enter Number of 2-Room Flats (blank to keep current)
+        String newTwoRoomFlats = CLIView.prompt("Enter number of 2-room flats: ");
+        int numTwoRoomFlats = ProjectService.parseInt(newTwoRoomFlats, projectToEdit.getNumUnits(FlatType.TWO_ROOM));
 
-        System.out.print("Enter new Number of 3-Room Flats: ");
-        int new3Room = scanner.nextInt();
+        // Enter Number of 3-Room Flats (blank to keep current)
+        String newThreeRoomFlats = CLIView.prompt("Enter number of 3-room flats: ");
+        int numThreeRoomFlats = ProjectService.parseInt(newThreeRoomFlats, projectToEdit.getNumUnits(FlatType.THREE_ROOM));
 
-        System.out.print("Enter new Application Opening Date (YYYY-MM-DD): ");
-        LocalDate newOpenDate = LocalDate.parse(scanner.next());
+        // Enter 2-Room Flat Price (blank to keep current)
+        String newTwoRoomPrice = CLIView.prompt("Enter 2-room flat price: ");
+        double twoRoomPrice = ProjectService.parseDouble(newTwoRoomPrice, projectToEdit.getFlatPrice(FlatType.TWO_ROOM));
 
-        System.out.print("Enter new Application Closing Date (YYYY-MM-DD): ");
-        LocalDate newCloseDate = LocalDate.parse(scanner.next());
+        // Enter 3-Room Flat Price (blank to keep current)
+        String newThreeRoomPrice = CLIView.prompt("Enter 3-room flat price: ");
+        double threeRoomPrice = ProjectService.parseDouble(newThreeRoomPrice, projectToEdit.getFlatPrice(FlatType.THREE_ROOM));
 
-        managerController.editProject(projectToEdit, newName, newNeighborhood, new2Room, new3Room, newOpenDate, newCloseDate);
+        // Enter Application Opening Date (blank to keep current)
+        String newOpeningDate = CLIView.prompt("Enter application opening date (YYYY-MM-DD): ");
+        LocalDate openingDate = ProjectService.parseDate(newOpeningDate, projectToEdit.getApplicationStartDate());
+
+        // Enter Application Closing Date (blank to keep current)
+        String newClosingDate = CLIView.prompt("Enter application closing date (YYYY-MM-DD): ");
+        LocalDate closingDate = ProjectService.parseDate(newClosingDate, projectToEdit.getApplicationEndDate());
+
+        // Enter Max Officer Slots (blank to keep current)
+        String newMaxOfficerSlots = CLIView.prompt("Enter max officer slots: ");
+        int maxOfficerSlots = ProjectService.parseInt(newMaxOfficerSlots, projectToEdit.getMaxOfficerSlots());
+        if (maxOfficerSlots < 0) {
+            System.out.println("Max officer slots cannot be negative. Keeping current value.");
+            maxOfficerSlots = projectToEdit.getMaxOfficerSlots();
+        }
+        if (maxOfficerSlots < projectToEdit.getOfficers().size()) {
+            System.out.println("Max officer slots cannot be less than current assigned officers. Keeping current value.");
+            maxOfficerSlots = projectToEdit.getMaxOfficerSlots();
+        }
+        if (maxOfficerSlots > 10) {
+            System.out.println("Max officer slots cannot exceed 10. Value will be changed to 10.");
+            maxOfficerSlots = 10;
+        }
+
+        // Enter Visibility (blank to keep current)
+        String newVisibility = CLIView.prompt("Enter visibility (TRUE / FALSE): ");
+        boolean visibility = ProjectService.parseBoolean(newVisibility, projectToEdit.isVisible());
+        projectToEdit.setVisible(visibility);
+
+
+        managerController.editProject(projectToEdit, newName, newNeighborhood, numTwoRoomFlats, numThreeRoomFlats,
+                twoRoomPrice, threeRoomPrice, openingDate, closingDate, maxOfficerSlots, visibility);
         System.out.println("Project updated successfully!");
     }
 
     private void deleteProjectMenu(Scanner scanner) {
-        System.out.print("Enter Project ID to Delete: ");
-        int projectId = scanner.nextInt();
-        scanner.nextLine();  // Consume the newline
+        // Display all projects
+        viewAllProjects();
+        System.out.print("Enter Project Name to Delete: ");
+        String projectName = scanner.nextLine();
 
-        Project projectToDelete = findProjectById(projectId);
+        Project projectToDelete = findProjectByName(projectName);
         if (projectToDelete == null) {
             System.out.println("Project not found!");
             return;
         }
 
-        managerController.deleteProject(manager, projectToDelete, manager.getManagedProjects());
+        // Confirm deletion
+        String confirm = CLIView.prompt("Are you sure you want to delete this project? (Y/N): ");
+        if (!confirm.equalsIgnoreCase("Y")) {
+            System.out.println("Project deletion cancelled.");
+            return;
+        }
+        
+        managerController.deleteProject(manager, projectToDelete);
         System.out.println("Project deleted successfully!");
     }
 
     private void toggleProjectVisibilityMenu(Scanner scanner) {
-        System.out.print("Enter Project ID to Toggle Visibility: ");
-        int projectId = scanner.nextInt();
-        scanner.nextLine();  // Consume the newline
+        System.out.print("Enter Project Name to Toggle Visibility: ");
+        String projectName = scanner.nextLine();
 
-        Project projectToToggle = findProjectById(projectId);
+        Project projectToToggle = findProjectByName(projectName);
         if (projectToToggle == null) {
             System.out.println("Project not found!");
             return;
@@ -442,13 +503,13 @@ public class ManagerMenu {
         }
     }
 
-    private Project findProjectById(int projectId) {
+    private Project findProjectByName(String projectName) {
         for (Project project : manager.getManagedProjects()) {
-            System.out.println("Project ID: " + project.getProjectID());
-            if (project.getProjectID() == projectId) {
+            if (project.getProjectName().equals(projectName)) {
                 return project;
             }
         }
         return null;
     }
+
 }

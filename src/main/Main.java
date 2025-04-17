@@ -1,6 +1,7 @@
 package main;
 
 import data.DataLoader;
+import data.ProjectRepository;
 import model.project.Project;
 import model.user.Applicant;
 import model.user.HDBOfficer;
@@ -25,6 +26,7 @@ public class Main {
             officers = new DataLoader().loadOfficers("src/data/OfficerList.csv");
             managers = new DataLoader().loadHDBManagers("src/data/ManagerList.csv");
             projects = DataLoader.loadProjects("src/data/ProjectList.csv", officers, managers);
+            ProjectRepository.setAllProjects(projects);
             allUsers.addAll(applicants); 
             allUsers.addAll(officers);
             allUsers.addAll(managers);
@@ -34,6 +36,6 @@ public class Main {
             return;
         }
 
-        new MainMenu(allUsers).show(projects);
+        new MainMenu(allUsers).show();
     }
 }

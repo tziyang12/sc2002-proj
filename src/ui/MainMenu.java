@@ -1,6 +1,7 @@
 package ui;
 
 import controller.AuthenticationController;
+import data.ProjectRepository;
 import model.project.Project;
 import model.user.Applicant;
 import model.user.HDBOfficer;
@@ -20,7 +21,7 @@ public class MainMenu {
         this.authController = new AuthenticationController(userService);
     }
 
-    public void show(List<Project> projects) {
+    public void show() {
         String[] mainOptions = {"Login", "Change Password", "Exit"};
 
         while (true) {
@@ -29,7 +30,7 @@ public class MainMenu {
             String choice = CLIView.prompt("");
 
             switch (choice) {
-                case "1" -> handleLogin(projects);
+                case "1" -> handleLogin(ProjectRepository.getAllProjects());
                 case "2" -> handlePasswordChange();
                 case "3" -> {
                     CLIView.printMessage("Exiting system. Goodbye!");
