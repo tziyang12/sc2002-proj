@@ -239,7 +239,7 @@ public class ManagerMenu {
             System.out.println("Project deletion cancelled.");
             return;
         }
-        
+
         managerController.deleteProject(manager, projectToDelete);
         System.out.println("Project deleted successfully!");
     }
@@ -263,19 +263,32 @@ public class ManagerMenu {
 
     private void manageOfficerRegistrationsMenu(Scanner scanner) {
         List<Project> managerProjects = manager.getManagedProjects();
-
-        UserService userService = new UserService(allUsers);
-        List<HDBOfficer> allOfficers = userService.getOfficersForManager(manager);
-
         if (managerProjects.isEmpty()) {
             System.out.println("You are not assigned to any projects.");
             return;
         }
 
-        // Step 1: View officer registrations
+        UserService userService = new UserService(allUsers);
+        List<HDBOfficer> allOfficers = userService.getOfficersForManager(manager);
+
         managerController.viewOfficerRegistrations(managerProjects, allOfficers);
 
-        // Step 2: Choose a project
+        Project selectedProject = selectProject(scanner, managerProjects);
+        if (selectedProject == null) return;
+
+        List<HDBOfficer> pendingOfficers = getPendingOfficers(allOfficers, selectedProject);
+        if (pendingOfficers.isEmpty()) {
+            System.out.println("No pending officer registrations for this project.");
+            return;
+        }
+
+        HDBOfficer selectedOfficer = selectOfficer(scanner, pendingOfficers);
+        if (selectedOfficer == null) return;
+
+        handleOfficerDecision(scanner, selectedProject, selectedOfficer);
+    }
+
+    private Project selectProject(Scanner scanner, List<Project> managerProjects) {
         System.out.println("\nSelect a project to manage officer registrations:");
         for (int i = 0; i < managerProjects.size(); i++) {
             System.out.println((i + 1) + ". " + managerProjects.get(i).getProjectName());
@@ -285,12 +298,12 @@ public class ManagerMenu {
         scanner.nextLine(); // consume newline
 
         if (projectChoice == 0 || projectChoice < 1 || projectChoice > managerProjects.size()) {
-            return;
+            return null;
         }
+        return managerProjects.get(projectChoice - 1);
+    }
 
-        Project selectedProject = managerProjects.get(projectChoice - 1);
-
-        // Step 3: Display officers with PENDING registrations for that project
+    private List<HDBOfficer> getPendingOfficers(List<HDBOfficer> allOfficers, Project selectedProject) {
         List<HDBOfficer> pendingOfficers = new ArrayList<>();
         for (HDBOfficer officer : allOfficers) {
             for (OfficerProjectRegistration reg : officer.getRegisteredProjects()) {
@@ -300,29 +313,26 @@ public class ManagerMenu {
                 }
             }
         }
+        return pendingOfficers;
+    }
 
-        if (pendingOfficers.isEmpty()) {
-            System.out.println("No pending officer registrations for this project.");
-            return;
-        }
-
+    private HDBOfficer selectOfficer(Scanner scanner, List<HDBOfficer> pendingOfficers) {
         System.out.println("\nPending Officer Registrations:");
         for (int i = 0; i < pendingOfficers.size(); i++) {
             System.out.println((i + 1) + ". " + pendingOfficers.get(i).getName());
         }
 
-        // Step 4: Select officer to approve/reject
         System.out.print("Select an officer to approve/reject (0 to return): ");
         int officerChoice = scanner.nextInt();
         scanner.nextLine(); // consume newline
 
         if (officerChoice == 0 || officerChoice < 1 || officerChoice > pendingOfficers.size()) {
-            return;
+            return null;
         }
+        return pendingOfficers.get(officerChoice - 1);
+    }
 
-        HDBOfficer selectedOfficer = pendingOfficers.get(officerChoice - 1);
-
-        // Step 5: Approve or reject
+    private void handleOfficerDecision(Scanner scanner, Project selectedProject, HDBOfficer selectedOfficer) {
         System.out.print("Approve or Reject? (A/R): ");
         String decision = scanner.nextLine().trim().toUpperCase();
 
