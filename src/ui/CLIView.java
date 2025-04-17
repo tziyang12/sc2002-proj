@@ -8,6 +8,7 @@ import model.user.HDBOfficer;
 
 public class CLIView {
     private static final Scanner scanner = new Scanner(System.in);
+    private static final String PROJECT_TABLE_BORDER = "+-----+----------------------+-----------------+---------+---------+------------+------------+--------------+--------------+----------+------------+--------------------+------------+--------------+--------------+%n";
 
     private CLIView() {
         // Prevent instantiation
@@ -53,19 +54,21 @@ public class CLIView {
         " (Opening: " + project.getApplicationStartDate() + ", Closing: " + project.getApplicationEndDate() + ")");
     }
     
+
     public static void printProjectTableHeader() {
         System.out.println("\n=== Project List ===");
-    
-        System.out.format("+-----+----------------------+-----------------+---------+---------+--------------+--------------+----------+------------+--------------------+------------+--------------+--------------+%n");
-        System.out.format("| ID  | Project Name         | Neighbourhood   | 2-Room  | 3-Room  | Start Date   | End Date     | Visible  | Manager    | Officers           | OfficerMax | #Enquiries   | #Applicants  |%n");
-        System.out.format("+-----+----------------------+-----------------+---------+---------+--------------+--------------+----------+------------+--------------------+------------+--------------+--------------+%n");
+        System.out.format(PROJECT_TABLE_BORDER);
+        System.out.format("| ID  | Project Name         | Neighbourhood   | 2-Room  | 3-Room  | 2R Price   | 3R Price   | Start Date   | End Date     | Visible  | Manager    | Officers           | OfficerMax | #Enquiries   | #Applicants  |%n");
+        System.out.format(PROJECT_TABLE_BORDER);
     }
     
     public static void printProjectRow(Project project) {
-        String leftAlignFormat = "| %-3s | %-20s | %-15s | %-7s | %-7s | %-12s | %-12s | %-8s | %-10s | %-18s | %-10s | %-12s | %-12s |%n";
+        String leftAlignFormat = "| %-3s | %-20s | %-15s | %-7s | %-7s | %-10s | %-10s | %-12s | %-12s | %-8s | %-10s | %-18s | %-10s | %-12s | %-12s |%n";
     
         int twoRoomUnits = project.getNumUnits(FlatType.TWO_ROOM);
         int threeRoomUnits = project.getNumUnits(FlatType.THREE_ROOM);
+        double twoRoomPrice = project.getFlatPrice(FlatType.TWO_ROOM);
+        double threeRoomPrice = project.getFlatPrice(FlatType.THREE_ROOM);
         String startDate = project.getApplicationStartDate().toString();
         String endDate = project.getApplicationEndDate().toString();
         String visible = project.isVisible() ? "Yes" : "No";
@@ -90,6 +93,8 @@ public class CLIView {
                 project.getNeighbourhood(),
                 twoRoomUnits,
                 threeRoomUnits,
+                String.format("$%.2f", twoRoomPrice),
+                String.format("$%.2f", threeRoomPrice),
                 startDate,
                 endDate,
                 visible,
@@ -99,11 +104,12 @@ public class CLIView {
                 enquiryCount,
                 applicantCount
         );
+
+    }
+    public static void printProjectTableFooter() {
+        System.out.format(PROJECT_TABLE_BORDER);
     }
     
-    public static void printProjectTableFooter() {
-        System.out.format("+-----+----------------------+-----------------+---------+---------+--------------+--------------+----------+------------+--------------------+------------+--------------+--------------+%n");
-    }
 
     public static void printEnquiryTableHeader() {
         System.out.println("\n=== Enquiries ===");

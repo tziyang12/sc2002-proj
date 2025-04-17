@@ -5,8 +5,10 @@ import controller.EnquiryController;
 import model.user.HDBOfficer;
 import model.user.Applicant;
 import model.project.Project;
+import model.transaction.ApplicationStatus;
 import model.transaction.Enquiry;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -56,19 +58,22 @@ public class OfficerMenu {
     }
 
     private void showOfficerOptions(Scanner scanner) {
+        String[] menuOptions = {
+                "View projects available for officer registration",
+                "View assigned project",
+                "Register to handle a project",
+                "View project registration status",
+                "View project enquiries",
+                "Reply to an enquiry",
+                "Generate booking receipt",
+                "View and Manage Applicant Application (Booking)",
+                "Back"
+        };
+
         while (true) {
-            System.out.println("\n--- HDB Officer Options ---");
-            System.out.println("1. View projects available for officer registration");
-            System.out.println("2. View assigned project");
-            System.out.println("3. Register to handle a project");
-            System.out.println("4. View project registration status");
-            System.out.println("5. View project enquiries");
-            System.out.println("6. Reply to an enquiry");
-            System.out.println("7. Generate booking receipt");
-            System.out.println("8. Back");
-            System.out.print("Select an option: ");
-    
-            int choice = scanner.nextInt();
+            CLIView.printHeader("HDB Officer Menu");
+            CLIView.printMenu(menuOptions);
+            int choice = CLIView.promptInt("");
             scanner.nextLine(); // Consume newline
     
             switch (choice) {
@@ -79,7 +84,8 @@ public class OfficerMenu {
                 case 5 -> viewEnquiries();
                 case 6 -> replyToEnquiry(scanner);
                 case 7 -> generateBookingReceipt();
-                case 8 -> { return; } // Back to main menu
+                case 8 -> manageApplicantApplicationMenu(scanner, applicantList, currentOfficer);
+                case 9 -> { return; } // Back to main menu
                 default -> System.out.println("Invalid choice. Try again.");
             }
         }
@@ -194,6 +200,76 @@ public class OfficerMenu {
         officerController.replyToEnquiry(currentOfficer, project, enquiryId, replyMessage);
     }
 
+    private void manageApplicantApplicationMenu(Scanner scanner, List<Applicant> allApplicants, HDBOfficer officer) {
+        List<Project> assignedProjects = officer.getAssignedProjects();
+        
+        if (assignedProjects.isEmpty()) {
+            System.out.println("You are not currently assigned to any projects.");
+            return;
+        }
+        
+        // Step 1: View assigned projects
+        System.out.println("\n[Assigned Projects]");
+        for (int i = 0; i < assignedProjects.size(); i++) {
+            System.out.printf("%d. %s%n", i + 1, assignedProjects.get(i).getProjectName());
+        }
+
+        // Step 2: Choose a project
+        System.out.print("Select a project to manage applications (Enter number): ");
+        int choice = scanner.nextInt();
+        scanner.nextLine(); // consume newline
+
+        if (choice < 1 || choice > assignedProjects.size()) {
+            System.out.println("Invalid selection.");
+            return;
+        }
+
+        Project selectedProject = assignedProjects.get(choice - 1);
+
+        // Step 3: Display SUCCESSFUL applications
+        List<Applicant> successfulApplicants = new ArrayList<>();
+        for (Applicant applicant : allApplicants) {
+            if (applicant.getApplication() != null && 
+                    applicant.getApplication().getProject() == selectedProject && 
+                    applicant.getApplication().getStatus() == ApplicationStatus.SUCCESSFUL) {
+                    successfulApplicants.add(applicant);
+                }
+        }
+
+        if (successfulApplicants.isEmpty()) {
+            System.out.println("No successful applicants for this project.");
+            return;
+        }
+
+        System.out.println("\n[Successful Applications]");
+        for (Applicant applicant : successfulApplicants) {
+            System.out.printf("NRIC: %s | Name: %s | Flat Type: %s%n",
+                    applicant.getNric(), applicant.getName(), applicant.getApplication().getFlatType());
+        }
+
+        // Step 4: Select NRIC to change to BOOKED
+        System.out.print("Enter NRIC of applicant to mark as BOOKED: ");
+        String nric = scanner.nextLine();
+
+        Applicant selectedApplicant = null;
+        for (Applicant a : successfulApplicants) {
+            if (a.getNric().equalsIgnoreCase(nric)) {
+                selectedApplicant = a;
+                break;
+            }
+        }
+
+        if (selectedApplicant == null) {
+            System.out.println("No matching successful applicant with that NRIC.");
+            return;
+        }
+
+        // Step 5: Update status to BOOKED and decrease flat count
+        boolean booked = officerController.changeApplicationStatusToBooked(selectedApplicant);
+        if (booked) {
+            officerController.generateBookingReceipt(officer, selectedApplicant);
+        }
+    }
 
     private void generateBookingReceipt() {
         System.out.print("Enter applicant name to generate booking receipt: ");
