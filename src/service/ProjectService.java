@@ -1,6 +1,7 @@
 package service;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import model.project.Project;
 import model.user.HDBOfficer;
@@ -19,5 +20,12 @@ public class ProjectService {
             }
         }
         return false;
+    }
+
+    public static Project findByName(String name, List<Project> projects) {
+        return projects.stream()
+                .filter(p -> p.getProjectName().equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
     }
 }

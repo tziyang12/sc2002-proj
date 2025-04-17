@@ -1,6 +1,7 @@
 package model.transaction;
 
 import model.project.Project;
+import model.user.Applicant;
 
 public class Enquiry {
     private int enquiryId;
@@ -8,13 +9,15 @@ public class Enquiry {
     private String replyMessage;
     private boolean isReplied;
     private Project project;
+    private Applicant applicant;
 
     // Constructor
-    public Enquiry(int enquiryId, String enquiryMessage, Project project) {
+    public Enquiry(int enquiryId, String enquiryMessage, Project project, Applicant applicant) {
         this.enquiryId = enquiryId;
         this.enquiryMessage = enquiryMessage;
         this.isReplied = false; // Initially, no reply
         this.project = project;
+        this.applicant = applicant;
     }
 
     // Getters and Setters
@@ -33,6 +36,10 @@ public class Enquiry {
 
     public Project getProject() {
         return project;
+    }
+
+    public Applicant getApplicant() {
+        return applicant;
     }
 
     public String getReplyMessage() {

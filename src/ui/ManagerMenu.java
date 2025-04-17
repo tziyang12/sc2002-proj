@@ -422,16 +422,23 @@ public class ManagerMenu {
         System.out.println("2. Flat Type");
         System.out.print("Enter your choice: ");
         int choice = scanner.nextInt();
+        scanner.nextLine(); // Consume the newline
 
         if (choice == 1) {
-            System.out.print("Enter Marital Status: ");
-            String maritalStatus = scanner.next();
+            System.out.print("Enter Marital Status (e.g., Single, Married): ");
+            String maritalStatus = scanner.nextLine().trim();
             managerController.generateApplicantReport(manager, "maritalStatus", maritalStatus);
-
         } else if (choice == 2) {
-            System.out.print("Enter Flat Type: ");
-            String flatType = scanner.next();
-            managerController.generateApplicantReport(manager, "flatType", flatType);
+            System.out.print("Enter Flat Type (TWO_ROOM, THREE_ROOM): ");
+            String flatTypeStr = scanner.nextLine().trim().toUpperCase();
+            try {
+                FlatType flatType = FlatType.valueOf(flatTypeStr);
+                managerController.generateApplicantReport(manager, "flatType", flatType.name());
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid Flat Type entered.");
+            }
+        } else {
+            System.out.println("Invalid choice.");
         }
     }
 

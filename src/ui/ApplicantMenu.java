@@ -1,18 +1,20 @@
 package ui;
 
 import controller.ApplicantController;
-import controller.EnquiryController;
 import model.project.FlatType;
 import model.project.Project;
 import model.transaction.Enquiry;
 import model.user.Applicant;
 
+import service.ProjectService;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ApplicantMenu {
     private final ApplicantController applicantController = new ApplicantController();
-    private final EnquiryController enquiryController = new EnquiryController();
 
     public void show(Applicant applicant, List<Project> projects) {
         String[] menuOptions = {
@@ -35,11 +37,8 @@ public class ApplicantMenu {
                 case 2 -> handleApply(applicant, projects);
                 case 3 -> applicantController.withdrawApplication(applicant);
                 case 4 -> applicantController.viewApplicationStatus(applicant);
-                case 5 -> {
-                    String enquiry = CLIView.prompt("Enter your enquiry: ");
-                    applicantController.submitEnquiry(applicant, enquiry);
-                }
-                case 6 -> manageEnquiries(applicant);
+                case 5 -> createEnquiry(applicant, projects);
+                case 6 -> manageEnquiries(applicant, projects);
                 case 7 -> {
                     CLIView.printMessage("Logging out...");
                     return;
@@ -71,7 +70,22 @@ public class ApplicantMenu {
         }
     }
 
-    private void manageEnquiries(Applicant applicant) {
+    private void createEnquiry(Applicant applicant, List<Project> projects) {
+        applicantController.viewProjects(applicant, projects);
+        // Step 1: Show eligible projects
+        String selectedProjectName = CLIView.prompt("Enter the project name for your enquiry: ");
+        Project selectedProject = ProjectService.findByName(selectedProjectName, projects);
+        
+        if (selectedProject == null) {
+            CLIView.printError("Project not found.");
+            return;
+        }
+        // Step 2: Prompt enquiry message
+        String enquiry = CLIView.prompt("Enter your enquiry: ");
+        applicantController.submitEnquiry(applicant, enquiry, selectedProject);
+    }
+
+    private void manageEnquiries(Applicant applicant, List<Project> projects) {
         String[] enquiryOptions = {
                 "View Enquiries",
                 "Edit Enquiry",
@@ -87,13 +101,10 @@ public class ApplicantMenu {
             switch (choice) {
                 case 1 -> viewMyEnquiries(applicant);
                 case 2 -> {
-                    int id = CLIView.promptInt("Enter enquiry ID to edit: ");
-                    String newMsg = CLIView.prompt("Enter new enquiry message: ");
-                    applicantController.editEnquiry(applicant, id, newMsg);
+                    editEnquiry(applicant, projects);
                 }
                 case 3 -> {
-                    int id = CLIView.promptInt("Enter enquiry ID to delete: ");
-                    applicantController.deleteEnquiry(applicant, id);
+                    deleteEnquiry(applicant, projects);
                 }
                 case 4 -> {
                     return;
@@ -103,30 +114,84 @@ public class ApplicantMenu {
         }
     }
 
-        private void viewMyEnquiries(Applicant currentApplicant) {
-        List<Enquiry> enquiries = enquiryController.getEnquiriesByApplicant(currentApplicant);
 
-        if (enquiries.isEmpty()) {
-            System.out.println("No enquiries available.");
+
+    private void viewMyEnquiries(Applicant currentApplicant) {
+        // Get a list of all enquiries grouped by project
+        Map<Project, List<Enquiry>> projectEnquiriesMap = new HashMap<>();
+
+        // Populate the map with enquiries for each project
+        for (Enquiry enquiry : currentApplicant.getEnquiries()) {
+            projectEnquiriesMap
+                .computeIfAbsent(enquiry.getProject(), k -> new ArrayList<>())
+                .add(enquiry);
+        }
+
+        if (projectEnquiriesMap.isEmpty()) {
+            CLIView.printMessage("No enquiries available.");
             return;
         }
 
-        System.out.println("\n--- Your Enquiries ---");
-        CLIView.printEnquiryTableHeader();
+        // Display each project followed by the enquiries related to that project
+        for (Map.Entry<Project, List<Enquiry>> entry : projectEnquiriesMap.entrySet()) {
+            Project project = entry.getKey();
+            List<Enquiry> enquiries = entry.getValue();
 
-        for (Enquiry enquiry : enquiries) {
-            String projectName = enquiry.getProject() != null 
-                ? enquiry.getProject().getProjectName() 
-                : "N/A";
+            System.out.println("\n--- Enquiries for Project: " + project.getProjectName() + " ---");
+            CLIView.printEnquiryTableHeader();
 
-            CLIView.printEnquiryRow(
-                projectName,
-                enquiry.getEnquiryId(),
-                enquiry.getEnquiryMessage(),
-                enquiry.getReplyMessage()
-            );
+            for (Enquiry enquiry : enquiries) {
+                CLIView.printEnquiryRow(
+                    project.getProjectName(),
+                    enquiry.getEnquiryId(),
+                    enquiry.getEnquiryMessage(),
+                    enquiry.getReplyMessage()
+                );
+            }
+
+            CLIView.printEnquiryTableFooter();
         }
-
-        CLIView.printEnquiryTableFooter();
     }
+
+    private void editEnquiry(Applicant applicant, List<Project> projects) {
+        viewMyEnquiries(applicant);
+    
+        Enquiry enquiry = getApplicantEnquiryByProjectAndId(applicant, projects);
+        if (enquiry == null) return;
+    
+        String newMessage = CLIView.prompt("Enter the new enquiry message: ");
+        applicantController.editEnquiry(applicant, enquiry, newMessage);
+    }
+
+    private void deleteEnquiry(Applicant applicant, List<Project> projects) {
+        viewMyEnquiries(applicant);
+    
+        Enquiry enquiry = getApplicantEnquiryByProjectAndId(applicant, projects);
+        if (enquiry == null) return;
+    
+        applicantController.deleteEnquiry(applicant, enquiry);
+    }
+    
+    // Helper method to get the enquiry by project and ID
+    private Enquiry getApplicantEnquiryByProjectAndId(Applicant applicant, List<Project> projects) {
+        String projectName = CLIView.prompt("Enter the project name for your enquiry: ");
+        Project project = ProjectService.findByName(projectName, projects);
+        if (project == null) {
+            CLIView.printError("Project not found.");
+            return null;
+        }
+    
+        int enquiryId = CLIView.promptInt("Enter the enquiry ID: ");
+        Enquiry enquiry = applicant.getEnquiries().stream()
+                .filter(e -> e.getProject().equals(project) && e.getEnquiryId() == enquiryId)
+                .findFirst()
+                .orElse(null);
+    
+        if (enquiry == null) {
+            CLIView.printError("Enquiry not found.");
+        }
+    
+        return enquiry;
+    }
+    
 }

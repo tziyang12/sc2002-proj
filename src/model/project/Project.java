@@ -135,7 +135,7 @@ public class Project {
     }
 
     public boolean isVisible() {
-        return visibility;
+        return visibility && !isApplicationPeriodOver();
     }
 
     public HDBManager getManager() {
@@ -182,6 +182,10 @@ public class Project {
         return today.isAfter(applicationEndDate);
     }
 
+    public boolean isClosed() {
+        return isApplicationPeriodOver();
+    }
+    
     // Check if a project is available for registration (e.g., not yet fully assigned or restricted)
     public boolean isAvailableForRegistration() {
         // Implement your specific logic here, e.g.

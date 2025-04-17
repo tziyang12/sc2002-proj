@@ -3,6 +3,7 @@ package controller;
 import model.project.FlatType;
 import model.project.Project;
 import model.transaction.Application;
+import model.transaction.Enquiry;
 import model.user.Applicant;
 
 import java.util.List;
@@ -35,20 +36,26 @@ public class ApplicantController {
         }
     }
 
-    public void submitEnquiry(Applicant applicant, String enquiry) {
-        if (!applicant.hasApplied()) {
-            System.out.println("You need to apply for a project before submitting an enquiry.");
+    public void submitEnquiry(Applicant applicant, String enquiry, Project project) {
+        enquiryController.submitEnquiry(applicant, enquiry, project);
+    }
+
+
+    public void editEnquiry(Applicant applicant, Enquiry enquiry, String updated) {
+        // Check if enquiry's applicant matches the current applicant
+        if (!enquiry.getApplicant().equals(applicant)) {
+            System.out.println("You do not have permission to edit this enquiry.");
             return;
         }
-        enquiryController.submitEnquiry(applicant, enquiry, applicant.getApplication().getProject());
+        enquiryController.editEnquiry(enquiry, updated);
     }
 
-
-    public void editEnquiry(Applicant applicant, int index, String updated) {
-        enquiryController.editEnquiry(applicant, index, updated);
-    }
-
-    public void deleteEnquiry(Applicant applicant, int index) {
-        enquiryController.deleteEnquiry(applicant, index);
+    public void deleteEnquiry(Applicant applicant, Enquiry enquiry) {
+        // Check if enquiry's applicant matches the current applicant
+        if (!enquiry.getApplicant().equals(applicant)) {
+            System.out.println("You do not have permission to delete this enquiry.");
+            return;
+        }
+        enquiryController.deleteEnquiry(enquiry);
     }
 }

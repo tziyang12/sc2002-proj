@@ -52,7 +52,6 @@ public class Applicant extends User {
 
         int unitsAvailable = project.getNumUnits(type);
         if (unitsAvailable <= 0) return false;
-
         switch (getMaritalStatus()) {
             case MARRIED:
                 return getAge() >= 21;

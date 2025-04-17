@@ -25,7 +25,7 @@ public class ProjectController {
     
             String twoRoomDisplay = "NA";
             String threeRoomDisplay = "NA";
-    
+            
             // Check if applicant is eligible and if units exist
             if (project.getFlatUnits().containsKey(FlatType.TWO_ROOM)) {
                 if (applicant.isEligible(project, FlatType.TWO_ROOM)) {
