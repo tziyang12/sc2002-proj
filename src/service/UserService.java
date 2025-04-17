@@ -17,10 +17,17 @@ public class UserService {
         this.users = users;
     }
 
+    // Find a user by their NRIC
+    public Optional<User> findUserByNric(String nric) {
+        return users.stream()
+                .filter(user -> user.getNric().equalsIgnoreCase(nric))
+                .findFirst();
+    }
+
     // Find a user by their username
     public Optional<User> findUserByUsername(String username) {
         return users.stream()
-                .filter(user -> user.getName().equals(username))
+                .filter(user -> user.getName().equalsIgnoreCase(username))
                 .findFirst();
     }
 
@@ -29,23 +36,31 @@ public class UserService {
         return users.stream()
                 .filter(user -> user instanceof Applicant)
                 .map(user -> (Applicant) user)
-                .filter(applicant -> applicant.getNric().equals(nric))
+                .filter(applicant -> applicant.getNric().equalsIgnoreCase(nric))
                 .findFirst();
     }
 
     // Authenticate user login
-    public boolean authenticateUser(String username, String password) {
-        Optional<User> user = findUserByUsername(username);
-        return user.isPresent() && user.get().getPassword().equals(password);
+    public Optional<User> authenticate(String nric, String password) {
+        if (!ValidationService.isValidNric(nric)) return Optional.empty();
+    
+        return users.stream()
+                .filter(user -> user.getNric().equalsIgnoreCase(nric))
+                .filter(user -> user.getPassword().equals(password))
+                .findFirst();
     }
 
     // Update user password
-    public boolean updatePassword(User user, String newPassword) {
-        if (user != null) {
-            user.setPassword(newPassword);
-            return true;
+    public boolean updatePassword(String nric, String oldPassword, String newPassword) {
+        Optional<User> userOpt = findUserByNric(nric);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            if (user.getPassword().equals(oldPassword)) {
+                user.setPassword(newPassword);
+                return true;
+            }
         }
-        return false;
+        return false;   
     }
 
     // Get a list of all officers for a specific manager
@@ -64,5 +79,26 @@ public class UserService {
                 .filter(user -> user instanceof Applicant)
                 .map(user -> (Applicant) user)
                 .toList();
+    }
+
+    // Get all managers
+    public List<HDBManager> getAllManagers() {
+        return users.stream()
+                .filter(user -> user instanceof HDBManager)
+                .map(user -> (HDBManager) user)
+                .toList();
+    }
+
+    // Get all officers
+    public List<HDBOfficer> getAllOfficers() {
+        return users.stream()
+                .filter(user -> user instanceof HDBOfficer)
+                .map(user -> (HDBOfficer) user)
+                .toList();
+    }
+
+    //Get all users
+    public List<User> getAllUsers() {
+        return users;
     }
 }

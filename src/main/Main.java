@@ -34,6 +34,6 @@ public class Main {
             return;
         }
 
-        new MainMenu().show(allUsers, projects);
+        new MainMenu(allUsers).show(projects);
     }
 }
