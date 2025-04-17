@@ -10,27 +10,13 @@ import model.transaction.OfficerRegistrationStatus;
 import model.user.Applicant;
 import model.user.HDBOfficer;
 
-import java.time.LocalDate;
+import service.ProjectService;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class OfficerController {
-
-    // Check if officer can register for a new project, ensuring no date conflicts with already assigned projects
-    public static boolean canRegisterForProject(HDBOfficer officer, Project newProject) {
-        LocalDate newStart = newProject.getApplicationStartDate();
-        LocalDate newEnd = newProject.getApplicationEndDate();
-    
-        for (Project assignedProject : officer.getAssignedProjects()) {
-            LocalDate start = assignedProject.getApplicationStartDate();
-            LocalDate end = assignedProject.getApplicationEndDate();
-    
-            if (!(newEnd.isBefore(start) || newStart.isAfter(end))) {
-                return false;
-            }
-        }
-        return true;
-    }
+    private ProjectService projectService = new ProjectService();
 
     public List<Project> getAvailableProjects(HDBOfficer officer, List<Project> projectList) {
         List<Project> availableProjects = new ArrayList<>();
@@ -46,9 +32,38 @@ public class OfficerController {
     public List<Project> getAssignedProjects(HDBOfficer officer) {
         return officer.getAssignedProjects();
     }
+    
+    public static boolean canRegisterForProject(HDBOfficer officer, Project project) {
+        // Check if officer is already assigned to this project
+        //Make use of officer.isHandlingProject(project) method
+        if (officer.isHandlingProject(project)) {
+            System.out.println("You are already handling this project.");
+            return false;
+        }
+
+        // Check if officer has already applied for this project as an applicant
+        if (officer.getApplication() != null && officer.getApplication().getProject() == project) {
+            System.out.println("You have already applied for this project as an applicant.");
+            return false;
+        }
+
+        // Check if project has available slots for new officers
+        if (!project.isAvailableForRegistration()) {
+            System.out.println("This project does not have available officer slots.");
+            return false;
+        }
+
+        // If all checks pass
+        return true;
+    }
 
     // Register officer for a new project
     public boolean registerOfficerToProject(HDBOfficer officer, Project project) {
+        if (!project.isAvailableForRegistration()) {
+            System.out.println("The project is not available for officer registration.");
+            return false;
+        }
+
         if (officer.isHandlingProject(project)) {
             System.out.println("Officer is already registered for another project or has a pending registration.");
             return false;
@@ -59,7 +74,7 @@ public class OfficerController {
             return false;
         }
 
-        if (!canRegisterForProject(officer, project)) {
+        if (projectService.hasDateConflict(project, officer)) {
             System.out.println("Project dates overlap with an existing assigned project.");
             return false;
         }

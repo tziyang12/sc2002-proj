@@ -182,6 +182,26 @@ public class Project {
         return today.isAfter(applicationEndDate);
     }
 
+    // Check if a project is available for registration (e.g., not yet fully assigned or restricted)
+    public boolean isAvailableForRegistration() {
+        // Implement your specific logic here, e.g.
+        // - Check if the project is still accepting officer registrations
+        // - Check if the project has already reached its max number of officers
+        // - Other business rules
+        return !this.isFull() && this.hasAvailableOfficerSlots();  // Example conditions
+    }
+
+    // Additional methods for checking specific conditions
+    private boolean isFull() {
+        // Check if the project has reached its max capacity for applicants or officers
+        return this.getOfficers().size() >= this.getMaxOfficerSlots();
+    }
+
+    private boolean hasAvailableOfficerSlots() {
+        // Check if there are available officer slots left for registration
+        return this.getMaxOfficerSlots() > this.getOfficers().size();
+    }
+
     public void decreaseRemainingFlats(FlatType flatType) {
         if (flatUnits.containsKey(flatType) && flatUnits.get(flatType) > 0) {
             int remainingFlats = flatUnits.get(flatType);
