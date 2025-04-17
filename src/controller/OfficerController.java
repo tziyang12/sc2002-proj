@@ -169,7 +169,7 @@ public class OfficerController {
     }
 
     // Generate a booking receipt for a successful applicant
-    public void generateBookingReceipt(HDBOfficer officer, Applicant applicant) {
+    public void generateBookingReceipt(Applicant applicant) {
         Application app = applicant.getApplication();
 
         if (app == null || app.getStatus() != ApplicationStatus.BOOKED) {

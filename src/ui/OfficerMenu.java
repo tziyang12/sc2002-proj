@@ -54,7 +54,15 @@ public class OfficerMenu {
     }
 
     private void showApplicantMenu() {
-        new ApplicantMenu().show(currentOfficer, projectList); // HDBOfficer is an Applicant
+        // Filter out projects the officer is already assigned to
+        List<Project> filteredProjects = new ArrayList<>();
+        for (Project project : projectList) {
+            if (!currentOfficer.getAssignedProjects().contains(project)) {
+                filteredProjects.add(project);
+            }
+        }
+
+        new ApplicantMenu().show(currentOfficer, filteredProjects); // HDBOfficer is an Applicant
     }
 
     private void showOfficerOptions(Scanner scanner) {
@@ -266,7 +274,7 @@ public class OfficerMenu {
         // Step 5: Update status to BOOKED and decrease flat count
         boolean booked = officerController.changeApplicationStatusToBooked(selectedApplicant);
         if (booked) {
-            officerController.generateBookingReceipt(officer, selectedApplicant);
+            officerController.generateBookingReceipt(selectedApplicant);
         }
     }
 
@@ -277,7 +285,7 @@ public class OfficerMenu {
         Applicant applicant = findApplicantByNric(applicantNRIC);
 
         if (applicant != null) {
-            officerController.generateBookingReceipt(currentOfficer, applicant);
+            officerController.generateBookingReceipt(applicant);
         } else {
             System.out.println("Applicant not found.");
         }

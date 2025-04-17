@@ -11,28 +11,52 @@ import model.user.Applicant;
 public class ProjectController {
 
     public void showEligibleProjects(Applicant applicant, List<Project> projects) {
-        System.out.println("Available Projects:");
-
+        System.out.println("Available Projects (Eligible Only):");
+        System.out.printf("%-20s %-20s %-10s %-10s%n", "Project Name", "Neighbourhood", "TWO_ROOM", "THREE_ROOM");
+        System.out.println("----------------------------------------------------------------------");
+    
+        boolean hasEligible = false;
+    
         for (Project project : projects) {
             if (!project.isVisible()) continue;
-
-            for (Map.Entry<FlatType, Integer> entry : project.getFlatUnits().entrySet()) {
-                FlatType type = entry.getKey();
-                int count = entry.getValue();
-
-                if (applicant.isEligible(project, type)) {
-                    System.out.println("== " + project.getProjectName() + " (" + project.getNeighbourhood() + ") ==");
-                    System.out.println(" - " + type + ": " + count + " units available");
+    
+            String projectName = project.getProjectName();
+            String neighbourhood = project.getNeighbourhood();
+    
+            String twoRoomDisplay = "NA";
+            String threeRoomDisplay = "NA";
+    
+            // Check if applicant is eligible and if units exist
+            if (project.getFlatUnits().containsKey(FlatType.TWO_ROOM)) {
+                if (applicant.isEligible(project, FlatType.TWO_ROOM)) {
+                    twoRoomDisplay = String.valueOf(project.getFlatUnits().get(FlatType.TWO_ROOM));
                 }
             }
+    
+            if (project.getFlatUnits().containsKey(FlatType.THREE_ROOM)) {
+                if (applicant.isEligible(project, FlatType.THREE_ROOM)) {
+                    threeRoomDisplay = String.valueOf(project.getFlatUnits().get(FlatType.THREE_ROOM));
+                }
+            }
+    
+            // Skip if not eligible for either type
+            if (twoRoomDisplay.equals("NA") && threeRoomDisplay.equals("NA")) continue;
+    
+            hasEligible = true;
+            System.out.printf("%-20s %-20s %-10s %-10s%n", projectName, neighbourhood, twoRoomDisplay, threeRoomDisplay);
         }
-
+    
+        if (!hasEligible) {
+            System.out.println("No eligible projects found at the moment.");
+        }
+    
         if (applicant.hasApplied()) {
             Application app = applicant.getApplication();
             System.out.println("\nYou have applied for: " + app.getProject().getProjectName()
                     + " (" + app.getFlatType() + ") [Status: " + app.getStatus() + "]");
         }
     }
+    
 
     public void applyForProject(Applicant applicant, Project project, FlatType flatType) {
         if (applicant.hasApplied()) {
