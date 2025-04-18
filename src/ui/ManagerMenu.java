@@ -131,7 +131,6 @@ public class ManagerMenu {
         }
         CLIView.printProjectTableFooter();
     }
-    
 
     private void editProjectMenu() {
         String projectName = CLIView.prompt("Enter Project Name to Edit: ");
@@ -263,7 +262,7 @@ public class ManagerMenu {
         HDBOfficer selectedOfficer = selectOfficer(pendingOfficers);
         if (selectedOfficer == null) return;
 
-        handleOfficerDecision(scanner, selectedProject, selectedOfficer);
+        handleOfficerDecision(selectedProject, selectedOfficer);
     }
 
     private Project selectProject(List<Project> managerProjects) {
@@ -293,9 +292,8 @@ public class ManagerMenu {
         return pendingOfficers.get(officerChoice - 1);
     }
 
-    private void handleOfficerDecision(Scanner scanner, Project selectedProject, HDBOfficer selectedOfficer) {
-        System.out.print("Approve or Reject? (A/R): ");
-        String decision = scanner.nextLine().trim().toUpperCase();
+    private void handleOfficerDecision(Project selectedProject, HDBOfficer selectedOfficer) {
+        String decision = CLIView.prompt("Approve or Reject? (A/R): ").trim().toUpperCase();
 
         if (decision.equals("A")) {
             if (selectedProject.getAvailableOfficerSlots() > 0) {
@@ -311,7 +309,6 @@ public class ManagerMenu {
             CLIView.printError("Invalid input. Please enter 'A' to approve or 'R' to reject.");
         }
     }
-
 
     private void manageApplicantApplicationsMenu(Scanner scanner) {
         List<Application> applications = managerController.getApplicationsForManagedProjects(manager);
@@ -425,5 +422,4 @@ public class ManagerMenu {
         }
         return null;
     }
-
 }
