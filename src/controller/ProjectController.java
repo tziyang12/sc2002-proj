@@ -14,18 +14,17 @@ public class ProjectController {
 
     public void showEligibleProjects(Applicant applicant, List<Project> projects) {
         System.out.println("Available Projects (Eligible Only):");
-        System.out.printf("%-20s %-20s %-10s %-10s%n", "Project Name", "Neighbourhood", "TWO_ROOM", "THREE_ROOM");
-        System.out.println("----------------------------------------------------------------------");
+        System.out.printf("%-20s %-20s %-10s %-10s %-10s %-10s %n", "Project Name", "Neighbourhood", "TWO_ROOM", "Price", "THREE_ROOM", "Price");
+        System.out.println("------------------------------------------------------------------------------------");
     
         boolean hasEligible = false;
     
         for (Project project : projects) {
-            if (!project.isVisible()) continue;
-    
+            boolean isApplicantProject = applicant.hasApplied() && applicant.getApplication().getProject().equals(project);
+            if (!project.isVisible() && !isApplicantProject) continue;
             String[] displays = getFlatTypeDisplays(applicant, project);
             String twoRoomDisplay = displays[0];
             String threeRoomDisplay = displays[1];
-    
             if (twoRoomDisplay.equals("NA") && threeRoomDisplay.equals("NA")) continue;
     
             hasEligible = true;
@@ -42,7 +41,7 @@ public class ProjectController {
     private String[] getFlatTypeDisplays(Applicant applicant, Project project) {
         String twoRoomDisplay = "NA";
         String threeRoomDisplay = "NA";
-        
+
         if (project.getFlatUnits().containsKey(FlatType.TWO_ROOM) && applicant.isEligible(project, FlatType.TWO_ROOM)) {
             twoRoomDisplay = String.valueOf(project.getFlatUnits().get(FlatType.TWO_ROOM));
         }
@@ -50,16 +49,19 @@ public class ProjectController {
         if (project.getFlatUnits().containsKey(FlatType.THREE_ROOM) && applicant.isEligible(project, FlatType.THREE_ROOM)) {
             threeRoomDisplay = String.valueOf(project.getFlatUnits().get(FlatType.THREE_ROOM));
         }
-        
+
         return new String[] { twoRoomDisplay, threeRoomDisplay };
     }
 
     private void displayProjectDetails(Project project, String twoRoomDisplay, String threeRoomDisplay) {
-        System.out.printf("%-20s %-20s %-10s %-10s%n", 
+        System.out.printf("%-20s %-20s %-10s %-10s %-10s %-10s%n", 
             project.getProjectName(), 
             project.getNeighbourhood(), 
             twoRoomDisplay, 
-            threeRoomDisplay);
+            project.getFlatPrice(FlatType.TWO_ROOM),
+            threeRoomDisplay,
+            project.getFlatPrice(FlatType.THREE_ROOM)
+            );
     }
 
     private void displayApplicantApplication(Applicant applicant) {

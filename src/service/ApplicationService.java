@@ -12,6 +12,10 @@ public class ApplicationService {
             throw new IllegalStateException("You have already applied for a project.");
         }
 
+        if (project.isClosed()) {
+            throw new IllegalStateException("This project is closed for applications.");
+        }
+
         if (!applicant.isEligible(project, flatType)) {
             throw new IllegalArgumentException("You do not meet the eligibility criteria for this flat type.");
         }
