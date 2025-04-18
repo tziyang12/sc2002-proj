@@ -17,7 +17,6 @@ import java.util.List;
 
 public class OfficerController {
     private ProjectService projectService = new ProjectService();
-    private EnquiryController enquiryController = new EnquiryController();
 
     public List<Project> getAvailableProjects(HDBOfficer officer, List<Project> projectList) {
         List<Project> availableProjects = new ArrayList<>();

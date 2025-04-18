@@ -6,11 +6,14 @@ import model.transaction.Application;
 import model.transaction.Enquiry;
 import model.user.Applicant;
 
+import service.ApplicationService;
+
 import java.util.List;
 
 public class ApplicantController {
     private final ProjectController projectController = new ProjectController();
     private final EnquiryController enquiryController = new EnquiryController();
+    private final ApplicationService applicationService = new ApplicationService();
 
     public void viewProjects(Applicant applicant, List<Project> projects) {
         projectController.showEligibleProjects(applicant, projects);
@@ -25,14 +28,14 @@ public class ApplicantController {
     }
 
     public void viewApplicationStatus(Applicant applicant) {
-        if (!applicant.hasApplied()) {
-            System.out.println("No application found.");
-        } else {
-            Application app = applicant.getApplication();
+        try {
+            Application app = applicationService.getApplication(applicant);
             System.out.println("Application Status for " +
                     app.getProject().getProjectName() + " (" +
                     app.getFlatType() + "): " +
                     app.getStatus());
+        } catch (IllegalStateException e) {
+            System.out.println(e.getMessage());
         }
     }
 
