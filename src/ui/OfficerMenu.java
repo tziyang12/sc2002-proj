@@ -71,8 +71,7 @@ public class OfficerMenu {
                 "View assigned project",
                 "Register to handle a project",
                 "View project registration status",
-                "View project enquiries",
-                "Reply to an enquiry",
+                "View and Manage Enquiries",
                 "Generate booking receipt",
                 "View and Manage Applicant Application (Booking)",
                 "Back"
@@ -88,11 +87,10 @@ public class OfficerMenu {
                 case 2 -> viewAssignedProject();
                 case 3 -> registerOfficerToProject(scanner);
                 case 4 -> officerController.viewRegistrationStatus(currentOfficer);
-                case 5 -> viewEnquiries();
-                case 6 -> replyToEnquiry(scanner);
-                case 7 -> generateBookingReceipt();
-                case 8 -> manageApplicantApplicationMenu(scanner, applicantList, currentOfficer);
-                case 9 -> { return; } // Back to main menu
+                case 5 -> new EnquiryMenu(currentOfficer, currentOfficer.getAssignedProjects(), enquiryController).show();
+                case 6 -> generateBookingReceipt();
+                case 7 -> manageApplicantApplicationMenu(scanner, applicantList, currentOfficer);
+                case 8 -> { return; } // Back to main menu
                 default -> System.out.println("Invalid choice. Try again.");
             }
         }
@@ -187,24 +185,6 @@ public class OfficerMenu {
         }
 
         CLIView.printEnquiryTableFooter();
-    }
-
-    private void replyToEnquiry(Scanner scanner) {
-        System.out.print("Enter project name: ");
-        String projectName = scanner.nextLine();
-        Project project = findProjectByName(projectName);
-        System.out.print("Enter enquiry ID to reply to: ");
-        if (!scanner.hasNextInt()) {
-            System.out.println("Invalid input. Please enter a number for enquiry ID.");
-            scanner.nextLine(); // consume the invalid input
-            return;
-        }
-        int enquiryId = scanner.nextInt();
-        scanner.nextLine();  // Consume newline
-        System.out.print("Enter your reply: ");
-        String replyMessage = scanner.nextLine();
-
-        officerController.replyToEnquiry(currentOfficer, project, enquiryId, replyMessage);
     }
 
     private void manageApplicantApplicationMenu(Scanner scanner, List<Applicant> allApplicants, HDBOfficer officer) {

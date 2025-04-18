@@ -175,5 +175,19 @@ public class ManagerController {
         }
         System.out.println("Report generated successfully.");
     }
+
+
+    public List<HDBOfficer> getPendingOfficers(List<HDBOfficer> allOfficers, Project selectedProject) {
+        List<HDBOfficer> pendingOfficers = new ArrayList<>();
+        for (HDBOfficer officer : allOfficers) {
+            for (OfficerProjectRegistration reg : officer.getRegisteredProjects()) {
+                if (reg.getProject().equals(selectedProject) &&
+                    reg.getRegistrationStatus() == OfficerRegistrationStatus.PENDING) {
+                    pendingOfficers.add(officer);
+                }
+            }
+        }
+        return pendingOfficers;
+    }
     
 }

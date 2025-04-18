@@ -1,7 +1,9 @@
 package controller;
 
 import model.user.Applicant;
+import model.user.HDBManager;
 import model.user.HDBOfficer;
+import model.user.User;
 import model.transaction.Enquiry;
 import model.project.Project;
 
@@ -60,5 +62,28 @@ public class EnquiryController {
         else System.out.println("Cannot delete the enquiry. It may have been replied.");
         return success;
     }
+
+    public void replyToEnquiry(User user, Project project, int enquiryId, String replyMessage) {
+        boolean hasPermission = false;
+
+        if ((user instanceof HDBManager manager && manager.getManagedProjects().contains(project)) ||
+            (user instanceof HDBOfficer officer && officer.getAssignedProjects().contains(project))) {
+            hasPermission = true;
+        }
+
+        if (!hasPermission) {
+            System.out.println("You are not authorized to reply to enquiries for this project.");
+            return;
+        }
+
+        Enquiry enquiry = project.getEnquiryById(enquiryId);
+        if (enquiry != null) {
+            enquiry.setReply(replyMessage);
+            System.out.println("Replied to enquiry: " + enquiry.getEnquiryMessage());
+        } else {
+            System.out.println("Enquiry not found.");
+        }
+    }
+
     
 }

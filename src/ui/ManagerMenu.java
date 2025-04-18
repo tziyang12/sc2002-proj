@@ -9,13 +9,9 @@ import model.user.User;
 import service.UserService;
 import service.ProjectService;
 import model.transaction.Application;
-import model.transaction.Enquiry;
-import model.transaction.OfficerProjectRegistration;
-import model.transaction.OfficerRegistrationStatus;
 import model.project.FlatType;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -49,9 +45,8 @@ public class ManagerMenu {
             System.out.println("6. Toggle Project Visibility");
             System.out.println("7. View and Manage Officer Registrations");
             System.out.println("8. View and Manage Applicant Applications");
-            System.out.println("9. View All Enquiries");
-            System.out.println("10. View Managed Project Enquiries");
-            System.out.println("11. Generate Report");
+            System.out.println("9. View and Manage Enquiries");
+            System.out.println("10. Generate Report");
             System.out.println("0. Exit");
 
             System.out.print("Enter your choice: ");
@@ -67,9 +62,8 @@ public class ManagerMenu {
                 case 6 -> toggleProjectVisibilityMenu(scanner);
                 case 7 -> manageOfficerRegistrationsMenu(scanner);
                 case 8 -> manageApplicantApplicationsMenu(scanner);
-                case 9 -> viewAllEnquiries();
-                case 10 -> viewManagedEnquiries();
-                case 11 -> generateReportMenu(scanner);
+                case 9 -> new EnquiryMenu(manager, manager.getManagedProjects(), enquiryController).show();
+                case 10 -> generateReportMenu(scanner);
                 case 0 -> {
                     exit = true;
                     System.out.println("Exiting...");
@@ -276,7 +270,7 @@ public class ManagerMenu {
         Project selectedProject = selectProject(scanner, managerProjects);
         if (selectedProject == null) return;
 
-        List<HDBOfficer> pendingOfficers = getPendingOfficers(allOfficers, selectedProject);
+        List<HDBOfficer> pendingOfficers = managerController.getPendingOfficers(allOfficers, selectedProject);
         if (pendingOfficers.isEmpty()) {
             System.out.println("No pending officer registrations for this project.");
             return;
@@ -301,19 +295,6 @@ public class ManagerMenu {
             return null;
         }
         return managerProjects.get(projectChoice - 1);
-    }
-
-    private List<HDBOfficer> getPendingOfficers(List<HDBOfficer> allOfficers, Project selectedProject) {
-        List<HDBOfficer> pendingOfficers = new ArrayList<>();
-        for (HDBOfficer officer : allOfficers) {
-            for (OfficerProjectRegistration reg : officer.getRegisteredProjects()) {
-                if (reg.getProject().equals(selectedProject) &&
-                    reg.getRegistrationStatus() == OfficerRegistrationStatus.PENDING) {
-                    pendingOfficers.add(officer);
-                }
-            }
-        }
-        return pendingOfficers;
     }
 
     private HDBOfficer selectOfficer(Scanner scanner, List<HDBOfficer> pendingOfficers) {
@@ -431,61 +412,6 @@ public class ManagerMenu {
             default -> System.out.println("Invalid choice.");
         }
     }
-    
-    private void viewAllEnquiries() {
-        List<Enquiry> enquiries = enquiryController.getAllEnquiries(allProjects);
-
-        if (enquiries.isEmpty()) {
-            System.out.println("No enquiries available.");
-            return;
-        }
-
-        System.out.println("\n--- Your Enquiries ---");
-        CLIView.printEnquiryTableHeader();
-
-        for (Enquiry enquiry : enquiries) {
-            String projectName = enquiry.getProject() != null 
-                ? enquiry.getProject().getProjectName() 
-                : "N/A";
-
-            CLIView.printEnquiryRow(
-                projectName,
-                enquiry.getEnquiryId(),
-                enquiry.getEnquiryMessage(),
-                enquiry.getReplyMessage()
-            );
-        }
-
-        CLIView.printEnquiryTableFooter();
-    }
-
-    private void viewManagedEnquiries() {
-        List<Enquiry> enquiries = enquiryController.getAllEnquiries(manager.getManagedProjects());
-
-        if (enquiries.isEmpty()) {
-            System.out.println("No enquiries available.");
-            return;
-        }
-
-        System.out.println("\n--- Your Enquiries ---");
-        CLIView.printEnquiryTableHeader();
-
-        for (Enquiry enquiry : enquiries) {
-            String projectName = enquiry.getProject() != null 
-                ? enquiry.getProject().getProjectName() 
-                : "N/A";
-
-            CLIView.printEnquiryRow(
-                projectName,
-                enquiry.getEnquiryId(),
-                enquiry.getEnquiryMessage(),
-                enquiry.getReplyMessage()
-            );
-        }
-
-        CLIView.printEnquiryTableFooter();
-    }
-    
 
     private void generateReportMenu(Scanner scanner) {
         System.out.println("Generate report based on:");

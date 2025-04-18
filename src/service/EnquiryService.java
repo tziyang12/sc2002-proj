@@ -14,7 +14,6 @@ public class EnquiryService {
 
         applicant.getEnquiries().add(enquiry);
         project.addEnquiry(enquiry);
-
         return enquiry;
     }
 
