@@ -50,6 +50,23 @@ public class UserService {
                 .findFirst();
     }
 
+    // Validate NRIC and password
+    public boolean updatePasswordWithValidation(String nric, String currentPass, String newPass) {
+    if (!ValidationService.isValidNric(nric)) {
+        throw new IllegalArgumentException("[ERROR] Invalid NRIC format.");
+    }
+
+    if (ValidationService.isNullOrEmpty(currentPass) || ValidationService.isNullOrEmpty(newPass)) {
+        throw new IllegalArgumentException("[ERROR] Passwords cannot be empty.");
+    }
+
+    if (currentPass.equals(newPass)) {
+        throw new IllegalArgumentException("[ERROR] New password cannot be the same as the current password.");
+    }
+
+    return updatePassword(nric, currentPass, newPass); // returns true if updated
+}
+
     // Update user password
     public boolean updatePassword(String nric, String oldPassword, String newPassword) {
         Optional<User> userOpt = findUserByNric(nric);

@@ -9,4 +9,12 @@ public class ValidationService {
     public static boolean isValidNric(String nric) {
         return nric != null && nric.matches("^[STFG]\\d{7}[A-Z]$");
     }
+
+    public static boolean isNullOrEmpty(String s) {
+        return s == null || s.trim().isEmpty();
+    }
+    
+    public static boolean validateNricAndPassword(String nric, String password) {
+        return isValidNric(nric) && !isNullOrEmpty(password);
+    }
 }
