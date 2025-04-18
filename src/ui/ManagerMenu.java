@@ -64,7 +64,7 @@ public class ManagerMenu {
                 case 8 -> manageApplicantApplicationsMenu(scanner);
                 case 9 -> new EnquiryMenu(manager, manager.getManagedProjects(), enquiryController).show();
                 case 10 -> generateReportMenu(scanner);
-                case 0 -> {
+                case 11 -> {
                     exit = true;
                     CLIView.printMessage("Exiting Manager Menu...");
                 }
@@ -167,29 +167,18 @@ public class ManagerMenu {
 
         // Enter Number of 2-Room Flats (blank to keep current)
         String newTwoRoomFlats = CLIView.prompt("Enter number of 2-room flats: ");
-        if (!newTwoRoomFlats.isBlank()) {
-            CLIView.printError("Invalid number of 2-room flats. Defaulted to " + projectToEdit.getNumUnits(FlatType.TWO_ROOM) + ".");
-        }
         int numTwoRoomFlats = ProjectService.parseInt(newTwoRoomFlats, projectToEdit.getNumUnits(FlatType.TWO_ROOM));
 
         // Enter Number of 3-Room Flats (blank to keep current)
         String newThreeRoomFlats = CLIView.prompt("Enter number of 3-room flats: ");
-        if (!newThreeRoomFlats.isBlank()) {
-            CLIView.printError("Invalid number of 2-room flats. Defaulted to " + projectToEdit.getNumUnits(FlatType.TWO_ROOM) + ".");
-        }
         int numThreeRoomFlats = ProjectService.parseInt(newThreeRoomFlats, projectToEdit.getNumUnits(FlatType.THREE_ROOM));
+
         // Enter 2-Room Flat Price (blank to keep current)
         String newTwoRoomPrice = CLIView.prompt("Enter 2-room flat price: ");
-        if (!newTwoRoomPrice.isBlank()) {
-            CLIView.printError("Invalid price for 2-room flats. Defaulted to " + projectToEdit.getFlatPrice(FlatType.TWO_ROOM) + ".");
-        }
         double twoRoomPrice = ProjectService.parseDouble(newTwoRoomPrice, projectToEdit.getFlatPrice(FlatType.TWO_ROOM));
 
         // Enter 3-Room Flat Price (blank to keep current)
         String newThreeRoomPrice = CLIView.prompt("Enter 3-room flat price: ");
-        if (!newThreeRoomPrice.isBlank()) {
-            CLIView.printError("Invalid price for 3-room flats. Defaulted to " + projectToEdit.getFlatPrice(FlatType.TWO_ROOM) + ".");
-        }
         double threeRoomPrice = ProjectService.parseDouble(newThreeRoomPrice, projectToEdit.getFlatPrice(FlatType.THREE_ROOM));
 
         // Enter Application Opening Date (blank to keep current)

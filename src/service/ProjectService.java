@@ -35,7 +35,7 @@ public class ProjectService {
             return currentDate;
         }
         // Validate date format (YYYY-MM-DD)
-        if (ValidationService.isValidDate(dateInput)) {
+        if (!ValidationService.isValidDate(dateInput)) {
             System.out.println("Invalid date format. Defaulting to " + currentDate);
             return currentDate;
         }
