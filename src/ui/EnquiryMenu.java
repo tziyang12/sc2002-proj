@@ -9,7 +9,6 @@ import model.user.HDBOfficer;
 import model.user.User;
 
 import java.util.List;
-import java.util.Scanner;
 
 public class EnquiryMenu {
     private final User user;
@@ -23,43 +22,48 @@ public class EnquiryMenu {
     }
 
     public void show() {
-        Scanner sc = new Scanner(System.in);
+        // Define menu options for different user roles
+        String[] managerOptions = {
+                "View All Enquiries",
+                "View Managed Enquiries",
+                "Reply to Enquiry",
+                "Back"
+        };
+
+        String[] officerOptions = {
+                "View Managed Enquiries",
+                "Reply to Enquiry",
+                "Back"
+        };
 
         while (true) {
-            System.out.println("\n--- Enquiry Management ---");
+            CLIView.printHeader("Enquiry Management");
 
             if (user instanceof HDBManager) {
-                System.out.println(accessibleProjects);
-                System.out.println("1. View All Enquiries");
-                System.out.println("2. View Managed Enquiries");
-                System.out.println("3. Reply to Enquiry");
-                System.out.println("4. Back");
+                CLIView.printMenu(managerOptions);
             } else if (user instanceof HDBOfficer) {
-                System.out.println("1. View Managed Enquiries");
-                System.out.println("2. Reply to Enquiry");
-                System.out.println("3. Back");
+                CLIView.printMenu(officerOptions);
             } else {
-                System.out.println("You do not have access to enquiry management.");
+                CLIView.printError("You do not have access to enquiry management.");
                 return;
             }
 
-            System.out.print("Select an option: ");
-            String choice = sc.nextLine();
+            int choice = CLIView.promptInt("");
 
-            if (user instanceof HDBManager manager) {
+            if (user instanceof HDBManager) {
                 switch (choice) {
-                    case "1" -> viewAllEnquiries();               // All projects
-                    case "2" -> viewManagedEnquiries();           // Only managed
-                    case "3" -> replyToEnquiry();                 // Reply if managing
-                    case "4" -> { return; }
-                    default -> System.out.println("Invalid option. Try again.");
+                    case 1 -> viewAllEnquiries();               // All projects
+                    case 2 -> viewManagedEnquiries();           // Only managed
+                    case 3 -> replyToEnquiry();                 // Reply if managing
+                    case 4 -> { return; }
+                    default -> CLIView.printError("Invalid option. Try again.");
                 }
             } else if (user instanceof HDBOfficer) {
                 switch (choice) {
-                    case "1" -> viewManagedEnquiries();
-                    case "2" -> replyToEnquiry();
-                    case "3" -> { return; }
-                    default -> System.out.println("Invalid option. Try again.");
+                    case 1 -> viewManagedEnquiries();
+                    case 2 -> replyToEnquiry();
+                    case 3 -> { return; }
+                    default -> CLIView.printError("Invalid option. Try again.");
                 }
             }
         }
@@ -69,11 +73,11 @@ public class EnquiryMenu {
         List<Enquiry> all = enquiryController.getAllEnquiries(ProjectRepository.getAllProjects());
 
         if (all.isEmpty()) {
-            System.out.println("No enquiries available.");
+            CLIView.printMessage("No enquiries available.");
             return;
         }
 
-        System.out.println("\n--- All Project Enquiries ---");
+        CLIView.printHeader("All Project Enquiries");
         CLIView.printEnquiryTableHeader();
         for (Enquiry enquiry : all) {
             String projectName = enquiry.getProject() != null ? enquiry.getProject().getProjectName() : "N/A";
@@ -91,11 +95,11 @@ public class EnquiryMenu {
         List<Enquiry> enquiries = enquiryController.getAllEnquiries(accessibleProjects);
 
         if (enquiries.isEmpty()) {
-            System.out.println("No enquiries found for your projects.");
+            CLIView.printMessage("No enquiries available for your projects.");
             return;
         }
 
-        System.out.println("\n--- Managed Project Enquiries ---");
+        CLIView.printHeader("Managed Project Enquiries");
         CLIView.printEnquiryTableHeader();
         for (Enquiry enquiry : enquiries) {
             String projectName = enquiry.getProject() != null ? enquiry.getProject().getProjectName() : "N/A";
@@ -117,7 +121,7 @@ public class EnquiryMenu {
                 .orElse(null);
 
         if (selectedProject == null) {
-            System.out.println("You are not assigned to or managing this project.");
+            CLIView.printError("You are not assigned to or managing this project.");
             return;
         }
 
