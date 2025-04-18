@@ -6,8 +6,6 @@ import model.project.Project;
 import model.transaction.Enquiry;
 import model.user.Applicant;
 
-import service.ProjectService;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -73,8 +71,7 @@ public class ApplicantMenu {
     private void createEnquiry(Applicant applicant, List<Project> projects) {
         applicantController.viewProjects(applicant, projects);
         // Step 1: Show eligible projects
-        String selectedProjectName = CLIView.prompt("Enter the project name for your enquiry: ");
-        Project selectedProject = ProjectService.findByName(selectedProjectName, projects);
+        Project selectedProject = CLIView.promptProject(projects);
         
         if (selectedProject == null) {
             CLIView.printError("Project not found.");
@@ -100,12 +97,8 @@ public class ApplicantMenu {
 
             switch (choice) {
                 case 1 -> viewMyEnquiries(applicant);
-                case 2 -> {
-                    editEnquiry(applicant, projects);
-                }
-                case 3 -> {
-                    deleteEnquiry(applicant, projects);
-                }
+                case 2 -> editEnquiry(applicant, projects);
+                case 3 -> deleteEnquiry(applicant, projects);
                 case 4 -> {
                     return;
                 }
@@ -137,7 +130,7 @@ public class ApplicantMenu {
             Project project = entry.getKey();
             List<Enquiry> enquiries = entry.getValue();
 
-            System.out.println("\n--- Enquiries for Project: " + project.getProjectName() + " ---");
+            CLIView.printMessage("--- Enquiries for Project: " + project.getProjectName() + " ---");
             CLIView.printEnquiryTableHeader();
 
             for (Enquiry enquiry : enquiries) {
@@ -174,8 +167,7 @@ public class ApplicantMenu {
     
     // Helper method to get the enquiry by project and ID
     private Enquiry getApplicantEnquiryByProjectAndId(Applicant applicant, List<Project> projects) {
-        String projectName = CLIView.prompt("Enter the project name for your enquiry: ");
-        Project project = ProjectService.findByName(projectName, projects);
+        Project project = CLIView.promptProject(projects);
         if (project == null) {
             CLIView.printError("Project not found.");
             return null;

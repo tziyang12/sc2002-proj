@@ -27,12 +27,12 @@ public class MainMenu {
         while (true) {
             CLIView.printHeader("Welcome to the BTO Management System");
             CLIView.printMenu(mainOptions);
-            String choice = CLIView.prompt("");
+            int choice = CLIView.promptInt("Select an option: ");
 
             switch (choice) {
-                case "1" -> handleLogin(ProjectRepository.getAllProjects());
-                case "2" -> handlePasswordChange();
-                case "3" -> {
+                case 1 -> handleLogin(ProjectRepository.getAllProjects());
+                case 2 -> handlePasswordChange();
+                case 3 -> {
                     CLIView.printMessage("Exiting system. Goodbye!");
                     return;
                 }
@@ -51,15 +51,14 @@ public class MainMenu {
 
         CLIView.printMessage("Login successful. Welcome, " + loggedInUser.getName());
 
-        if (loggedInUser instanceof HDBOfficer officer) {
-            List<Applicant> applicantList = userService.getAllApplicants();
-            new OfficerMenu(officer, projects, applicantList).showMenu();
-        } else if (loggedInUser instanceof Applicant applicant) {
-            new ApplicantMenu().show(applicant, projects);
-        } else if (loggedInUser instanceof HDBManager manager) {
-            new ManagerMenu(manager, projects, userService.getAllUsers()).showMenu();
-        } else {
-            CLIView.printError("This user type is not yet supported.");
+        switch (loggedInUser) {
+            case HDBOfficer officer -> {
+                List<Applicant> applicantList = userService.getAllApplicants();
+                new OfficerMenu(officer, projects, applicantList).showMenu();
+            }
+            case Applicant applicant -> new ApplicantMenu().show(applicant, projects);
+            case HDBManager manager -> new ManagerMenu(manager, projects, userService.getAllUsers()).showMenu();
+            default -> CLIView.printError("This user type is not yet supported.");
         }
     }
 

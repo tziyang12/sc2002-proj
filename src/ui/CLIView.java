@@ -1,10 +1,12 @@
 package ui;
 
+import java.util.List;
 import java.util.Scanner;
 
 import model.project.FlatType;
 import model.project.Project;
 import model.user.HDBOfficer;
+import service.ProjectService;
 
 public class CLIView {
     private static final Scanner scanner = new Scanner(System.in);
@@ -135,5 +137,20 @@ public class CLIView {
     private static String truncate(String input, int maxLength) {
         if (input == null) return "-";
         return input.length() > maxLength ? input.substring(0, maxLength - 3) + "..." : input;
+    }
+
+    public static boolean promptYesNo(String message) {
+        while (true) {
+            System.out.print(message + " (y/n): ");
+            String input = scanner.nextLine().trim().toLowerCase();
+            if (input.equals("y")) return true;
+            if (input.equals("n")) return false;
+            printError("Invalid input. Enter 'y' or 'n'.");
+        }
+    }
+
+    public static Project promptProject(List<Project> projects) {
+        String projectName = prompt("Enter the project name: ");
+        return ProjectService.findByName(projectName, projects);
     }
 }
