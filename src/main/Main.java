@@ -1,7 +1,7 @@
 package main;
 
-import Data.DataLoader;
-import Data.ProjectRepository;
+import data.DataLoader;
+import data.ProjectRepository;
 import model.project.Project;
 import model.user.Applicant;
 import model.user.HDBOfficer;
