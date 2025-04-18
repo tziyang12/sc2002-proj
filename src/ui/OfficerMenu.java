@@ -6,11 +6,9 @@ import model.user.HDBOfficer;
 import model.user.Applicant;
 import model.project.Project;
 import model.transaction.ApplicationStatus;
-import model.transaction.Enquiry;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class OfficerMenu {
 
@@ -29,26 +27,25 @@ public class OfficerMenu {
     }
 
     public void showMenu() {
-        Scanner scanner = new Scanner(System.in);
+        String[] menuOptions = {
+                "Applicant Options",
+                "Officer Options",
+                "Exit"
+        };
     
         while (true) {
-            System.out.println("\n--- HDB Officer Main Menu ---");
-            System.out.println("1. Applicant Options");
-            System.out.println("2. Officer Options");
-            System.out.println("3. Exit");
-            System.out.print("Select an option: ");
-    
-            int choice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+            CLIView.printHeader("HDB Officer Main Menu");
+            CLIView.printMenu(menuOptions);
+            int choice = CLIView.promptInt("");
     
             switch (choice) {
                 case 1 -> showApplicantMenu();
-                case 2 -> showOfficerOptions(scanner);
+                case 2 -> showOfficerOptions();
                 case 3 -> {
-                    System.out.println("Exiting HDB Officer Menu.");
+                    CLIView.printMessage("Exiting officer menu...");
                     return;
                 }
-                default -> System.out.println("Invalid option. Please try again.");
+                default -> CLIView.printError("Invalid option. Please try again.");
             }
         }
     }
@@ -65,7 +62,7 @@ public class OfficerMenu {
         new ApplicantMenu().show(currentOfficer, filteredProjects); // HDBOfficer is an Applicant
     }
 
-    private void showOfficerOptions(Scanner scanner) {
+    private void showOfficerOptions() {
         String[] menuOptions = {
                 "View projects available for officer registration",
                 "View assigned project",
@@ -85,19 +82,19 @@ public class OfficerMenu {
             switch (choice) {
                 case 1 -> viewProjectsAvailableForOfficer();
                 case 2 -> viewAssignedProject();
-                case 3 -> registerOfficerToProject(scanner);
+                case 3 -> registerOfficerToProject();
                 case 4 -> officerController.viewRegistrationStatus(currentOfficer);
                 case 5 -> new EnquiryMenu(currentOfficer, currentOfficer.getAssignedProjects(), enquiryController).show();
                 case 6 -> generateBookingReceipt();
-                case 7 -> manageApplicantApplicationMenu(scanner, applicantList, currentOfficer);
+                case 7 -> manageApplicantApplicationMenu(applicantList, currentOfficer);
                 case 8 -> { return; } // Back to main menu
-                default -> System.out.println("Invalid choice. Try again.");
+                default -> CLIView.printError("Invalid option. Please try again.");
             }
         }
     }
 
     private void viewProjectsAvailableForOfficer() {
-        System.out.println("\n--- Projects Available for Officer Registration ---");
+        CLIView.printHeader("Available Projects for Officer Registration");
 
         boolean found = false;
         String officerID = currentOfficer.getNric();  // Assuming this is inside an Officer subclass
@@ -123,28 +120,27 @@ public class OfficerMenu {
         }
 
         if (!found) {
-            System.out.println("No projects available for officer registration at the moment.");
+            CLIView.printError("No projects available for registration.");
         }
     }
     
-    private void registerOfficerToProject(Scanner scanner) {
-        System.out.print("Enter project name: ");
-        String projectName = scanner.nextLine();
+    private void registerOfficerToProject() {
+        String projectName = CLIView.prompt("Enter project name: ");
         // Retrieve the project object by name (You can customize this part based on your project structure)
         Project project = findProjectByName(projectName);
 
         if (project != null) {
             boolean isRegistered = officerController.registerOfficerToProject(currentOfficer, project);
             if (isRegistered) {
-                System.out.println("Registration successful.");
+                CLIView.printMessage("Registration successful.");
             }
         } else {
-            System.out.println("Project not found.");
+            CLIView.printError("Project not found.");
         }
     }
 
     private void viewAssignedProject() {
-        System.out.println("\n--- Your Assigned Project(s) ---");
+        CLIView.printHeader("Assigned Projects");
         List<Project> assignedProjects = currentOfficer.getAssignedProjects();
     
         if (!assignedProjects.isEmpty()) {
@@ -154,60 +150,29 @@ public class OfficerMenu {
             }
             CLIView.printProjectTableFooter();
         } else {
-            System.out.println("You are not currently registered to any project.");
+            CLIView.printError("You are not currently assigned to any projects.");
         }
     }
-    
-    
 
-    private void viewEnquiries() {
-        List<Enquiry> enquiries = enquiryController.getEnquiriesForOfficer(currentOfficer);
-
-        if (enquiries.isEmpty()) {
-            System.out.println("No enquiries available.");
-            return;
-        }
-
-        System.out.println("\n--- Your Enquiries ---");
-        CLIView.printEnquiryTableHeader();
-
-        for (Enquiry enquiry : enquiries) {
-            String projectName = enquiry.getProject() != null 
-                ? enquiry.getProject().getProjectName() 
-                : "N/A";
-
-            CLIView.printEnquiryRow(
-                projectName,
-                enquiry.getEnquiryId(),
-                enquiry.getEnquiryMessage(),
-                enquiry.getReplyMessage()
-            );
-        }
-
-        CLIView.printEnquiryTableFooter();
-    }
-
-    private void manageApplicantApplicationMenu(Scanner scanner, List<Applicant> allApplicants, HDBOfficer officer) {
+    private void manageApplicantApplicationMenu(List<Applicant> allApplicants, HDBOfficer officer) {
         List<Project> assignedProjects = officer.getAssignedProjects();
         
         if (assignedProjects.isEmpty()) {
-            System.out.println("You are not currently assigned to any projects.");
+            CLIView.printError("No projects assigned to you.");
             return;
         }
         
         // Step 1: View assigned projects
-        System.out.println("\n[Assigned Projects]");
+        CLIView.printHeader("Assigned Projects");
         for (int i = 0; i < assignedProjects.size(); i++) {
-            System.out.printf("%d. %s%n", i + 1, assignedProjects.get(i).getProjectName());
+            CLIView.printMessage("Project " + (i + 1) + ": " + assignedProjects.get(i).getProjectName());
         }
 
         // Step 2: Choose a project
-        System.out.print("Select a project to manage applications (Enter number): ");
-        int choice = scanner.nextInt();
-        scanner.nextLine(); // consume newline
+        int choice = CLIView.promptInt("Select a project to manage applications (Enter number): ");
 
         if (choice < 1 || choice > assignedProjects.size()) {
-            System.out.println("Invalid selection.");
+            CLIView.printError("Invalid choice.");
             return;
         }
 
@@ -224,19 +189,18 @@ public class OfficerMenu {
         }
 
         if (successfulApplicants.isEmpty()) {
-            System.out.println("No successful applicants for this project.");
+            CLIView.printError("No successful applications for this project.");
             return;
         }
 
-        System.out.println("\n[Successful Applications]");
+        CLIView.printHeader("Successful Applications for " + selectedProject.getProjectName());
         for (Applicant applicant : successfulApplicants) {
             System.out.printf("NRIC: %s | Name: %s | Flat Type: %s%n",
                     applicant.getNric(), applicant.getName(), applicant.getApplication().getFlatType());
         }
 
         // Step 4: Select NRIC to change to BOOKED
-        System.out.print("Enter NRIC of applicant to mark as BOOKED: ");
-        String nric = scanner.nextLine();
+        String nric = CLIView.prompt("Enter NRIC of applicant to mark as BOOKED: ");
 
         Applicant selectedApplicant = null;
         for (Applicant a : successfulApplicants) {
@@ -247,7 +211,7 @@ public class OfficerMenu {
         }
 
         if (selectedApplicant == null) {
-            System.out.println("No matching successful applicant with that NRIC.");
+            CLIView.printError("No matching successful applicant with that NRIC.");
             return;
         }
 
@@ -259,15 +223,14 @@ public class OfficerMenu {
     }
 
     private void generateBookingReceipt() {
-        System.out.print("Enter applicant name to generate booking receipt: ");
-        String applicantNRIC = new Scanner(System.in).nextLine();
+        String applicantNRIC = CLIView.prompt("Enter Applicant's NRIC: ");
         // Retrieve the applicant (you can retrieve by name or some identifier)
         Applicant applicant = findApplicantByNric(applicantNRIC);
 
         if (applicant != null) {
             officerController.generateBookingReceipt(applicant);
         } else {
-            System.out.println("Applicant not found.");
+            CLIView.printError("Applicant not found.");
         }
     }
 

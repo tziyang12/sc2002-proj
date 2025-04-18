@@ -27,7 +27,7 @@ public class MainMenu {
         while (true) {
             CLIView.printHeader("Welcome to the BTO Management System");
             CLIView.printMenu(mainOptions);
-            int choice = CLIView.promptInt("Select an option: ");
+            int choice = CLIView.promptInt("");
 
             switch (choice) {
                 case 1 -> handleLogin(ProjectRepository.getAllProjects());
