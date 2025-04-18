@@ -1,4 +1,4 @@
-package data;
+package Data;
 
 public class DataSaver {
     

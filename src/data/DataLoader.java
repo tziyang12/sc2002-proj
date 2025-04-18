@@ -1,4 +1,4 @@
-package data;
+package Data;
 
 import model.project.Project;
 import model.project.FlatType;
