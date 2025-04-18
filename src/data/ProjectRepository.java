@@ -1,5 +1,5 @@
 // In data/ProjectRepository.java
-package data;
+package Data;
 
 import model.project.Project;
 import java.util.ArrayList;
