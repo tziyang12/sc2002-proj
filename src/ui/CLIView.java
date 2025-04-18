@@ -5,6 +5,7 @@ import java.util.Scanner;
 
 import model.project.FlatType;
 import model.project.Project;
+import model.user.Applicant;
 import model.user.HDBOfficer;
 import service.ProjectService;
 
@@ -152,5 +153,12 @@ public class CLIView {
     public static Project promptProject(List<Project> projects) {
         String projectName = prompt("Enter the project name: ");
         return ProjectService.findByName(projectName, projects);
+    }
+
+    public static void printApplicantApplicationRow(Applicant applicant) {
+        System.out.printf("NRIC: %s | Name: %s | Flat Type: %s%n",
+            applicant.getNric(),
+            applicant.getName(),
+            applicant.getApplication().getFlatType());
     }
 }

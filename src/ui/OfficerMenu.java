@@ -100,21 +100,18 @@ public class OfficerMenu {
         String officerID = currentOfficer.getNric();  // Assuming this is inside an Officer subclass
 
         for (Project project : projectList) {
-            // Skip if officer is already assigned
+            // Combine all conditions into a single if statement
             boolean alreadyAssigned = project.getOfficers().stream()
                 .anyMatch(officer -> officer.getNric().equals(officerID));
-            if (alreadyAssigned) continue;
+            boolean hasApplied = currentOfficer.getApplication() != null &&
+                currentOfficer.getApplication().getProject() == project;
+            boolean datesOverlap = !OfficerController.canRegisterForProject(currentOfficer, project);
 
-            // Skip if officer has already applied for the project as an applicant
-            if (currentOfficer.getApplication() != null &&
-                currentOfficer.getApplication().getProject() == project) {
+            if (alreadyAssigned || hasApplied || datesOverlap) {
                 continue;
             }
 
-            // Skip if dates overlap
-            if (!OfficerController.canRegisterForProject(currentOfficer, project)) continue;
-
-            // If passed both conditions, show project
+            // If passed all conditions, show project
             found = true;
             CLIView.printProject(project);
         }
@@ -195,8 +192,7 @@ public class OfficerMenu {
 
         CLIView.printHeader("Successful Applications for " + selectedProject.getProjectName());
         for (Applicant applicant : successfulApplicants) {
-            System.out.printf("NRIC: %s | Name: %s | Flat Type: %s%n",
-                    applicant.getNric(), applicant.getName(), applicant.getApplication().getFlatType());
+            CLIView.printApplicantApplicationRow(applicant);
         }
 
         // Step 4: Select NRIC to change to BOOKED
