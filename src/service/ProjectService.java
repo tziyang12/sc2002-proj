@@ -68,7 +68,6 @@ public class ProjectService {
         try {
             return Double.parseDouble(input);
         } catch (NumberFormatException e) {
-            System.out.println("Invalid input. Defaulting to " + defaultValue);
             return defaultValue;
         }
     }
@@ -86,19 +85,10 @@ public class ProjectService {
     }
 
     public static int validateMaxOfficers(int maxOfficers, Project project) {
-        if (maxOfficers < 1) {
-            System.out.println("Max officers must be at least 1. Defaulting to 10.");
-            maxOfficers = 10;
+        int currentAssigned = project.getOfficers().size();
+        if (maxOfficers < 1 || maxOfficers > 10 || maxOfficers < currentAssigned) {
+            return Math.clamp(currentAssigned, maxOfficers, 10);
         }
-        if (maxOfficers > 10) {
-            System.out.println("Max officers cannot exceed 10. Defaulting to 10.");
-            maxOfficers = 10;
-        }
-        if (maxOfficers < project.getOfficers().size()) {
-            System.out.println("Max officers cannot be less than current assigned officers. Defaulting to " + project.getOfficers().size());
-            maxOfficers = project.getOfficers().size();
-        }
-
         return maxOfficers;
     }
 }

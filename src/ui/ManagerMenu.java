@@ -87,7 +87,7 @@ public class ManagerMenu {
         String newThreeRoomFlats = CLIView.prompt("Enter Number of 3-Room Flats: ");
         int num3Room = ProjectService.parseInt(newThreeRoomFlats, 0); // Default to 0 if input is blank
         if (!newTwoRoomFlats.isBlank() && num3Room == 0) {
-            CLIView.printError("Invalid number of 2-room flats. Defaulted to 0.");
+            CLIView.printError("Invalid number of 3-room flats. Defaulted to 0.");
         }
 
         String newOpeningDate = CLIView.prompt("Enter Application Opening Date (YYYY-MM-DD): ");
@@ -98,7 +98,12 @@ public class ManagerMenu {
     
         String newMaxOfficerSlots = CLIView.prompt("Enter Max Officer Slots: ");
         int maxOfficerSlots = ProjectService.parseInt(newMaxOfficerSlots, 1); // Default to 1 if input is blank
-    
+        if (maxOfficerSlots < 1) {
+            CLIView.printError("Max officers must be at least 1. Defaulting to 10.");
+        }
+        if (maxOfficerSlots > 10) {
+            CLIView.printError("Max officers cannot exceed 10. Defaulting to 10.");
+        }
         // Create the new project
         Project newProject = new Project(name, neighborhood, openDate, closeDate, maxOfficerSlots);
         newProject.addFlatUnit(FlatType.TWO_ROOM, num2Room);
@@ -162,18 +167,29 @@ public class ManagerMenu {
 
         // Enter Number of 2-Room Flats (blank to keep current)
         String newTwoRoomFlats = CLIView.prompt("Enter number of 2-room flats: ");
+        if (!newTwoRoomFlats.isBlank()) {
+            CLIView.printError("Invalid number of 2-room flats. Defaulted to " + projectToEdit.getNumUnits(FlatType.TWO_ROOM) + ".");
+        }
         int numTwoRoomFlats = ProjectService.parseInt(newTwoRoomFlats, projectToEdit.getNumUnits(FlatType.TWO_ROOM));
 
         // Enter Number of 3-Room Flats (blank to keep current)
         String newThreeRoomFlats = CLIView.prompt("Enter number of 3-room flats: ");
+        if (!newThreeRoomFlats.isBlank()) {
+            CLIView.printError("Invalid number of 2-room flats. Defaulted to " + projectToEdit.getNumUnits(FlatType.TWO_ROOM) + ".");
+        }
         int numThreeRoomFlats = ProjectService.parseInt(newThreeRoomFlats, projectToEdit.getNumUnits(FlatType.THREE_ROOM));
-
         // Enter 2-Room Flat Price (blank to keep current)
         String newTwoRoomPrice = CLIView.prompt("Enter 2-room flat price: ");
+        if (!newTwoRoomPrice.isBlank()) {
+            CLIView.printError("Invalid price for 2-room flats. Defaulted to " + projectToEdit.getFlatPrice(FlatType.TWO_ROOM) + ".");
+        }
         double twoRoomPrice = ProjectService.parseDouble(newTwoRoomPrice, projectToEdit.getFlatPrice(FlatType.TWO_ROOM));
 
         // Enter 3-Room Flat Price (blank to keep current)
         String newThreeRoomPrice = CLIView.prompt("Enter 3-room flat price: ");
+        if (!newThreeRoomPrice.isBlank()) {
+            CLIView.printError("Invalid price for 3-room flats. Defaulted to " + projectToEdit.getFlatPrice(FlatType.TWO_ROOM) + ".");
+        }
         double threeRoomPrice = ProjectService.parseDouble(newThreeRoomPrice, projectToEdit.getFlatPrice(FlatType.THREE_ROOM));
 
         // Enter Application Opening Date (blank to keep current)
@@ -188,7 +204,15 @@ public class ManagerMenu {
         String newMaxOfficerSlots = CLIView.prompt("Enter max officer slots: ");
         int maxOfficerSlots = ProjectService.parseInt(newMaxOfficerSlots, projectToEdit.getMaxOfficerSlots());
         maxOfficerSlots = ProjectService.validateMaxOfficers(maxOfficerSlots, projectToEdit);
-
+        if (maxOfficerSlots < 1) {
+            CLIView.printError("Max officers must be at least 1. Defaulting to 10.");
+        }
+        if (maxOfficerSlots > 10) {
+            CLIView.printError("Max officers cannot exceed 10. Defaulting to 10.");
+        }
+        if (maxOfficerSlots < projectToEdit.getOfficers().size()) {
+            CLIView.printError("Max officers cannot be less than current assigned officers. Defaulting to " + projectToEdit.getOfficers().size());
+        }
         // Enter Visibility (blank to keep current)
         String newVisibility = CLIView.prompt("Enter visibility (TRUE / FALSE): ");
         boolean visibility = ProjectService.parseBoolean(newVisibility, projectToEdit.isVisible());
