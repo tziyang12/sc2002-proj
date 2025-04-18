@@ -35,7 +35,7 @@ public class ProjectService {
             return currentDate;
         }
         // Validate date format (YYYY-MM-DD)
-        if (!dateInput.matches("\\d{4}-\\d{2}-\\d{2}")) {
+        if (ValidationService.isValidDate(dateInput)) {
             System.out.println("Invalid date format. Defaulting to " + currentDate);
             return currentDate;
         }
@@ -57,7 +57,6 @@ public class ProjectService {
         try {
             return Integer.parseInt(input);
         } catch (NumberFormatException e) {
-            System.out.println("Invalid input. Defaulting to " + defaultValue);
             return defaultValue;
         }
     }
@@ -84,5 +83,22 @@ public class ProjectService {
 
     public static List<Project> getAllProjects() {
         return ProjectRepository.getAllProjects();
+    }
+
+    public static int validateMaxOfficers(int maxOfficers, Project project) {
+        if (maxOfficers < 1) {
+            System.out.println("Max officers must be at least 1. Defaulting to 10.");
+            maxOfficers = 10;
+        }
+        if (maxOfficers > 10) {
+            System.out.println("Max officers cannot exceed 10. Defaulting to 10.");
+            maxOfficers = 10;
+        }
+        if (maxOfficers < project.getOfficers().size()) {
+            System.out.println("Max officers cannot be less than current assigned officers. Defaulting to " + project.getOfficers().size());
+            maxOfficers = project.getOfficers().size();
+        }
+
+        return maxOfficers;
     }
 }

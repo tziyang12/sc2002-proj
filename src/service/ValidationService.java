@@ -17,4 +17,8 @@ public class ValidationService {
     public static boolean validateNricAndPassword(String nric, String password) {
         return isValidNric(nric) && !isNullOrEmpty(password);
     }
+
+    public static boolean isValidDate(String date) {
+        return date != null && date.matches("\\d{4}-\\d{2}-\\d{2}");
+    }
 }

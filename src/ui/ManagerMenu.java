@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Scanner;
 
 public class ManagerMenu {
-
     private HDBManager manager;
     private ManagerController managerController;
     private EnquiryController enquiryController;
@@ -32,73 +31,72 @@ public class ManagerMenu {
     }
 
     public void showMenu() {
+        String[] menuOptions = {
+                "Create a New BTO Project",
+                "View All Projects",
+                "View My Projects",
+                "Edit Project",
+                "Delete Project",
+                "Toggle Project Visibility",
+                "View and Manage Officer Registrations",
+                "View and Manage Applicant Applications",
+                "View and Manage Enquiries",
+                "Generate Report",
+                "Exit"
+        };
+
         Scanner scanner = new Scanner(System.in);
         boolean exit = false;
 
         while (!exit) {
-            System.out.println("\n=== HDB Manager Menu ===");
-            System.out.println("1. Create a New BTO Project");
-            System.out.println("2. View All Projects");
-            System.out.println("3. View My Projects");
-            System.out.println("4. Edit Project");
-            System.out.println("5. Delete Project");
-            System.out.println("6. Toggle Project Visibility");
-            System.out.println("7. View and Manage Officer Registrations");
-            System.out.println("8. View and Manage Applicant Applications");
-            System.out.println("9. View and Manage Enquiries");
-            System.out.println("10. Generate Report");
-            System.out.println("0. Exit");
-
-            System.out.print("Enter your choice: ");
-            int choice = scanner.nextInt();
-            scanner.nextLine();  // Consume the newline character
+            CLIView.printHeader("HDB Manager Menu");
+            CLIView.printMenu(menuOptions);
+            int choice = CLIView.promptInt("");
 
             switch (choice) {
-                case 1 -> createProjectMenu(scanner);
+                case 1 -> createProjectMenu();
                 case 2 -> viewAllProjects();
                 case 3 -> viewMyProjects();
-                case 4 -> editProjectMenu(scanner);
-                case 5 -> deleteProjectMenu(scanner);
-                case 6 -> toggleProjectVisibilityMenu(scanner);
+                case 4 -> editProjectMenu();
+                case 5 -> deleteProjectMenu();
+                case 6 -> toggleProjectVisibilityMenu();
                 case 7 -> manageOfficerRegistrationsMenu(scanner);
                 case 8 -> manageApplicantApplicationsMenu(scanner);
                 case 9 -> new EnquiryMenu(manager, manager.getManagedProjects(), enquiryController).show();
                 case 10 -> generateReportMenu(scanner);
                 case 0 -> {
                     exit = true;
-                    System.out.println("Exiting...");
+                    CLIView.printMessage("Exiting Manager Menu...");
                 }
-                default -> System.out.println("Invalid choice, please try again.");
+                default -> CLIView.printError("Invalid option. Please try again.");
             }
         }
     }
 
-    private void createProjectMenu(Scanner scanner) {
+    private void createProjectMenu() {
         // Prompt for new details
-        System.out.print("Enter Project Name: ");
-        String name = scanner.nextLine();
-    
-        System.out.print("Enter Neighborhood: ");
-        String neighborhood = scanner.nextLine();
-    
-        System.out.print("Enter Number of 2-Room Flats: ");
-        String newTwoRoomFlats = scanner.nextLine();
+        String name = CLIView.prompt("Enter Project Name: ");
+        String neighborhood = CLIView.prompt("Enter Neighborhood: ");
+
+        String newTwoRoomFlats = CLIView.prompt("Enter Number of 2-Room Flats: ");
         int num2Room = ProjectService.parseInt(newTwoRoomFlats, 0); // Default to 0 if input is blank
-    
-        System.out.print("Enter Number of 3-Room Flats: ");
-        String newThreeRoomFlats = scanner.nextLine();
+        if (!newTwoRoomFlats.isBlank() && num2Room == 0) {
+            CLIView.printError("Invalid number of 2-room flats. Defaulted to 0.");
+        }
+
+        String newThreeRoomFlats = CLIView.prompt("Enter Number of 3-Room Flats: ");
         int num3Room = ProjectService.parseInt(newThreeRoomFlats, 0); // Default to 0 if input is blank
-    
-        System.out.print("Enter Application Opening Date (YYYY-MM-DD): ");
-        String newOpeningDate = scanner.nextLine();
+        if (!newTwoRoomFlats.isBlank() && num3Room == 0) {
+            CLIView.printError("Invalid number of 2-room flats. Defaulted to 0.");
+        }
+
+        String newOpeningDate = CLIView.prompt("Enter Application Opening Date (YYYY-MM-DD): ");
         LocalDate openDate = ProjectService.parseDate(newOpeningDate, LocalDate.now()); // Default to current date if blank
-    
-        System.out.print("Enter Application Closing Date (YYYY-MM-DD): ");
-        String newClosingDate = scanner.nextLine();
+        
+        String newClosingDate = CLIView.prompt("Enter Application Closing Date (YYYY-MM-DD): ");
         LocalDate closeDate = ProjectService.parseDate(newClosingDate, LocalDate.now().plusMonths(1)); // Default to 1 month from now if blank
     
-        System.out.print("Enter Max Officer Slots: ");
-        String newMaxOfficerSlots = scanner.nextLine();
+        String newMaxOfficerSlots = CLIView.prompt("Enter Max Officer Slots: ");
         int maxOfficerSlots = ProjectService.parseInt(newMaxOfficerSlots, 1); // Default to 1 if input is blank
     
         // Create the new project
@@ -111,9 +109,9 @@ public class ManagerMenu {
         // Check if the project can be created
         if (managerController.canCreateNewProject(manager, newProject)) {
             managerController.createProject(manager, newProject);
-            System.out.println("New project created successfully!");
+            CLIView.printMessage("Project created successfully!");
         } else {
-            System.out.println("Cannot create project due to overlapping dates with existing projects.");
+            CLIView.printError("Cannot create project due to overlapping dates with existing projects.");
         }
     }
 
@@ -135,23 +133,22 @@ public class ManagerMenu {
     }
     
 
-    private void editProjectMenu(Scanner scanner) {
-        System.out.print("Enter Project Name to Edit: ");
-        String projectName = scanner.nextLine();
+    private void editProjectMenu() {
+        String projectName = CLIView.prompt("Enter Project Name to Edit: ");
 
         Project projectToEdit = findProjectByName(projectName);
         if (projectToEdit == null) {
-            System.out.println("Project not found!");
+            CLIView.printError("Project not found!");
             return;
         }
         // Given that the project is found, we can proceed to edit it
         // Display current project details
-        System.out.println("Current Project Details:");
+        CLIView.printHeader("Current Project Details");
         CLIView.printProjectTableHeader();
         CLIView.printProjectRow(projectToEdit);
         CLIView.printProjectTableFooter();
 
-        System.out.println("Enter new details (leave blank to keep current values):");
+        CLIView.printMessage("Enter new details (leave blank to keep current values):");
         // Prompt for new details
         String newName = CLIView.prompt("Enter project name: ");
         if (newName.isBlank()) {
@@ -191,18 +188,7 @@ public class ManagerMenu {
         // Enter Max Officer Slots (blank to keep current)
         String newMaxOfficerSlots = CLIView.prompt("Enter max officer slots: ");
         int maxOfficerSlots = ProjectService.parseInt(newMaxOfficerSlots, projectToEdit.getMaxOfficerSlots());
-        if (maxOfficerSlots < 0) {
-            System.out.println("Max officer slots cannot be negative. Keeping current value.");
-            maxOfficerSlots = projectToEdit.getMaxOfficerSlots();
-        }
-        if (maxOfficerSlots < projectToEdit.getOfficers().size()) {
-            System.out.println("Max officer slots cannot be less than current assigned officers. Keeping current value.");
-            maxOfficerSlots = projectToEdit.getMaxOfficerSlots();
-        }
-        if (maxOfficerSlots > 10) {
-            System.out.println("Max officer slots cannot exceed 10. Value will be changed to 10.");
-            maxOfficerSlots = 10;
-        }
+        maxOfficerSlots = ProjectService.validateMaxOfficers(maxOfficerSlots, projectToEdit);
 
         // Enter Visibility (blank to keep current)
         String newVisibility = CLIView.prompt("Enter visibility (TRUE / FALSE): ");
@@ -212,53 +198,51 @@ public class ManagerMenu {
 
         managerController.editProject(projectToEdit, newName, newNeighborhood, numTwoRoomFlats, numThreeRoomFlats,
                 twoRoomPrice, threeRoomPrice, openingDate, closingDate, maxOfficerSlots, visibility);
-        System.out.println("Project updated successfully!");
+        CLIView.printMessage("Project updated successfully!");
     }
 
-    private void deleteProjectMenu(Scanner scanner) {
+    private void deleteProjectMenu() {
         // Display all projects
         viewAllProjects();
-        System.out.print("Enter Project Name to Delete: ");
-        String projectName = scanner.nextLine();
+        String projectName = CLIView.prompt("Enter Project Name to Delete: ");
 
         Project projectToDelete = findProjectByName(projectName);
         if (projectToDelete == null) {
-            System.out.println("Project not found!");
+            CLIView.printError("Project not found!");
             return;
         }
 
         // Confirm deletion
         String confirm = CLIView.prompt("Are you sure you want to delete this project? (Y/N): ");
         if (!confirm.equalsIgnoreCase("Y")) {
-            System.out.println("Project deletion cancelled.");
+            CLIView.printMessage("Project deletion cancelled.");
             return;
         }
 
         managerController.deleteProject(manager, projectToDelete);
-        System.out.println("Project deleted successfully!");
+        CLIView.printMessage("Project deleted successfully!");
     }
 
-    private void toggleProjectVisibilityMenu(Scanner scanner) {
-        System.out.print("Enter Project Name to Toggle Visibility: ");
-        String projectName = scanner.nextLine();
+    private void toggleProjectVisibilityMenu() {
+        String projectName = CLIView.prompt("Enter Project Name to Toggle Visibility: ");
 
         Project projectToToggle = findProjectByName(projectName);
         if (projectToToggle == null) {
-            System.out.println("Project not found!");
+            CLIView.printError("Project not found!");
             return;
         }
 
-        System.out.print("Enter visibility (true for visible, false for hidden): ");
-        boolean visibility = scanner.nextBoolean();
+        boolean visibility = CLIView.promptYesNo(projectName + " is currently " + (projectToToggle.isVisible() ? "visible" : "hidden") +
+                ". Do you want to toggle visibility? ");
 
         managerController.toggleVisibility(projectToToggle, visibility);
-        System.out.println("Project visibility updated.");
+        CLIView.printMessage("Project visibility toggled successfully!");
     }
 
     private void manageOfficerRegistrationsMenu(Scanner scanner) {
         List<Project> managerProjects = manager.getManagedProjects();
         if (managerProjects.isEmpty()) {
-            System.out.println("You are not assigned to any projects.");
+            CLIView.printError("You are not managing any projects.");
             return;
         }
 
@@ -267,29 +251,27 @@ public class ManagerMenu {
 
         managerController.viewOfficerRegistrations(managerProjects, allOfficers);
 
-        Project selectedProject = selectProject(scanner, managerProjects);
+        Project selectedProject = selectProject(managerProjects);
         if (selectedProject == null) return;
 
         List<HDBOfficer> pendingOfficers = managerController.getPendingOfficers(allOfficers, selectedProject);
         if (pendingOfficers.isEmpty()) {
-            System.out.println("No pending officer registrations for this project.");
+            CLIView.printError("No pending officer registrations for this project.");
             return;
         }
 
-        HDBOfficer selectedOfficer = selectOfficer(scanner, pendingOfficers);
+        HDBOfficer selectedOfficer = selectOfficer(pendingOfficers);
         if (selectedOfficer == null) return;
 
         handleOfficerDecision(scanner, selectedProject, selectedOfficer);
     }
 
-    private Project selectProject(Scanner scanner, List<Project> managerProjects) {
-        System.out.println("\nSelect a project to manage officer registrations:");
+    private Project selectProject(List<Project> managerProjects) {
+        CLIView.printHeader("Select Project for Officer Registrations");
         for (int i = 0; i < managerProjects.size(); i++) {
-            System.out.println((i + 1) + ". " + managerProjects.get(i).getProjectName());
+            CLIView.printMessage((i + 1) + ": " + managerProjects.get(i).getProjectName());
         }
-        System.out.print("Enter choice (0 to return): ");
-        int projectChoice = scanner.nextInt();
-        scanner.nextLine(); // consume newline
+        int projectChoice = CLIView.promptInt("Enter choice (0 to return): ");
 
         if (projectChoice == 0 || projectChoice < 1 || projectChoice > managerProjects.size()) {
             return null;
@@ -297,15 +279,13 @@ public class ManagerMenu {
         return managerProjects.get(projectChoice - 1);
     }
 
-    private HDBOfficer selectOfficer(Scanner scanner, List<HDBOfficer> pendingOfficers) {
-        System.out.println("\nPending Officer Registrations:");
+    private HDBOfficer selectOfficer(List<HDBOfficer> pendingOfficers) {
+        CLIView.printHeader("Pending Officers for Registration");
         for (int i = 0; i < pendingOfficers.size(); i++) {
-            System.out.println((i + 1) + ". " + pendingOfficers.get(i).getName());
+            CLIView.printMessage((i + 1) + ": " + pendingOfficers.get(i).getName());
         }
 
-        System.out.print("Select an officer to approve/reject (0 to return): ");
-        int officerChoice = scanner.nextInt();
-        scanner.nextLine(); // consume newline
+        int officerChoice = CLIView.promptInt("Select an officer to approve/reject (0 to return): ");
 
         if (officerChoice == 0 || officerChoice < 1 || officerChoice > pendingOfficers.size()) {
             return null;
@@ -320,15 +300,15 @@ public class ManagerMenu {
         if (decision.equals("A")) {
             if (selectedProject.getAvailableOfficerSlots() > 0) {
                 managerController.approveOfficer(selectedProject, selectedOfficer);
-                System.out.println("Officer approved and assigned.");
+                CLIView.printMessage("Officer approved and assigned successfully.");
             } else {
-                System.out.println("No available officer slots in this project.");
+                CLIView.printError("No available officer slots in this project.");
             }
         } else if (decision.equals("R")) {
             managerController.rejectOfficer(selectedProject, selectedOfficer);
-            System.out.println("Officer registration rejected.");
+            CLIView.printMessage("Officer registration rejected.");
         } else {
-            System.out.println("Invalid input.");
+            CLIView.printError("Invalid input. Please enter 'A' to approve or 'R' to reject.");
         }
     }
 
@@ -337,105 +317,103 @@ public class ManagerMenu {
         List<Application> applications = managerController.getApplicationsForManagedProjects(manager);
     
         if (applications.isEmpty()) {
-            System.out.println("No applications found for your managed projects.");
+            CLIView.printError("No applications found for your managed projects.");
             return;
         }
-    
-        System.out.println("\n=== Applications for Your Projects ===");
+        
+        CLIView.printHeader("Applications for Your Projects");
         for (int i = 0; i < applications.size(); i++) {
             Application app = applications.get(i);
-            System.out.printf("%d. Applicant: %s | Project: %s | FlatType: %s | Status: %s | Withdrawal Requested: %b | Applied on: %s%n",
-                    i + 1,
-                    app.getApplicant().getName(),
-                    app.getProject().getProjectName(),
-                    app.getFlatType(),
-                    app.getStatus(),
-                    app.isWithdrawalRequested(),
-                    app.getApplicationDate()
-            );
+            CLIView.printFormatter(
+            "%d. Applicant: %s | Project: %s | FlatType: %s | Status: %s | Withdrawal Requested: %b | Applied on: %s%n",
+            i + 1,
+            app.getApplicant().getName(),
+            app.getProject().getProjectName(),
+            app.getFlatType(),
+            app.getStatus(),
+            app.isWithdrawalRequested(),
+            app.getApplicationDate()
+        );
         }
-    
-        System.out.print("\nEnter application number to manage (0 to cancel): ");
-        int choice = scanner.nextInt();
+
+        int choice = CLIView.promptInt("\\n" + //
+                        "Enter application number to manage (0 to cancel): ");
         scanner.nextLine(); // consume newline
     
         if (choice <= 0 || choice > applications.size()) {
-            System.out.println("Cancelled or invalid input.");
+            CLIView.printError("Invalid choice.");
             return;
         }
     
         Application selected = applications.get(choice - 1);
-    
-        System.out.println("\nSelected Application:");
-        System.out.println("Applicant: " + selected.getApplicant().getName());
-        System.out.println("Project: " + selected.getProject().getProjectName());
-        System.out.println("Flat Type: " + selected.getFlatType());
-        System.out.println("Status: " + selected.getStatus());
-        System.out.println("Withdrawal Requested: " + selected.isWithdrawalRequested());
-    
-        System.out.println("\nChoose an action:");
+        
+        CLIView.printHeader("Selected Application");
+            CLIView.printFormatter(
+            "Applicant: %s | Project: %s | FlatType: %s | Status: %s | Withdrawal Requested: %b | Applied on: %s%n",
+            selected.getApplicant().getName(),
+            selected.getProject().getProjectName(),
+            selected.getFlatType(),
+            selected.getStatus(),
+            selected.isWithdrawalRequested(),
+            selected.getApplicationDate()
+        );
+
+        // Step: Choose an action
+        CLIView.printHeader("Choose Action");
         System.out.println("1. Approve Application");
         System.out.println("2. Reject Application");
         if (selected.isWithdrawalRequested()) {
             System.out.println("3. Approve Withdrawal");
             System.out.println("4. Reject Withdrawal");
         }
-        System.out.print("Enter your choice: ");
-        int action = scanner.nextInt();
-        scanner.nextLine(); // consume newline
+        int action = CLIView.promptInt("");
     
         switch (action) {
             case 1 -> {
                 managerController.approveApplication(selected);
-                System.out.println("Application approved.");
+                CLIView.printMessage("Application approved.");
             }
             case 2 -> {
                 managerController.rejectApplication(selected);
-                System.out.println("Application rejected.");
+                CLIView.printMessage("Application rejected.");
             }
             case 3 -> {
-                if (selected.isWithdrawalRequested()) {
-                    managerController.approveWithdrawal(selected);
-                    System.out.println("Withdrawal approved.");
-                } else {
-                    System.out.println("No withdrawal was requested.");
-                }
+                managerController.approveWithdrawal(selected);
+                CLIView.printMessage("Withdrawal approved.");
             }
             case 4 -> {
-                if (selected.isWithdrawalRequested()) {
-                    managerController.rejectWithdrawal(selected);
-                    System.out.println("Withdrawal rejected.");
-                } else {
-                    System.out.println("No withdrawal was requested.");
-                }
+                managerController.rejectWithdrawal(selected);
+                CLIView.printMessage("Withdrawal rejected.");
             }
-            default -> System.out.println("Invalid choice.");
+            default -> CLIView.printError("Invalid choice.");
         }
     }
 
     private void generateReportMenu(Scanner scanner) {
-        System.out.println("Generate report based on:");
-        System.out.println("1. Marital Status");
-        System.out.println("2. Flat Type");
-        System.out.print("Enter your choice: ");
-        int choice = scanner.nextInt();
+        String[] reportOptions = {
+                "Generate Report by Marital Status",
+                "Generate Report by Flat Type"
+        };
+        CLIView.printHeader("Generate Report");
+        CLIView.printMenu(reportOptions);
+        int choice = CLIView.promptInt("");
         scanner.nextLine(); // Consume the newline
 
-        if (choice == 1) {
-            System.out.print("Enter Marital Status (e.g., Single, Married): ");
-            String maritalStatus = scanner.nextLine().trim();
-            managerController.generateApplicantReport(manager, "maritalStatus", maritalStatus);
-        } else if (choice == 2) {
-            System.out.print("Enter Flat Type (TWO_ROOM, THREE_ROOM): ");
-            String flatTypeStr = scanner.nextLine().trim().toUpperCase();
-            try {
-                FlatType flatType = FlatType.valueOf(flatTypeStr);
-                managerController.generateApplicantReport(manager, "flatType", flatType.name());
-            } catch (IllegalArgumentException e) {
-                System.out.println("Invalid Flat Type entered.");
+        switch (choice) {
+            case 1 -> {
+                String maritalStatus = CLIView.prompt("Enter Marital Status (e.g., Single, Married): ");
+                managerController.generateApplicantReport(manager, "maritalStatus", maritalStatus);
             }
-        } else {
-            System.out.println("Invalid choice.");
+            case 2 -> {
+                String flatTypeStr = CLIView.prompt("Enter Flat Type (TWO_ROOM, THREE_ROOM): ").trim().toUpperCase();
+                try {
+                    FlatType flatType = FlatType.valueOf(flatTypeStr);
+                    managerController.generateApplicantReport(manager, "flatType", flatType.name());
+                } catch (IllegalArgumentException e) {
+                    CLIView.printError("Invalid Flat Type entered.");
+                }
+            }
+            default -> CLIView.printError("Invalid choice.");
         }
     }
 

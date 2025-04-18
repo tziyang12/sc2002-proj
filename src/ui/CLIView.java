@@ -161,4 +161,8 @@ public class CLIView {
             applicant.getName(),
             applicant.getApplication().getFlatType());
     }
+
+    public static void printFormatter(String format, Object... args) {
+        System.out.printf(format, args);
+    }
 }
