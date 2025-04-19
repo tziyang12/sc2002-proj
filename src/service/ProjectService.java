@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import data.ProjectRepository;
@@ -137,5 +138,59 @@ public class ProjectService {
             })
     
             .collect(Collectors.toList());
+    }
+
+
+    public List<Project> filterAndSortProjects(Applicant applicant, List<Project> projects, ProjectSearchCriteria criteria) {
+        return projects.stream()
+            .filter(project -> isProjectEligible(applicant, project, criteria))
+            .sorted((p1, p2) -> compareProjects(p1, p2, criteria))
+            .collect(Collectors.toList());
+    }
+
+    public double getLowestAvailablePrice(Project project) {
+        double min = Double.MAX_VALUE;
+        for (FlatType type : FlatType.values()) {
+            int supply = project.getNumUnits(type);
+            double price = project.getFlatPrice(type);
+            if (supply > 0 && price < min) {
+                min = price;
+            }
+        }
+        return min == Double.MAX_VALUE ? 0 : min;
+    }
+
+
+    public int compareProjects(Project p1, Project p2, ProjectSearchCriteria criteria) {
+        if (criteria.isSortByPriceAscending()) {
+            double p1Price = getLowestAvailablePrice(p1);
+            double p2Price = getLowestAvailablePrice(p2);
+            return Double.compare(p1Price, p2Price);
+        } else {
+            return p2.getProjectName().compareToIgnoreCase(p1.getProjectName());
+        }
+    }
+
+    public boolean isProjectEligible(Applicant applicant, Project project, ProjectSearchCriteria criteria) {
+        boolean isApplicantProject = applicant.hasApplied() && applicant.getApplication().getProject().equals(project);
+        if (!project.isVisible() && !isApplicantProject) return false;
+
+        if (!criteria.getNeighbourhood().isEmpty() &&
+            !project.getNeighbourhood().equalsIgnoreCase(criteria.getNeighbourhood())) {
+            return false;
+        }
+
+        Set<FlatType> selectedTypes = criteria.getFlatTypes();
+        if (!selectedTypes.isEmpty()) {
+            boolean hasMatch = selectedTypes.stream().anyMatch(ft -> project.getNumUnits(ft) > 0);
+            if (!hasMatch) return false;
+        }
+
+        return true;
+    }
+
+    public boolean isProjectVisibleToApplicant(Applicant applicant, Project project) {
+        boolean isApplicantProject = applicant.hasApplied() && applicant.getApplication().getProject().equals(project);
+        return project.isVisible() || isApplicantProject;
     }
 }

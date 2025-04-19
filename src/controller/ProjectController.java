@@ -1,8 +1,6 @@
 package controller;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import model.project.FlatType;
 import model.project.Project;
@@ -10,53 +8,22 @@ import model.project.ProjectSearchCriteria;
 import model.transaction.Application;
 import model.user.Applicant;
 
+import service.ProjectService;
+
 import service.ApplicationService;
 
 public class ProjectController {
     private ApplicationService applicationService = new ApplicationService();
+    private ProjectService projectService = new ProjectService();
 
     public void showEligibleProjects(Applicant applicant, List<Project> projects) {
         ProjectSearchCriteria criteria = applicant.getSearchCriteria();
         
-        projects = filterAndSortProjects(applicant, projects, criteria);
+        projects = projectService.filterAndSortProjects(applicant, projects, criteria);
         displayEligibleProjects(applicant, projects);
         displayApplicantApplication(applicant);
     }
 
-    private List<Project> filterAndSortProjects(Applicant applicant, List<Project> projects, ProjectSearchCriteria criteria) {
-        return projects.stream()
-            .filter(project -> isProjectEligible(applicant, project, criteria))
-            .sorted((p1, p2) -> compareProjects(p1, p2, criteria))
-            .collect(Collectors.toList());
-    }
-
-    private boolean isProjectEligible(Applicant applicant, Project project, ProjectSearchCriteria criteria) {
-        boolean isApplicantProject = applicant.hasApplied() && applicant.getApplication().getProject().equals(project);
-        if (!project.isVisible() && !isApplicantProject) return false;
-
-        if (!criteria.getNeighbourhood().isEmpty() &&
-            !project.getNeighbourhood().equalsIgnoreCase(criteria.getNeighbourhood())) {
-            return false;
-        }
-
-        Set<FlatType> selectedTypes = criteria.getFlatTypes();
-        if (!selectedTypes.isEmpty()) {
-            boolean hasMatch = selectedTypes.stream().anyMatch(ft -> project.getNumUnits(ft) > 0);
-            if (!hasMatch) return false;
-        }
-
-        return true;
-    }
-
-    private int compareProjects(Project p1, Project p2, ProjectSearchCriteria criteria) {
-        if (criteria.isSortByPriceAscending()) {
-            double p1Price = getLowestAvailablePrice(p1);
-            double p2Price = getLowestAvailablePrice(p2);
-            return Double.compare(p1Price, p2Price);
-        } else {
-            return p2.getProjectName().compareToIgnoreCase(p1.getProjectName());
-        }
-    }
 
     private void displayEligibleProjects(Applicant applicant, List<Project> projects) {
         System.out.println("Available Projects (Eligible Only):");
@@ -66,7 +33,7 @@ public class ProjectController {
         boolean hasEligible = false;
 
         for (Project project : projects) {
-            if (!isProjectVisibleToApplicant(applicant, project)) continue;
+            if (!projectService.isProjectVisibleToApplicant(applicant, project)) continue;
 
             String[] displays = getFlatTypeDisplays(applicant, project);
             String twoRoomDisplay = displays[0];
@@ -87,11 +54,6 @@ public class ProjectController {
         if (!hasEligible) {
             System.out.println("No eligible projects found at the moment.");
         }
-    }
-
-    private boolean isProjectVisibleToApplicant(Applicant applicant, Project project) {
-        boolean isApplicantProject = applicant.hasApplied() && applicant.getApplication().getProject().equals(project);
-        return project.isVisible() || isApplicantProject;
     }
 
     private String[] getFlatTypeDisplays(Applicant applicant, Project project) {
@@ -156,17 +118,5 @@ public class ProjectController {
         } catch (IllegalStateException e) {
             System.out.println(e.getMessage());
         }
-    }
-
-    private double getLowestAvailablePrice(Project project) {
-        double min = Double.MAX_VALUE;
-        for (FlatType type : FlatType.values()) {
-            int supply = project.getNumUnits(type);
-            double price = project.getFlatPrice(type);
-            if (supply > 0 && price < min) {
-                min = price;
-            }
-        }
-        return min == Double.MAX_VALUE ? 0 : min;
     }
 }
