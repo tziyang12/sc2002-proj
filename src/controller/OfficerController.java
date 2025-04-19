@@ -12,20 +12,13 @@ import model.user.HDBOfficer;
 
 import service.ProjectService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class OfficerController {
     private ProjectService projectService = new ProjectService();
 
     public List<Project> getAvailableProjects(HDBOfficer officer, List<Project> projectList) {
-        List<Project> availableProjects = new ArrayList<>();
-        for (Project project : projectList) {
-            if (!project.hasApplicant(officer) && officer.getAssignedProjects().stream().noneMatch(p -> p.getProjectName().equals(project.getProjectName()))) {
-                availableProjects.add(project);
-            }
-        }
-        return availableProjects;
+        return projectService.getAvailableProjectsForOfficer(officer, projectList);
     }
 
     // Get assigned projects for an officer

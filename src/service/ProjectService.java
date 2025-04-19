@@ -1,6 +1,7 @@
 package service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -85,6 +86,16 @@ public class ProjectService {
 
     public static List<Project> getAllProjects() {
         return ProjectRepository.getAllProjects();
+    }
+
+    public List<Project> getAvailableProjectsForOfficer(HDBOfficer officer, List<Project> projectList) {
+        List<Project> availableProjects = new ArrayList<>();
+        for (Project project : projectList) {
+            if (!project.hasApplicant(officer) && officer.getAssignedProjects().stream().noneMatch(p -> p.getProjectName().equals(project.getProjectName()))) {
+                availableProjects.add(project);
+            }
+        }
+        return availableProjects;
     }
 
     public static int validateMaxOfficers(int maxOfficers, Project project) {
