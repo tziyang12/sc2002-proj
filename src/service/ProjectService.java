@@ -2,9 +2,12 @@ package service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import data.ProjectRepository;
 import model.project.Project;
+import model.project.ProjectSearchCriteria;
+import model.user.Applicant;
 import model.user.HDBOfficer;
 
 public class ProjectService {
@@ -91,4 +94,22 @@ public class ProjectService {
         }
         return maxOfficers;
     }
+
+    public List<Project> searchProjects(ProjectSearchCriteria criteria, Applicant applicant) {
+        List<Project> allProjects = ProjectRepository.getAllProjects();
+
+        return allProjects.stream()
+            .filter(Project::isVisible) // only visible projects
+            .filter(p -> criteria.getNeighbourhood() == null || p.getNeighbourhood().equalsIgnoreCase(criteria.getNeighbourhood()))
+            .filter(p -> criteria.getFlatType() == null || p.getFlatUnits().containsKey(criteria.getFlatType()))
+            .filter(p -> applicant == null || applicant.isEligible(p, criteria.getFlatType())) // eligibility by marital status, age
+            .sorted((p1, p2) -> {
+                if (!criteria.isSortByPriceAscending()) return 0;
+                double price1 = p1.getFlatPrice(criteria.getFlatType());
+                double price2 = p2.getFlatPrice(criteria.getFlatType());
+                return Double.compare(price1, price2);
+            })
+            .collect(Collectors.toList());
+    }
+
 }
