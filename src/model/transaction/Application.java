@@ -52,7 +52,7 @@ public class Application {
 
     public void withdraw() {
         this.withdrawalRequested = false;
-        this.status = ApplicationStatus.WITHDRAWN;
+        this.status = ApplicationStatus.UNSUCCESSFUL;
     }
 
     public void cancelWithdrawalRequest() {

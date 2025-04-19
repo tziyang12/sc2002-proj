@@ -32,18 +32,14 @@ public class ManagerMenu {
 
     public void showMenu() {
         String[] menuOptions = {
-                "Create a New BTO Project",
-                "View All Projects",
-                "View My Projects",
-                "Edit Project",
-                "Delete Project",
-                "Toggle Project Visibility",
-                "View and Manage Officer Registrations",
-                "View and Manage Applicant Applications",
-                "View and Manage Enquiries",
-                "Generate Report",
-                "Exit"
+            "View and Manage Projects",
+            "View and Manage Officer Registrations",
+            "View and Manage Applicant Applications",
+            "View and Manage Enquiries",
+            "Generate Report",
+            "Exit"
         };
+        
 
         Scanner scanner = new Scanner(System.in);
         boolean exit = false;
@@ -54,17 +50,12 @@ public class ManagerMenu {
             int choice = CLIView.promptInt("");
 
             switch (choice) {
-                case 1 -> createProjectMenu();
-                case 2 -> viewAllProjects();
-                case 3 -> viewMyProjects();
-                case 4 -> editProjectMenu();
-                case 5 -> deleteProjectMenu();
-                case 6 -> toggleProjectVisibilityMenu();
-                case 7 -> manageOfficerRegistrationsMenu(scanner);
-                case 8 -> manageApplicantApplicationsMenu(scanner);
-                case 9 -> new EnquiryMenu(manager, manager.getManagedProjects(), enquiryController).show();
-                case 10 -> generateReportMenu(scanner);
-                case 11 -> {
+                case 1 -> viewAndManageProjectsMenu();
+                case 2 -> manageOfficerRegistrationsMenu(scanner);
+                case 3 -> manageApplicantApplicationsMenu();
+                case 4 -> new EnquiryMenu(manager, manager.getManagedProjects(), enquiryController).show();
+                case 5 -> generateReportMenu(scanner);
+                case 6 -> {
                     exit = true;
                     CLIView.printMessage("Exiting Manager Menu...");
                 }
@@ -72,6 +63,37 @@ public class ManagerMenu {
             }
         }
     }
+
+    private void viewAndManageProjectsMenu() {
+        String[] projectOptions = {
+            "Create New BTO Project",
+            "View All Projects",
+            "View My Projects",
+            "Edit Project",
+            "Delete Project",
+            "Toggle Project Visibility",
+            "Back"
+        };
+    
+        boolean back = false;
+        while (!back) {
+            CLIView.printHeader("View and Manage Projects");
+            CLIView.printMenu(projectOptions);
+            int projectChoice = CLIView.promptInt("");
+    
+            switch (projectChoice) {
+                case 1 -> createProjectMenu();
+                case 2 -> viewAllProjects();
+                case 3 -> viewMyProjects();
+                case 4 -> editProjectMenu();
+                case 5 -> deleteProjectMenu();
+                case 6 -> toggleProjectVisibilityMenu();
+                case 7 -> back = true;
+                default -> CLIView.printError("Invalid option. Please try again.");
+            }
+        }
+    }
+    
 
     private void createProjectMenu() {
         // Prompt for new details
@@ -323,7 +345,7 @@ public class ManagerMenu {
         }
     }
 
-    private void manageApplicantApplicationsMenu(Scanner scanner) {
+    private void manageApplicantApplicationsMenu() {
         List<Application> applications = managerController.getApplicationsForManagedProjects(manager);
     
         if (applications.isEmpty()) {
@@ -348,7 +370,6 @@ public class ManagerMenu {
 
         int choice = CLIView.promptInt("\\n" + //
                         "Enter application number to manage (0 to cancel): ");
-        scanner.nextLine(); // consume newline
     
         if (choice <= 0 || choice > applications.size()) {
             CLIView.printError("Invalid choice.");
@@ -369,14 +390,27 @@ public class ManagerMenu {
         );
 
         // Step: Choose an action
-        CLIView.printHeader("Choose Action");
-        System.out.println("1. Approve Application");
-        System.out.println("2. Reject Application");
-        if (selected.isWithdrawalRequested()) {
-            System.out.println("3. Approve Withdrawal");
-            System.out.println("4. Reject Withdrawal");
+        int action = -1;
+        boolean valid = false;
+
+        while (!valid) {
+            CLIView.printHeader("Choose Action");
+            System.out.println("1. Approve Application");
+            System.out.println("2. Reject Application");
+
+            if (selected.isWithdrawalRequested()) {
+                System.out.println("3. Approve Withdrawal");
+                System.out.println("4. Reject Withdrawal");
+            }
+
+            action = CLIView.promptInt("Enter your choice: ");
+
+            if (action == 1 || action == 2 || (selected.isWithdrawalRequested() && (action == 3 || action == 4))) {
+                valid = true;
+            } else {
+                CLIView.printError("Invalid option. Please try again.");
+            }
         }
-        int action = CLIView.promptInt("");
     
         switch (action) {
             case 1 -> {

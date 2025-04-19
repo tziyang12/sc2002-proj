@@ -34,6 +34,9 @@ public class ApplicantController {
                     app.getProject().getProjectName() + " (" +
                     app.getFlatType() + "): " +
                     app.getStatus());
+            if (app.isWithdrawalRequested()){
+                System.out.println("Withdrawal requested. Awaiting approval.");
+            }
         } catch (IllegalStateException e) {
             System.out.println(e.getMessage());
         }

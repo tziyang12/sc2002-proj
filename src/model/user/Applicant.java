@@ -49,7 +49,7 @@ public class Applicant extends User {
 
     public boolean isEligible(Project project, FlatType type) {
         int unitsAvailable = project.getNumUnits(type);
-        if (unitsAvailable <= 0) return false;
+        if (unitsAvailable < 0) return false;
         switch (getMaritalStatus()) {
             case MARRIED:
                 return getAge() >= 21;

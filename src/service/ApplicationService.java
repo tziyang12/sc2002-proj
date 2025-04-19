@@ -31,9 +31,7 @@ public class ApplicationService {
             throw new IllegalStateException("No application to withdraw.");
         }
 
-        Application app = applicant.getApplication();
-        applicant.setApplication(null);
-        app.getProject().getApplications().remove(app); // optional cleanup
+        applicant.getApplication().requestWithdrawal();
     }
 
     public Application getApplication(Applicant applicant) {
