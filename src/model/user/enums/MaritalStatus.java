@@ -6,6 +6,5 @@ package model.user.enums;
 public enum MaritalStatus {
     SINGLE,
     MARRIED,
-    DIVORCED,
-    WIDOWED
+    BOTH
 }

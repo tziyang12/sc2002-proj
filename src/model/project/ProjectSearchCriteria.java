@@ -1,44 +1,48 @@
 package model.project;
 
+import model.user.enums.MaritalStatus;
+import java.util.HashSet;
+import java.util.Set;
+
 public class ProjectSearchCriteria {
-    private String neighborhood;
-    private FlatType flatType;
-    private boolean isMarried; // for applicants
+    private String neighbourhood;
+    private Set<FlatType> flatTypes;
+    private MaritalStatus maritalStatusFilter;
     private int minAge;
     private int maxAge;
     private boolean sortByPriceAscending;
 
-    // Constructors, getters, setters
     public ProjectSearchCriteria() {
-        this.neighborhood = "";
-        this.flatType = null;
-        this.isMarried = false;
+        this.neighbourhood = "";
+        this.flatTypes = new HashSet<>();
+        this.maritalStatusFilter = MaritalStatus.BOTH;
         this.minAge = 0;
-        this.maxAge = 100; // Default max age
-        this.sortByPriceAscending = true; // Default sorting order
+        this.maxAge = 120;
+        this.sortByPriceAscending = true;
     }
 
     public String getNeighbourhood() {
-        return neighborhood;
+        return neighbourhood;
     }
 
-    public void setNeighborhood(String neighborhood) {
-        this.neighborhood = neighborhood;
+    public void setNeighbourhood(String neighbourhood) {
+        this.neighbourhood = neighbourhood;
     }
 
-    public FlatType getFlatType() {
-        return flatType;
+    public Set<FlatType> getFlatTypes() {
+        return flatTypes;
     }
 
-    public void setFlatType(FlatType flatType) {
-        this.flatType = flatType;
+    public void setFlatTypes(Set<FlatType> flatTypes) {
+        this.flatTypes = flatTypes;
     }
 
-    public boolean isMarried() {
-        return isMarried;
+    public MaritalStatus getMaritalStatusFilter() {
+        return maritalStatusFilter;
     }
-    public void setMarried(boolean married) {
-        isMarried = married;
+
+    public void setMaritalStatusFilter(MaritalStatus maritalStatusFilter) {
+        this.maritalStatusFilter = maritalStatusFilter;
     }
 
     public int getMinAge() {
@@ -63,9 +67,5 @@ public class ProjectSearchCriteria {
 
     public void setSortByPriceAscending(boolean sortByPriceAscending) {
         this.sortByPriceAscending = sortByPriceAscending;
-    }
-
-    public void setSortByPriceDescending(boolean sortByPriceDescending) {
-        this.sortByPriceAscending = !sortByPriceDescending;
     }
 }

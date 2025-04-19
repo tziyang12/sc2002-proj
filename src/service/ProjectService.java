@@ -3,13 +3,16 @@ package service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import data.ProjectRepository;
+import model.project.FlatType;
 import model.project.Project;
 import model.project.ProjectSearchCriteria;
 import model.user.Applicant;
 import model.user.HDBOfficer;
+import model.user.enums.MaritalStatus;
 
 public class ProjectService {
     public boolean hasDateConflict(Project project, HDBOfficer officer) {
@@ -106,21 +109,33 @@ public class ProjectService {
         return maxOfficers;
     }
 
-    public List<Project> searchProjects(ProjectSearchCriteria criteria, Applicant applicant) {
+    public List<Project> searchProjects(Applicant applicant) {
+        ProjectSearchCriteria criteria = applicant.getSearchCriteria();
         List<Project> allProjects = ProjectRepository.getAllProjects();
-
+    
         return allProjects.stream()
-            .filter(Project::isVisible) // only visible projects
-            .filter(p -> criteria.getNeighbourhood() == null || p.getNeighbourhood().equalsIgnoreCase(criteria.getNeighbourhood()))
-            .filter(p -> criteria.getFlatType() == null || p.getFlatUnits().containsKey(criteria.getFlatType()))
-            .filter(p -> applicant == null || applicant.isEligible(p, criteria.getFlatType())) // eligibility by marital status, age
+            // Filter by neighbourhood
+            .filter(p -> criteria.getNeighbourhood() == null || criteria.getNeighbourhood().isEmpty()
+                || p.getNeighbourhood().equalsIgnoreCase(criteria.getNeighbourhood()))
+    
+            // Filter by flat types (any one match)
+            .filter(p -> criteria.getFlatTypes().isEmpty() ||
+                criteria.getFlatTypes().stream().anyMatch(ft -> p.getFlatUnits().containsKey(ft)))
+    
+            // Sort by price (based on first matching flat type)
             .sorted((p1, p2) -> {
                 if (!criteria.isSortByPriceAscending()) return 0;
-                double price1 = p1.getFlatPrice(criteria.getFlatType());
-                double price2 = p2.getFlatPrice(criteria.getFlatType());
+                Optional<FlatType> typeToCompare = criteria.getFlatTypes().stream()
+                    .filter(ft -> p1.getFlatUnits().containsKey(ft) && p2.getFlatUnits().containsKey(ft))
+                    .findFirst();
+    
+                if (typeToCompare.isEmpty()) return 0;
+    
+                double price1 = p1.getFlatPrice(typeToCompare.get());
+                double price2 = p2.getFlatPrice(typeToCompare.get());
                 return Double.compare(price1, price2);
             })
+    
             .collect(Collectors.toList());
     }
-
 }

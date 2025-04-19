@@ -1,6 +1,7 @@
 package model.user;
 
 import model.user.enums.MaritalStatus;
+import model.project.ProjectSearchCriteria;
 
 /**
  * Abstract base class representing a generic user in the BTO Management System.
@@ -12,6 +13,7 @@ public abstract class User {
     private String password;
     private int age;
     private MaritalStatus maritalStatus;
+    private ProjectSearchCriteria searchCriteria;
 
     public User(String name, String nric, String password, int age, MaritalStatus maritalStatus) {
         this.name = name;
@@ -19,6 +21,7 @@ public abstract class User {
         this.password = password;
         this.age = age;
         this.maritalStatus = maritalStatus;
+        this.searchCriteria = new ProjectSearchCriteria();
     }
 
     // Getters and Setters
@@ -70,4 +73,12 @@ public abstract class User {
      * To be implemented by subclasses.
      */
     public abstract String getRole();
+
+    public ProjectSearchCriteria getSearchCriteria() {
+        return searchCriteria;
+    }
+
+    public void setSearchCriteria(ProjectSearchCriteria searchCriteria) {
+        this.searchCriteria = searchCriteria;
+    }
 }

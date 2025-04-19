@@ -1,0 +1,5 @@
+Project Name,Neighborhood,Type 1,Number of units for Type 1,Selling price for Type 1,Type 2,Number of units for Type 2,Selling price for Type 2,Application opening date,Application closing date,Manager,Officer Slot,Officer
+Acacia Breeze,Yishun,3-Room,3,600000.00,2-Room,2,350000.00,2025-02-15,2025-03-20,Jessica,3,Daniel,Emily
+Test,Clementi,3-Room,4,500000.00,2-Room,3,400000.00,2025-03-21,2025-04-30,Jessica,3,Daniel,David
+Cant,Lavender,3-Room,5,450000.00,2-Room,4,350000.00,2025-03-01,2025-03-20,Michael,3,Daniel
+Second,Dover,3-Room,5,650000.00,2-Room,4,350000.00,2025-06-01,2025-06-20,Michael,3,David
