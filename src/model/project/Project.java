@@ -126,6 +126,10 @@ public class Project {
         return flatUnits;
     }
 
+    public Map<FlatType, Double> getFlatPrices() {
+        return flatPrices;
+    }
+
     public double getFlatPrice(FlatType type) {
         return flatPrices.getOrDefault(type, 0.0);
     }

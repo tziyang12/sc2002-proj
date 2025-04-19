@@ -102,10 +102,15 @@ public class OfficerController {
     // View officer's registration status for projects
     public void viewRegistrationStatus(HDBOfficer officer) {
         System.out.println("======= Officer Registration Status =======");
+        if (officer.getRegisteredProjects().isEmpty()) {
+            System.out.println("Officer has no registered projects.");
+            return;
+        }
         for (OfficerProjectRegistration registration : officer.getRegisteredProjects()) {
             Project project = registration.getProject();
             System.out.println("Project: " + project.getProjectName() + " | Status: " + registration.getRegistrationStatus());
         }
+
     }
 
     // View enquiries for the officer's assigned projects
@@ -135,7 +140,12 @@ public class OfficerController {
     // Change an applicant's status to 'BOOKED'
     public boolean changeApplicationStatusToBooked(Applicant applicant) {
         Application app = applicant.getApplication();
-        if (app != null && app.getStatus() == ApplicationStatus.SUCCESSFUL) {
+        if (app.getProject().getFlatUnits().get(app.getFlatType()) == 0) {
+            System.out.println("No available flats of this type.");
+            return false;
+        }
+        
+        if (app.getStatus() == ApplicationStatus.SUCCESSFUL) {
             app.setStatus(ApplicationStatus.BOOKED);
 
             Project project = app.getProject();

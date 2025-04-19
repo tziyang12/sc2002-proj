@@ -1,14 +1,18 @@
 package ui;
 
 import controller.AuthenticationController;
+import data.DataSaver;
 import data.ProjectRepository;
 import model.project.Project;
+import model.transaction.Enquiry;
+import model.transaction.Application;
 import model.user.Applicant;
 import model.user.HDBOfficer;
 import model.user.HDBManager;
 import model.user.User;
 import service.UserService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainMenu {
@@ -33,7 +37,21 @@ public class MainMenu {
                 case 1 -> handleLogin(ProjectRepository.getAllProjects());
                 case 2 -> handlePasswordChange();
                 case 3 -> {
+                    List<Project> allProjects = ProjectRepository.getAllProjects();
+                    List<Application> allApplications = new ArrayList<>();
+                    List<Enquiry> allEnquiries = new ArrayList<>();
+
+                    for (Project project : allProjects) {
+                        if (project.getApplications() != null)
+                            allApplications.addAll(project.getApplications());
+                        if (project.getEnquiries() != null)
+                            allEnquiries.addAll(project.getEnquiries());
+}
                     CLIView.printMessage("Exiting system. Goodbye!");
+                    DataSaver.saveApplications("src/data/applications.csv", allApplications);
+                    DataSaver.saveEnquiries("src/data/enquiries.csv", allEnquiries);
+                    DataSaver.saveProjects("src/data/ProjectListTest.csv", allProjects);
+
                     return;
                 }
                 default -> CLIView.printError("Invalid option. Try again.");
