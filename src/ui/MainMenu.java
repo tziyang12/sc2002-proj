@@ -48,9 +48,9 @@ public class MainMenu {
                             allEnquiries.addAll(project.getEnquiries());
 }
                     CLIView.printMessage("Exiting system. Goodbye!");
-                    DataSaver.saveApplications("src/data/applications.csv", allApplications);
-                    DataSaver.saveEnquiries("src/data/enquiries.csv", allEnquiries);
-                    DataSaver.saveProjects("src/data/ProjectListTest.csv", allProjects);
+                    DataSaver.saveApplications("src/data/ApplicationList.csv", allApplications);
+                    DataSaver.saveEnquiries("src/data/EnquiryList.csv", allEnquiries);
+                    DataSaver.saveProjects("src/data/ProjectList.csv", allProjects);
 
                     return;
                 }

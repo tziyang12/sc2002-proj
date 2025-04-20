@@ -42,6 +42,20 @@ public class Application {
         return status;
     }
 
+    public void setApplicationDate(LocalDate applicationDate) {
+        this.applicationDate = applicationDate;
+    }
+
+    public void setWithdrawalRequested(Boolean withdrawalRequested) {
+        this.withdrawalRequested = withdrawalRequested;
+    }
+
+    public void setStatus(String status) {
+        this.status = ApplicationStatus.valueOf(status.toUpperCase());
+    }
+
+
+
     public void approve() {
         this.status = ApplicationStatus.SUCCESSFUL;
     }

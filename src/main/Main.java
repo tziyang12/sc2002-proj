@@ -21,15 +21,19 @@ public class Main {
         List<HDBManager> managers;
         List<User> allUsers = new ArrayList<>();
 
+        DataLoader dataLoader = new DataLoader();
+
         try {
-            applicants = new DataLoader().loadApplicants("src/data/ApplicantList.csv");
-            officers = new DataLoader().loadOfficers("src/data/OfficerList.csv");
-            managers = new DataLoader().loadHDBManagers("src/data/ManagerList.csv");
+            applicants = dataLoader.loadApplicants("src/data/ApplicantList.csv");
+            officers = dataLoader.loadOfficers("src/data/OfficerList.csv");
+            managers = dataLoader.loadHDBManagers("src/data/ManagerList.csv");
             projects = DataLoader.loadProjects("src/data/ProjectList.csv", officers, managers);
             ProjectRepository.setAllProjects(projects);
             allUsers.addAll(applicants); 
             allUsers.addAll(officers);
             allUsers.addAll(managers);
+            dataLoader.loadApplications("src/data/ApplicationList.csv", allUsers, projects);
+            dataLoader.loadEnquiries("src/data/EnquiryList.csv", allUsers, projects);
         } catch (IOException e) {
             System.out.println("Failed to load data files.");
             e.printStackTrace();

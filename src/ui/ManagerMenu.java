@@ -51,10 +51,10 @@ public class ManagerMenu {
 
             switch (choice) {
                 case 1 -> viewAndManageProjectsMenu();
-                case 2 -> manageOfficerRegistrationsMenu(scanner);
+                case 2 -> manageOfficerRegistrationsMenu();
                 case 3 -> manageApplicantApplicationsMenu();
                 case 4 -> new EnquiryMenu(manager, manager.getManagedProjects(), enquiryController).show();
-                case 5 -> generateReportMenu(scanner);
+                case 5 -> generateReportMenu();
                 case 6 -> {
                     exit = true;
                     CLIView.printMessage("Exiting Manager Menu...");
@@ -162,7 +162,7 @@ public class ManagerMenu {
     private void editProjectMenu() {
         String projectName = CLIView.prompt("Enter Project Name to Edit: ");
 
-        Project projectToEdit = findProjectByName(projectName);
+        Project projectToEdit = managerController.findProjectByName(projectName, manager);
         if (projectToEdit == null) {
             CLIView.printError("Project not found!");
             return;
@@ -240,7 +240,7 @@ public class ManagerMenu {
         viewAllProjects();
         String projectName = CLIView.prompt("Enter Project Name to Delete: ");
 
-        Project projectToDelete = findProjectByName(projectName);
+        Project projectToDelete = managerController.findProjectByName(projectName, manager);
         if (projectToDelete == null) {
             CLIView.printError("Project not found!");
             return;
@@ -260,7 +260,7 @@ public class ManagerMenu {
     private void toggleProjectVisibilityMenu() {
         String projectName = CLIView.prompt("Enter Project Name to Toggle Visibility: ");
 
-        Project projectToToggle = findProjectByName(projectName);
+        Project projectToToggle = managerController.findProjectByName(projectName, manager);
         if (projectToToggle == null) {
             CLIView.printError("Project not found!");
             return;
@@ -273,7 +273,7 @@ public class ManagerMenu {
         CLIView.printMessage("Project visibility toggled successfully!");
     }
 
-    private void manageOfficerRegistrationsMenu(Scanner scanner) {
+    private void manageOfficerRegistrationsMenu() {
         List<Project> managerProjects = manager.getManagedProjects();
         if (managerProjects.isEmpty()) {
             CLIView.printError("You are not managing any projects.");
@@ -433,40 +433,84 @@ public class ManagerMenu {
         }
     }
 
-    private void generateReportMenu(Scanner scanner) {
+    private void generateReportMenu() {
+        // Add the option for no filter and all the other filter categories
         String[] reportOptions = {
                 "Generate Report by Marital Status",
-                "Generate Report by Flat Type"
+                "Generate Report by Flat Type",
+                "Generate Report by Neighbourhood",
+                "Generate Report by Age Range",
+                "Generate Report by Price",
+                "Generate Report with No Filter"
         };
+    
         CLIView.printHeader("Generate Report");
         CLIView.printMenu(reportOptions);
+    
         int choice = CLIView.promptInt("");
-        scanner.nextLine(); // Consume the newline
-
+        
+        List<Application> filteredApplications;
+    
         switch (choice) {
             case 1 -> {
                 String maritalStatus = CLIView.prompt("Enter Marital Status (e.g., Single, Married): ");
-                managerController.generateApplicantReport(manager, "maritalStatus", maritalStatus);
+                filteredApplications = managerController.generateApplicantReport(manager, "maritalStatus", maritalStatus);
             }
             case 2 -> {
                 String flatTypeStr = CLIView.prompt("Enter Flat Type (TWO_ROOM, THREE_ROOM): ").trim().toUpperCase();
                 try {
                     FlatType flatType = FlatType.valueOf(flatTypeStr);
-                    managerController.generateApplicantReport(manager, "flatType", flatType.name());
+                    filteredApplications = managerController.generateApplicantReport(manager, "flatType", flatType.name());
                 } catch (IllegalArgumentException e) {
                     CLIView.printError("Invalid Flat Type entered.");
+                    return;
                 }
             }
-            default -> CLIView.printError("Invalid choice.");
-        }
-    }
-
-    private Project findProjectByName(String projectName) {
-        for (Project project : manager.getManagedProjects()) {
-            if (project.getProjectName().equals(projectName)) {
-                return project;
+            case 3 -> {
+                String neighbourhood = CLIView.prompt("Enter Neighbourhood: ");
+                filteredApplications = managerController.generateApplicantReport(manager, "neighbourhood", neighbourhood);
+            }
+            case 4 -> {
+                String ageRange = CLIView.prompt("Enter Age Range (e.g., 25-40): ");
+                filteredApplications = managerController.generateApplicantReport(manager, "age", ageRange);
+            }
+            case 5 -> {
+                String sortByPrice = CLIView.prompt("Sort by Price (true for ascending, false for descending): ");
+                filteredApplications = managerController.generateApplicantReport(manager, "price", sortByPrice);
+            }
+            case 6 -> {
+                // No filter case
+                filteredApplications = managerController.generateApplicantReport(manager, "none", "");
+            }
+            default -> {
+                CLIView.printError("Invalid choice.");
+                return;
             }
         }
-        return null;
+    
+         // Handle the filtered applications list (e.g., display them or further processing)
+        if (filteredApplications.isEmpty()) {
+            CLIView.printError("No applications found matching the criteria.");
+        } else {
+            // Print the table header
+            CLIView.printHeader("Filtered Applications");
+            
+            CLIView.printFormatter("%-25s %-12s %-20s %-15s %-20s %-20s%n",
+            "Applicant Name", "Age", "Marital Status", "Flat Type", "Project Name", "Neighbourhood");
+            // Display the filtered applications in table format
+            for (Application app : filteredApplications) {
+                // Print additional application-specific data
+                CLIView.printFormatter("%-25s %-12s %-20s %-15s %-20s %-20s%n", 
+                app.getApplicant().getName(),  // Applicant name
+                app.getApplicant().getAge(),   // Applicant Age
+                app.getApplicant().getMaritalStatus(),   // Marital Status
+                app.getFlatType(),             // Flat Type
+                app.getProject().getProjectName(), // Project Name
+                app.getProject().getNeighbourhood());
+            }
+            
+            // Print the table footer
+            CLIView.printProjectTableFooter();
+        }
     }
 }

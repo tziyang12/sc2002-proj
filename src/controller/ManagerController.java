@@ -1,12 +1,14 @@
 package controller;
 
 import model.project.Project;
+import model.project.ProjectSearchCriteria;
 import model.project.FlatType;
 import model.transaction.Enquiry;
 import model.transaction.OfficerProjectRegistration;
 import model.transaction.OfficerRegistrationStatus;
 import model.user.HDBManager;
 import model.user.HDBOfficer;
+import model.user.enums.MaritalStatus;
 import model.transaction.Application;
 import model.transaction.ApplicationStatus;
 import service.ProjectService;
@@ -14,6 +16,7 @@ import service.ProjectService;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ManagerController {
 
@@ -150,31 +153,66 @@ public class ManagerController {
         return allEnquiries;
     }
 
-    public void generateApplicantReport(HDBManager manager, String filterCategory, String filterType) {
-        // This method would generate a report based on the filter category and type after selecting which project
-        // to filter on. The report could be a simple console output or a more complex file generation.
+    public List<Application> generateApplicantReport(HDBManager manager, String filterCategory, String filterType) {
         System.out.println("Generating report for " + manager.getName() + "...");
+        
+        // Get applications for the manager's projects
         List<Application> applications = getApplicationsForManagedProjects(manager);
         if (applications.isEmpty()) {
             System.out.println("No applications found.");
-            return;
+            return applications;
         }
-        System.out.println("Applications for " + manager.getName() + ":");
-
-        // Filter applications based on the filterCategory and filterType
-        // Help me craft the filter logic
-        // For example, if filterCategory is "status" and filterType is "PENDING", filter the applications accordingly
-
-
-
-        for (Application app : applications) {
-            System.out.println("Applicant: " + app.getApplicant().getName() +
-                               " | Project: " + app.getProject().getProjectName() +
-                               " | Flat Type: " + app.getFlatType() +
-                               " | Status: " + app.getStatus());
+    
+        // Create an instance of ProjectSearchCriteria to hold the filtering criteria
+        ProjectSearchCriteria searchCriteria = new ProjectSearchCriteria();
+        
+        // Apply filters based on the selected filter category
+        if ("none".equalsIgnoreCase(filterCategory)) {
+            // If no filter is selected, skip the filtering process
+            System.out.println("No filter applied, displaying all applications.");
+        } else {
+            // Apply the filter based on the filter category and filter type
+            switch (filterCategory.toLowerCase()) {
+                case "maritalstatus":
+                    searchCriteria.setMaritalStatusFilter(MaritalStatus.valueOf(filterType.toUpperCase()));
+                    break;
+                case "flattype":
+                    searchCriteria.getFlatTypes().add(FlatType.valueOf(filterType.toUpperCase()));
+                    break;
+                case "neighbourhood":
+                    searchCriteria.setNeighbourhood(filterType);
+                    break;
+                case "age":
+                    String[] ageRange = filterType.split("-");
+                    if (ageRange.length == 2) {
+                        searchCriteria.setMinAge(Integer.parseInt(ageRange[0].trim()));
+                        searchCriteria.setMaxAge(Integer.parseInt(ageRange[1].trim()));
+                    } else {
+                        System.out.println("Invalid age range format.");
+                        return applications;
+                    }
+                    break;
+                case "price":
+                    searchCriteria.setSortByPriceAscending(Boolean.parseBoolean(filterType));
+                    break;
+                default:
+                    System.out.println("Invalid filter category.");
+                    return applications;
+            }
         }
-        System.out.println("Report generated successfully.");
+    
+            // Filter the applications based on the criteria if filters are applied
+        List<Application> filteredApplications = "none".equalsIgnoreCase(filterCategory) ? applications : filterApplications(applications, searchCriteria);
+        
+        // If no applications match the criteria, return the empty list
+        if (filteredApplications.isEmpty()) {
+            System.out.println("No applications found matching the criteria.");
+        }
+
+        return filteredApplications;
     }
+    
+
 
 
     public List<HDBOfficer> getPendingOfficers(List<HDBOfficer> allOfficers, Project selectedProject) {
@@ -190,4 +228,38 @@ public class ManagerController {
         return pendingOfficers;
     }
     
+    private List<Application> filterApplications(List<Application> applications, ProjectSearchCriteria searchCriteria) {
+        return applications.stream()
+            .filter(app -> {
+                boolean matchesMaritalStatus = searchCriteria.getMaritalStatusFilter() == MaritalStatus.BOTH ||
+                                            app.getApplicant().getMaritalStatus() == searchCriteria.getMaritalStatusFilter();
+                boolean matchesFlatType = searchCriteria.getFlatTypes().isEmpty() ||
+                                        searchCriteria.getFlatTypes().contains(app.getFlatType());
+                boolean matchesNeighbourhood = searchCriteria.getNeighbourhood().isEmpty() ||
+                                            app.getProject().getNeighbourhood().equalsIgnoreCase(searchCriteria.getNeighbourhood());
+                boolean matchesAge = app.getApplicant().getAge() >= searchCriteria.getMinAge() &&
+                                    app.getApplicant().getAge() <= searchCriteria.getMaxAge();
+                boolean matchesPrice = true; // Handle price sorting separately
+
+                // Sorting by price, if enabled
+                if (searchCriteria.isSortByPriceAscending()) {
+                    // Sort applications based on price (implement logic here based on project price)
+                    // Sort logic will be handled outside filtering for the final output, if necessary
+                }
+
+                return matchesMaritalStatus && matchesFlatType && matchesNeighbourhood && matchesAge && matchesPrice;
+            })
+            .collect(Collectors.toList());
+    }
+
+        
+    public Project findProjectByName(String projectName, HDBManager manager) {
+        for (Project project : manager.getManagedProjects()) {
+            if (project.getProjectName().equals(projectName)) {
+                return project;
+            }
+        }
+        return null;
+    }
+
 }
