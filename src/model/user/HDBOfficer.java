@@ -16,6 +16,10 @@ public class HDBOfficer extends Applicant {
         super(name, nric, password, age, maritalStatus);
     }
 
+    
+    /** 
+     * @return List<OfficerProjectRegistration>
+     */
     public List<OfficerProjectRegistration> getRegisteredProjects() {
         return registeredProjects;
     }

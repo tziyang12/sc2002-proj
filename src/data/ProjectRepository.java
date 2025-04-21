@@ -8,6 +8,10 @@ import java.util.List;
 public class ProjectRepository {
     private static final List<Project> allProjects = new ArrayList<>();
 
+    
+    /** 
+     * @param project
+     */
     public static void addProject(Project project) {
         allProjects.add(project);
     }

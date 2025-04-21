@@ -151,6 +151,11 @@ public class OfficerMenu {
         }
     }
 
+    
+    /** 
+     * @param allApplicants
+     * @param officer
+     */
     private void manageApplicantApplicationMenu(List<Applicant> allApplicants, HDBOfficer officer) {
         List<Project> assignedProjects = officer.getAssignedProjects();
         

@@ -18,6 +18,11 @@ import java.io.File;
 
 public class DataSaver {
 
+    
+    /** 
+     * @param filePath
+     * @param projects
+     */
     public static void saveProjects(String filePath, List<Project> projects) {
         ensureDirectoryExists(filePath);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {

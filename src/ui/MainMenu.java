@@ -59,6 +59,10 @@ public class MainMenu {
         }
     }
 
+    
+    /** 
+     * @param projects
+     */
     private void handleLogin(List<Project> projects) {
         String nric = CLIView.prompt("Enter NRIC: ");
         String password = CLIView.prompt("Enter Password: ");

@@ -17,6 +17,11 @@ public class UserService {
         this.users = users;
     }
 
+    
+    /** 
+     * @param nric
+     * @return Optional<User>
+     */
     // Find a user by their NRIC
     public Optional<User> findUserByNric(String nric) {
         return users.stream()

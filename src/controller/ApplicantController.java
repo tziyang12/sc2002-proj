@@ -15,6 +15,11 @@ public class ApplicantController {
     private final EnquiryController enquiryController = new EnquiryController();
     private final ApplicationService applicationService = new ApplicationService();
 
+    
+    /** 
+     * @param applicant
+     * @param projects
+     */
     public void viewProjects(Applicant applicant, List<Project> projects) {
         projectController.showEligibleProjects(applicant, projects);
     }

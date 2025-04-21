@@ -13,6 +13,13 @@ import model.transaction.Enquiry;
 
 public class EnquiryService {
 
+    
+    /** 
+     * @param applicant
+     * @param enquiryMessage
+     * @param project
+     * @return Enquiry
+     */
     public Enquiry submitEnquiry(Applicant applicant, String enquiryMessage, Project project) {
         if (project == null) return null;
 

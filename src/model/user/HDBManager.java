@@ -15,6 +15,10 @@ public class HDBManager extends User {
         this.managedProjects = new ArrayList<>();
     }
 
+    
+    /** 
+     * @return String
+     */
     @Override
     public String getRole() {
         return "HDB Manager";

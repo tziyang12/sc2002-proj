@@ -17,6 +17,11 @@ import java.util.Set;
 public class ApplicantMenu {
     private final ApplicantController applicantController = new ApplicantController();
 
+    
+    /** 
+     * @param applicant
+     * @param projects
+     */
     public void show(Applicant applicant, List<Project> projects) {
         String[] menuOptions = {
                 "View Eligible Projects",

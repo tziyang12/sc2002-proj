@@ -16,6 +16,11 @@ public class ProjectController {
     private ApplicationService applicationService = new ApplicationService();
     private ProjectService projectService = new ProjectService();
 
+    
+    /** 
+     * @param applicant
+     * @param projects
+     */
     public void showEligibleProjects(Applicant applicant, List<Project> projects) {
         ProjectSearchCriteria criteria = applicant.getSearchCriteria();
         

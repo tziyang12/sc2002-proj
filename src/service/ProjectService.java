@@ -16,6 +16,12 @@ import model.user.HDBOfficer;
 import model.user.enums.MaritalStatus;
 
 public class ProjectService {
+    
+    /** 
+     * @param project
+     * @param officer
+     * @return boolean
+     */
     public boolean hasDateConflict(Project project, HDBOfficer officer) {
         LocalDate newStart = project.getApplicationStartDate();
         LocalDate newEnd = project.getApplicationEndDate();

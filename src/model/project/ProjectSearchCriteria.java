@@ -21,6 +21,10 @@ public class ProjectSearchCriteria {
         this.sortByPriceAscending = true;
     }
 
+    
+    /** 
+     * @return String
+     */
     public String getNeighbourhood() {
         return neighbourhood;
     }

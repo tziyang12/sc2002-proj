@@ -26,6 +26,10 @@ public class Application {
         this.applicationDate = LocalDate.now();
     }
 
+    
+    /** 
+     * @return Applicant
+     */
     public Applicant getApplicant() {
         return applicant;
     }

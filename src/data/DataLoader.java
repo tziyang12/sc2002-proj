@@ -17,6 +17,11 @@ import java.util.*;
 
 public class DataLoader {
 
+    
+    /** 
+     * @param filePath
+     * @return List<Applicant>
+     */
     // Load applicants from ApplicantList.csv
     public List<Applicant> loadApplicants(String filePath) {
         List<Applicant> applicants = new ArrayList<>();

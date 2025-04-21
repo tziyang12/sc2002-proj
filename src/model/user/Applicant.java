@@ -23,6 +23,10 @@ public class Applicant extends User {
         this.enquiries = new ArrayList<>();
     }
 
+    
+    /** 
+     * @return String
+     */
     @Override
     public String getRole() {
         return "Applicant";

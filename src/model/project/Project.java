@@ -46,6 +46,11 @@ public class Project {
         this.enquiries = new ArrayList<>();
     }
 
+    
+    /** 
+     * @param type
+     * @param units
+     */
     // Adders
     public void addFlatUnit(FlatType type, int units) {
         flatUnits.put(type, units);

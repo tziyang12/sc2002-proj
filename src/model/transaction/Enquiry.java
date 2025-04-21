@@ -20,6 +20,10 @@ public class Enquiry {
         this.applicant = applicant;
     }
 
+    
+    /** 
+     * @return int
+     */
     // Getters and Setters
     public int getEnquiryId() {
         return enquiryId;

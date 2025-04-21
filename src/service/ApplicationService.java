@@ -7,6 +7,13 @@ import model.user.Applicant;
 
 public class ApplicationService {
 
+    
+    /** 
+     * @param applicant
+     * @param project
+     * @param flatType
+     * @return Application
+     */
     public Application apply(Applicant applicant, Project project, FlatType flatType) {
         if (applicant.hasApplied()) {
             throw new IllegalStateException("You have already applied for a project.");

@@ -24,6 +24,10 @@ public abstract class User {
         this.searchCriteria = new ProjectSearchCriteria();
     }
 
+    
+    /** 
+     * @return String
+     */
     // Getters and Setters
     public String getName() {
         return name;

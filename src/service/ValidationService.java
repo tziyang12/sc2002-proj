@@ -6,6 +6,11 @@ public class ValidationService {
         // Private constructor to prevent instantiation
     }
 
+    
+    /** 
+     * @param nric
+     * @return boolean
+     */
     public static boolean isValidNric(String nric) {
         return nric != null && nric.matches("^[STFG]\\d{7}[A-Z]$");
     }

@@ -20,6 +20,12 @@ import java.util.stream.Collectors;
 
 public class ManagerController {
 
+    
+    /** 
+     * @param manager
+     * @param newProject
+     * @return boolean
+     */
     public boolean canCreateNewProject(HDBManager manager, Project newProject) {
         // Check if project name exists in ProjectRepository
         for (Project existing : ProjectService.getAllProjects()) {

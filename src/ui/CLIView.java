@@ -17,6 +17,10 @@ public class CLIView {
         // Prevent instantiation
     }
 
+    
+    /** 
+     * @param title
+     */
     public static void printHeader(String title) {
         System.out.println("\n=== " + title + " ===");
     }

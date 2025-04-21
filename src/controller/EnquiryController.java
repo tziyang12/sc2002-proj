@@ -14,6 +14,11 @@ public class EnquiryController {
 
     private EnquiryService enquiryService = new EnquiryService();
 
+    
+    /** 
+     * @param applicant
+     * @return List<Enquiry>
+     */
     public List<Enquiry> getEnquiriesByApplicant(Applicant applicant) {
         return applicant.getEnquiries(); // already stored in Applicant
     }

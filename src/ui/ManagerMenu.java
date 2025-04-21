@@ -300,6 +300,11 @@ public class ManagerMenu {
         handleOfficerDecision(selectedProject, selectedOfficer);
     }
 
+    
+    /** 
+     * @param managerProjects
+     * @return Project
+     */
     private Project selectProject(List<Project> managerProjects) {
         CLIView.printHeader("Select Project for Officer Registrations");
         for (int i = 0; i < managerProjects.size(); i++) {

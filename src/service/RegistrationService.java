@@ -4,6 +4,12 @@ import model.project.Project;
 import model.user.HDBOfficer;
 
 public class RegistrationService {
+    
+    /** 
+     * @param officer
+     * @param project
+     * @return boolean
+     */
     public boolean registerForProject(HDBOfficer officer, Project project) {
         if (officer.isHandlingProject(project)) {
             return false;  // Already registered

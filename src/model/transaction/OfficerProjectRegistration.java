@@ -11,6 +11,10 @@ public class OfficerProjectRegistration {
         this.registrationStatus = registrationStatus;
     }
 
+    
+    /** 
+     * @return Project
+     */
     public Project getProject() {
         return project;
     }

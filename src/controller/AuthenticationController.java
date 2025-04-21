@@ -12,6 +12,12 @@ public class AuthenticationController {
         this.userService = userService;
     }
 
+    
+    /** 
+     * @param nric
+     * @param password
+     * @return User
+     */
     public User authenticate(String nric, String password) {
         if (ValidationService.isNullOrEmpty(nric)) {
             System.out.println("[ERROR] NRIC cannot be empty.");

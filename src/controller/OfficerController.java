@@ -17,6 +17,12 @@ import java.util.List;
 public class OfficerController {
     private ProjectService projectService = new ProjectService();
 
+    
+    /** 
+     * @param officer
+     * @param projectList
+     * @return List<Project>
+     */
     public List<Project> getAvailableProjects(HDBOfficer officer, List<Project> projectList) {
         return projectService.getAvailableProjectsForOfficer(officer, projectList);
     }
