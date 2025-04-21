@@ -102,6 +102,14 @@ public class OfficerController {
             return false;
         }
 
+        // Check if the officer has already registered for this project
+        for (OfficerProjectRegistration reg : officer.getRegisteredProjects()) {
+            if (reg.getProject().equals(project)) {
+                System.out.println("Officer has already registered for this project.");
+                return false;
+            }
+        }
+
         if (projectService.hasDateConflict(project, officer)) {
             System.out.println("Project dates overlap with an existing assigned project.");
             return false;
