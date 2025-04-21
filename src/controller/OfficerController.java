@@ -22,6 +22,13 @@ public class OfficerController {
     private ProjectService projectService = new ProjectService();
 
     /**
+     * Constructs an OfficerController instance.
+     * This constructor can be used for initialization if needed.
+     */
+    public OfficerController() {
+        // Constructor can be used for initialization if needed
+    }
+    /**
      * Retrieves a list of available projects for an officer.
      *
      * @param officer The HDB Officer requesting available projects.

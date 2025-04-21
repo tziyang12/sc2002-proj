@@ -24,6 +24,13 @@ import java.util.stream.Collectors;
  */
 public class ManagerController {
     /**
+     * Constructs a ManagerController instance.
+     * This constructor can be used for initialization if needed.
+     */
+    public ManagerController() {
+        // Constructor can be used for initialization if needed
+    }
+    /**
      * Checks if a HDB Manager can create a new project.
      * 
      * @param manager the HDBManager instance requesting to create the project

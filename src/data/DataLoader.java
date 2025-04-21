@@ -19,6 +19,12 @@ import java.util.*;
  */
 public class DataLoader {
     /**
+     * Default constructor for DataLoader.
+     */
+    public DataLoader() {
+        // Constructor
+    }
+    /**
      * Loads applicants from a CSV file.
      *
      * @param filePath The path to the CSV file.

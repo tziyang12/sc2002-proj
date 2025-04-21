@@ -18,7 +18,13 @@ import service.ApplicationService;
 public class ProjectController {
     private ApplicationService applicationService = new ApplicationService();
     private ProjectService projectService = new ProjectService();
-
+    /**
+     * Constructs a ProjectController instance.
+     * This constructor can be used for initialization if needed.
+     */
+    public ProjectController() {
+        // Constructor can be used for initialization if needed
+    }
     /** 
      * Displays eligible BTO projects for an applicant based on their search criteria.
      * 

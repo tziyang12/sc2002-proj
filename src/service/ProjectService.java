@@ -19,7 +19,13 @@ import model.user.HDBOfficer;
  * project creation, deletion, searching, filtering, and sorting projects based on applicant criteria.
  */
 public class ProjectService {
-
+    /**
+     * Constructs a ProjectService instance.
+     * This constructor can be used for initialization if needed.
+     */
+    public ProjectService() {
+        // Constructor can be used for initialization if needed
+    }
     /**
      * Checks if a new project conflicts with an officer's already assigned projects based on the application dates.
      * 

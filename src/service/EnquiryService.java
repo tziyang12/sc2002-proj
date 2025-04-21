@@ -15,7 +15,13 @@ import java.util.List;
  * This includes submitting, editing, deleting, and viewing enquiries by applicants, officers, and managers.
  */
 public class EnquiryService {
-
+    /**
+     * Constructs an EnquiryService instance.
+     * This constructor can be used for initialization if needed.
+     */
+    public EnquiryService() {
+        // Constructor can be used for initialization if needed
+    }
     /**
      * Submits an enquiry for a project by an applicant.
      * 

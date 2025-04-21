@@ -10,7 +10,13 @@ import model.user.Applicant;
  * This includes applying for a project, withdrawing applications, and retrieving application details.
  */
 public class ApplicationService {
-
+    /**
+     * Constructs an ApplicationService instance.
+     * This constructor can be used for initialization if needed.
+     */
+    public ApplicationService() {
+        // Constructor can be used for initialization if needed
+    }
     /**
      * Allows an applicant to apply for a BTO project with a specified flat type.
      * 

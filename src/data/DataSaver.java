@@ -21,6 +21,13 @@ import java.io.File;
  */
 public class DataSaver {
     /**
+     * Constructs a DataSaver instance.
+     * This constructor can be used for initialization if needed.
+     */
+    public DataSaver() {
+        // Constructor can be used for initialization if needed
+    }
+    /**
      * Saves a list of projects to a CSV file.
      * 
      * @param filePath The path to the CSV file where the projects will be saved.

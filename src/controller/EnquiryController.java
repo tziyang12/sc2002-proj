@@ -17,6 +17,13 @@ import java.util.List;
 public class EnquiryController {
 
     private EnquiryService enquiryService = new EnquiryService();
+    /**
+     * Constructs an EnquiryController instance.
+     * This constructor can be used for initialization if needed.
+     */
+    public EnquiryController() {
+        // Constructor can be used for initialization if needed
+    }
 
     /**
      * Retrieves all enquiries made by a given applicant.

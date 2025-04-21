@@ -8,7 +8,13 @@ import model.user.HDBOfficer;
  * to apply for a BTO project.
  */
 public class RegistrationService {
-    
+    /**
+     * Constructs a RegistrationService instance.
+     * This constructor can be used for initialization if needed.
+     */
+    public RegistrationService() {
+        // Constructor can be used for initialization if needed
+    }
     /** 
      * Registers an HDB officer for a specific project if they are eligible and the project is available for registration.
      *
