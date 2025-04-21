@@ -160,7 +160,7 @@ public class ProjectController {
     public void withdrawApplication(Applicant applicant) {
         try {
             applicationService.withdraw(applicant);
-            System.out.println("Application withdrawn successfully.");
+            System.out.println("Application withdrawal has been submitted.");
         } catch (IllegalStateException e) {
             System.out.println(e.getMessage());
         }

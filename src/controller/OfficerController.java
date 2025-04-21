@@ -123,7 +123,6 @@ public class OfficerController {
 
         officer.applyForProject(project);
         officer.setProjectRegistrationStatus(project, OfficerRegistrationStatus.PENDING);
-        System.out.println("Officer registration for project " + project.getProjectName() + " is pending.");
         return true;
     }
 

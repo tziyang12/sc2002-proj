@@ -9,6 +9,7 @@ import model.user.User;
 import service.UserService;
 import service.ProjectService;
 import model.transaction.Application;
+import model.transaction.ApplicationStatus;
 import model.project.FlatType;
 
 import java.time.LocalDate;
@@ -456,15 +457,21 @@ public class ManagerMenu {
 
         while (!valid) {
             CLIView.printHeader("Choose Action");
-            System.out.println("1. Approve Application");
-            System.out.println("2. Reject Application");
-
             if (selected.isWithdrawalRequested()) {
-                System.out.println("3. Approve Withdrawal");
-                System.out.println("4. Reject Withdrawal");
+                System.out.println("1. Approve Withdrawal");
+                System.out.println("2. Reject Withdrawal");
+            } else if (selected.getStatus() == ApplicationStatus.PENDING){
+                System.out.println("1. Approve Application");
+                System.out.println("2. Reject Application");
+            }
+            else {
+                CLIView.printError("User application status is already " + selected.getStatus() + ". Cannot approve or reject.");
+                return;
             }
 
             action = CLIView.promptInt("Enter your choice: ");
+            if (action == 1 && selected.isWithdrawalRequested()) action = 3;
+            if (action == 2 && selected.isWithdrawalRequested()) action = 4;
 
             if (action == 1 || action == 2 || (selected.isWithdrawalRequested() && (action == 3 || action == 4))) {
                 valid = true;

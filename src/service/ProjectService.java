@@ -169,7 +169,7 @@ public class ProjectService {
     public List<Project> getAvailableProjectsForOfficer(HDBOfficer officer, List<Project> projectList) {
         List<Project> availableProjects = new ArrayList<>();
         for (Project project : projectList) {
-            if (!project.hasApplicant(officer) && officer.getAssignedProjects().stream().noneMatch(p -> p.getProjectName().equals(project.getProjectName()))) {
+            if (!project.hasApplicant(officer) && officer.getAssignedProjects().stream().noneMatch(p -> p.getProjectName().equals(project.getProjectName())) && !hasDateConflict(project, officer)) {
                 availableProjects.add(project);
             }
         }

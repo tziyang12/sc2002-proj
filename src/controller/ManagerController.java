@@ -193,18 +193,12 @@ public class ManagerController {
         return result;
     }
     /**
-     * Approves an application and updates the project status and remaining flats accordingly.
+     * Approves an application and updates the project status.
      * 
      * @param app the application to be approved
      */
     public void approveApplication(Application app) {
-        FlatType type = app.getFlatType();
-        Project project = app.getProject();
-        if (project.getNumUnits(type) > 0) {
-            project.decreaseRemainingFlats(type);
-            app.approve();
-        }
-        app.setStatus(ApplicationStatus.SUCCESSFUL);
+        app.approve();
         // maybe update booking status too?
     }
     /**
@@ -221,7 +215,12 @@ public class ManagerController {
      * @param app the application whose withdrawal request is to be approved
      */
     public void approveWithdrawal(Application app) {
+        if (app.getStatus() == ApplicationStatus.BOOKED) {
+            Project project = app.getProject();
+            project.setNumUnits(app.getFlatType(), project.getNumUnits(app.getFlatType()) + 1);
+        }
         app.withdraw();
+
     }
     /**
      * Rejects a withdrawal request for an application.

@@ -47,7 +47,13 @@ public class ApplicantMenu {
                 case 1 -> applicantController.viewProjects(applicant, projects);
                 case 2 -> changeProjectFilterSettings(applicant, projects);
                 case 3 -> handleApply(applicant, projects);
-                case 4 -> applicantController.withdrawApplication(applicant);
+                case 4 -> {
+                    boolean s = CLIView.promptYesNo("Are you sure you want to withdraw your application? ");
+                    if (s) {applicantController.withdrawApplication(applicant);}
+                    else {
+                        CLIView.printMessage("Exiting withdrawal process.");
+                    }
+                }
                 case 5 -> applicantController.viewApplicationStatus(applicant);
                 case 6 -> createEnquiry(applicant, projects);
                 case 7 -> manageEnquiries(applicant, projects);
@@ -67,9 +73,16 @@ public class ApplicantMenu {
      */
 
     private void handleApply(Applicant applicant, List<Project> projects) {
-        String projectName = CLIView.prompt("Enter project name to apply: ");
-        String flatTypeInput = CLIView.prompt("Enter flat type (TWO_ROOM / THREE_ROOM): ").toUpperCase();
-
+        String projectName = CLIView.prompt("Enter project name to apply (enter 0 to return):");
+        if ("0".equals(projectName)) {
+            CLIView.printMessage("Exiting application process.");
+            return;
+        }
+        String flatTypeInput = CLIView.prompt("Enter flat type (TWO_ROOM / THREE_ROOM) (enter 0 to return): ").toUpperCase();
+        if ("0".equals(flatTypeInput)) {
+            CLIView.printMessage("Exiting application process.");
+            return;
+        }
         Project selected = projects.stream()
                 .filter(p -> p.getProjectName().equalsIgnoreCase(projectName))
                 .findFirst()

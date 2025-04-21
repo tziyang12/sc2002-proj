@@ -3,6 +3,7 @@ package ui;
 import controller.OfficerController;
 import controller.EnquiryController;
 import model.user.HDBOfficer;
+import service.ProjectService;
 import model.user.Applicant;
 import model.project.Project;
 import model.transaction.ApplicationStatus;
@@ -117,27 +118,13 @@ public class OfficerMenu {
     private void viewProjectsAvailableForOfficer() {
         CLIView.printHeader("Available Projects for Officer Registration");
 
-        boolean found = false;
-        String officerID = currentOfficer.getNric();  // Assuming this is inside an Officer subclass
-
-        for (Project project : projectList) {
-            // Combine all conditions into a single if statement
-            boolean alreadyAssigned = project.getOfficers().stream()
-                .anyMatch(officer -> officer.getNric().equals(officerID));
-            boolean hasApplied = currentOfficer.getApplication() != null &&
-                currentOfficer.getApplication().getProject() == project;
-            boolean datesOverlap = !OfficerController.canRegisterForProject(currentOfficer, project);
-
-            if (alreadyAssigned || hasApplied || datesOverlap) {
-                continue;
-            }
-
-            // If passed all conditions, show project
-            found = true;
+        List<Project> availableProjects = new ProjectService()
+                .getAvailableProjectsForOfficer(currentOfficer, projectList);
+        for (Project project : availableProjects) {
             CLIView.printProject(project);
         }
 
-        if (!found) {
+        if (availableProjects.isEmpty()) {
             CLIView.printError("No projects available for registration.");
         }
     }
@@ -153,7 +140,7 @@ public class OfficerMenu {
         if (project != null) {
             boolean isRegistered = officerController.registerOfficerToProject(currentOfficer, project);
             if (isRegistered) {
-                CLIView.printMessage("Registration successful.");
+                CLIView.printMessage("Officer registration for project "+ projectName + " is pending.");
             }
         } else {
             CLIView.printError("Project not found.");
