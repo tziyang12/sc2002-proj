@@ -12,11 +12,19 @@ import ui.MainMenu;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * The Main class serves as the entry point for the application.
+ * It is responsible for loading data, initializing users and projects, 
+ * and launching the main menu interface for the user.
+ */
 public class Main {
     
-    /** 
-     * @param args
+    /**
+     * The main method is the entry point of the program.
+     * It loads all required data from CSV files, initializes the necessary data structures, 
+     * and displays the main menu to the user.
+     * 
+     * @param args Command-line arguments passed to the program (not used).
      */
     public static void main(String[] args) {
         List<Applicant> applicants;

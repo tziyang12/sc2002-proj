@@ -15,13 +15,16 @@ import java.util.Map;
 import java.util.StringJoiner;
 
 import java.io.File;
-
+/**
+ * The DataSaver class provides static methods for saving project, application, and enquiry data to CSV files.
+ * It ensures that data is saved in the correct format and that the necessary directories are created if they do not exist.
+ */
 public class DataSaver {
-
-    
-    /** 
-     * @param filePath
-     * @param projects
+    /**
+     * Saves a list of projects to a CSV file.
+     * 
+     * @param filePath The path to the CSV file where the projects will be saved.
+     * @param projects The list of projects to be saved.
      */
     public static void saveProjects(String filePath, List<Project> projects) {
         ensureDirectoryExists(filePath);
@@ -34,11 +37,21 @@ public class DataSaver {
             System.out.println("Error saving projects: " + e.getMessage());
         }
     }
-
+    /**
+     * Writes the header row for the projects CSV file.
+     * 
+     * @param writer The BufferedWriter used to write data to the file.
+     * @throws IOException If an I/O error occurs while writing the header.
+     */
     private static void writeProjectsHeader(BufferedWriter writer) throws IOException {
         writer.write("Project Name,Neighborhood,Type 1,Number of units for Type 1,Selling price for Type 1,Type 2,Number of units for Type 2,Selling price for Type 2,Application opening date,Application closing date,Manager,Officer Slot,Officer\n");
     }
-
+    /**
+     * Formats the data for a single project into a CSV-compatible string.
+     * 
+     * @param project The project to format.
+     * @return A CSV-formatted string representing the project.
+     */
     private static String formatProjectData(Project project) {
         Map<FlatType, Integer> flatUnits = project.getFlatUnits();
         Map<FlatType, Double> flatPrices = project.getFlatPrices();
@@ -77,7 +90,12 @@ public class DataSaver {
                 officerNames.toString()
         );
     }
-
+    /**
+     * Saves a list of applications to a CSV file.
+     * 
+     * @param filePath The path to the CSV file where the applications will be saved.
+     * @param applications The list of applications to be saved.
+     */
     public static void saveApplications(String filePath, List<Application> applications) {
         ensureDirectoryExists(filePath);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
@@ -98,7 +116,12 @@ public class DataSaver {
             System.out.println("Error saving applications: " + e.getMessage());
         }
     }
-
+    /**
+     * Saves a list of enquiries to a CSV file.
+     * 
+     * @param filePath The path to the CSV file where the enquiries will be saved.
+     * @param enquiries The list of enquiries to be saved.
+     */
     public static void saveEnquiries(String filePath, List<Enquiry> enquiries) {
         ensureDirectoryExists(filePath);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
@@ -118,7 +141,12 @@ public class DataSaver {
             System.out.println("Error saving enquiries: " + e.getMessage());
         }
     }
-
+    /**
+     * Converts a FlatType enum to its corresponding string representation.
+     * 
+     * @param type The FlatType to convert.
+     * @return The string representation of the FlatType.
+     */
     private static String getFlatTypeName(FlatType type) {
         switch (type) {
             case TWO_ROOM: return "2-Room";
@@ -126,7 +154,11 @@ public class DataSaver {
             default: return "";
         }
     }
-
+    /**
+     * Ensures that the directory for the given file path exists, creating it if necessary.
+     * 
+     * @param filePath The file path for which the directory should be checked/created.
+     */
     private static void ensureDirectoryExists(String filePath) {
         File file = new File(filePath);
         File parent = file.getParentFile();
@@ -134,5 +166,4 @@ public class DataSaver {
             parent.mkdirs(); // Create directory if it doesn't exist
         }
     }
-    // Optional: Add methods to save applicants, officers, or managers if needed
 }

@@ -9,32 +9,48 @@ import model.transaction.OfficerProjectRegistration;
 import model.transaction.OfficerRegistrationStatus;
 import model.user.Applicant;
 import model.user.HDBOfficer;
-
 import service.ProjectService;
 
 import java.util.List;
 
+/**
+ * OfficerController is responsible for handling operations related to officers
+ * and their interactions with projects, such as project registration, enquiry
+ * viewing, and application status updates.
+ */
 public class OfficerController {
     private ProjectService projectService = new ProjectService();
 
-    
-    /** 
-     * @param officer
-     * @param projectList
-     * @return List<Project>
+    /**
+     * Retrieves a list of available projects for an officer.
+     *
+     * @param officer The HDB Officer requesting available projects.
+     * @param projectList The list of all available projects.
+     * @return A list of projects available for the officer to register for.
      */
     public List<Project> getAvailableProjects(HDBOfficer officer, List<Project> projectList) {
         return projectService.getAvailableProjectsForOfficer(officer, projectList);
     }
 
-    // Get assigned projects for an officer
+    /**
+     * Retrieves the list of projects that the officer is currently assigned to.
+     *
+     * @param officer The HDB Officer requesting assigned projects.
+     * @return A list of projects assigned to the officer.
+     */
     public List<Project> getAssignedProjects(HDBOfficer officer) {
         return officer.getAssignedProjects();
     }
     
+    /**
+     * Checks if an officer can register for a specific project.
+     *
+     * @param officer The officer attempting to register.
+     * @param project The project the officer is trying to register for.
+     * @return True if the officer can register, false otherwise.
+     */
     public static boolean canRegisterForProject(HDBOfficer officer, Project project) {
         // Check if officer is already assigned to this project
-        //Make use of officer.isHandlingProject(project) method
         if (officer.isHandlingProject(project)) {
             System.out.println("You are already handling this project.");
             return false;
@@ -56,7 +72,13 @@ public class OfficerController {
         return true;
     }
 
-    // Register officer for a new project
+    /**
+     * Registers an officer for a project if they meet all requirements.
+     *
+     * @param officer The officer to register.
+     * @param project The project to register the officer for.
+     * @return True if the officer is successfully registered, false otherwise.
+     */
     public boolean registerOfficerToProject(HDBOfficer officer, Project project) {
         if (!project.isAvailableForRegistration()) {
             System.out.println("The project is not available for officer registration.");
@@ -78,7 +100,7 @@ public class OfficerController {
             return false;
         }
 
-            // Check if the officer has a rejected registration already
+        // Check if the officer has a rejected registration already
         for (OfficerProjectRegistration reg : officer.getRegisteredProjects()) {
             if (reg.getProject().equals(project)) {
                 OfficerRegistrationStatus status = reg.getRegistrationStatus();
@@ -98,7 +120,11 @@ public class OfficerController {
         return true;
     }
 
-    // View officer's registration status for projects
+    /**
+     * Displays the officer's registration status for each of their projects.
+     *
+     * @param officer The officer whose registration statuses are to be viewed.
+     */
     public void viewRegistrationStatus(HDBOfficer officer) {
         System.out.println("======= Officer Registration Status =======");
         if (officer.getRegisteredProjects().isEmpty()) {
@@ -109,10 +135,13 @@ public class OfficerController {
             Project project = registration.getProject();
             System.out.println("Project: " + project.getProjectName() + " | Status: " + registration.getRegistrationStatus());
         }
-
     }
 
-    // View enquiries for the officer's assigned projects
+    /**
+     * Displays the enquiries for each of the officer's assigned projects.
+     *
+     * @param officer The officer whose assigned projects' enquiries are to be viewed.
+     */
     public void viewEnquiries(HDBOfficer officer) {
         List<Project> assignedProjects = officer.getAssignedProjects();
         System.out.println("======= Enquiries =======");
@@ -136,14 +165,20 @@ public class OfficerController {
         }
     }
 
-    // Change an applicant's status to 'BOOKED'
+    /**
+     * Changes the application status of an applicant to 'BOOKED' if the applicant's
+     * status is currently 'SUCCESSFUL' and there are available flats of the selected type.
+     *
+     * @param applicant The applicant whose application status is to be changed.
+     * @return True if the status was successfully changed, false otherwise.
+     */
     public boolean changeApplicationStatusToBooked(Applicant applicant) {
         Application app = applicant.getApplication();
         if (app.getProject().getFlatUnits().get(app.getFlatType()) == 0) {
             System.out.println("No available flats of this type.");
             return false;
         }
-        
+
         if (app.getStatus() == ApplicationStatus.SUCCESSFUL) {
             app.setStatus(ApplicationStatus.BOOKED);
 
@@ -161,7 +196,12 @@ public class OfficerController {
         }
     }
 
-    // Generate a booking receipt for a successful applicant
+    /**
+     * Generates and displays a booking receipt for a successful applicant whose
+     * application status is 'BOOKED'.
+     *
+     * @param applicant The applicant for whom the booking receipt is to be generated.
+     */
     public void generateBookingReceipt(Applicant applicant) {
         Application app = applicant.getApplication();
 

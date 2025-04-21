@@ -9,17 +9,21 @@ import model.transaction.Application;
 import model.user.Applicant;
 
 import service.ProjectService;
-
 import service.ApplicationService;
 
+/**
+ * This controller class manages the operations related to BTO project listings, applications, and status management.
+ * It allows applicants to view eligible projects, apply, withdraw applications, and check their application status.
+ */
 public class ProjectController {
     private ApplicationService applicationService = new ApplicationService();
     private ProjectService projectService = new ProjectService();
 
-    
     /** 
-     * @param applicant
-     * @param projects
+     * Displays eligible BTO projects for an applicant based on their search criteria.
+     * 
+     * @param applicant The applicant requesting the eligible projects.
+     * @param projects The list of all available projects to filter and display.
      */
     public void showEligibleProjects(Applicant applicant, List<Project> projects) {
         ProjectSearchCriteria criteria = applicant.getSearchCriteria();
@@ -29,7 +33,13 @@ public class ProjectController {
         displayApplicantApplication(applicant);
     }
 
-
+    /**
+     * Displays the list of eligible projects for the applicant after filtering and sorting.
+     * Only projects that match the applicant's search criteria will be displayed.
+     *
+     * @param applicant The applicant requesting to view the projects.
+     * @param projects The filtered list of eligible projects.
+     */
     private void displayEligibleProjects(Applicant applicant, List<Project> projects) {
         System.out.println("Available Projects (Eligible Only):");
         System.out.printf("%-20s %-20s %-10s %-10s %-10s %-10s %n", "Project Name", "Neighbourhood", "TWO_ROOM", "Price", "THREE_ROOM", "Price");
@@ -38,19 +48,23 @@ public class ProjectController {
         boolean hasEligible = false;
 
         for (Project project : projects) {
-            if (!projectService.isProjectVisibleToApplicant(applicant, project)) continue;
-
+            boolean isNotVisible = !projectService.isProjectVisibleToApplicant(applicant, project);
             String[] displays = getFlatTypeDisplays(applicant, project);
             String twoRoomDisplay = displays[0];
-            if (!applicant.getSearchCriteria().getFlatTypes().contains(FlatType.TWO_ROOM) && applicant.getSearchCriteria().getFlatTypes().size()>= 1) {
+            String threeRoomDisplay = displays[1];
+
+            if (!applicant.getSearchCriteria().getFlatTypes().contains(FlatType.TWO_ROOM) && applicant.getSearchCriteria().getFlatTypes().size() >= 1) {
                 twoRoomDisplay = "NA";
             }
-            String threeRoomDisplay = displays[1];
-            if (!applicant.getSearchCriteria().getFlatTypes().contains(FlatType.THREE_ROOM) && applicant.getSearchCriteria().getFlatTypes().size()>= 1) {
+            if (!applicant.getSearchCriteria().getFlatTypes().contains(FlatType.THREE_ROOM) && applicant.getSearchCriteria().getFlatTypes().size() >= 1) {
                 threeRoomDisplay = "NA";
             }
 
-            if (twoRoomDisplay.equals("NA") && threeRoomDisplay.equals("NA")) continue;
+            boolean noEligibleFlats = twoRoomDisplay.equals("NA") && threeRoomDisplay.equals("NA");
+
+            if (isNotVisible || noEligibleFlats) {
+                continue;
+            }
 
             hasEligible = true;
             displayProjectDetails(project, twoRoomDisplay, threeRoomDisplay);
@@ -61,6 +75,13 @@ public class ProjectController {
         }
     }
 
+    /**
+     * Retrieves the available flat types and their respective available units for the project, based on the applicant's eligibility.
+     *
+     * @param applicant The applicant whose eligibility is checked.
+     * @param project The project to retrieve flat type details for.
+     * @return A string array containing the available flat types (two-room and three-room) with their unit counts.
+     */
     private String[] getFlatTypeDisplays(Applicant applicant, Project project) {
         String twoRoomDisplay = "NA";
         String threeRoomDisplay = "NA";
@@ -76,6 +97,13 @@ public class ProjectController {
         return new String[] { twoRoomDisplay, threeRoomDisplay };
     }
 
+    /**
+     * Displays the project details including the flat types and their available units.
+     *
+     * @param project The project whose details will be displayed.
+     * @param twoRoomDisplay The available units for two-room flats.
+     * @param threeRoomDisplay The available units for three-room flats.
+     */
     private void displayProjectDetails(Project project, String twoRoomDisplay, String threeRoomDisplay) {
         System.out.printf("%-20s %-20s %-10s %-10s %-10s %-10s%n", 
             project.getProjectName(), 
@@ -87,6 +115,12 @@ public class ProjectController {
             );
     }
 
+    /**
+     * Displays the current application status for the applicant.
+     * If the applicant has already applied, it shows the details of the application.
+     *
+     * @param applicant The applicant whose application status is being displayed.
+     */
     private void displayApplicantApplication(Applicant applicant) {
         if (applicant.hasApplied()) {
             Application app = applicant.getApplication();
@@ -95,7 +129,13 @@ public class ProjectController {
         }
     }
     
-
+    /**
+     * Allows the applicant to apply for a specific project with the given flat type.
+     *
+     * @param applicant The applicant submitting the application.
+     * @param project The project the applicant is applying for.
+     * @param flatType The type of flat the applicant is applying for.
+     */
     public void applyForProject(Applicant applicant, Project project, FlatType flatType) {
         try {
             applicationService.apply(applicant, project, flatType);
@@ -106,6 +146,11 @@ public class ProjectController {
         }
     }
 
+    /**
+     * Allows the applicant to withdraw their application.
+     *
+     * @param applicant The applicant withdrawing their application.
+     */
     public void withdrawApplication(Applicant applicant) {
         try {
             applicationService.withdraw(applicant);
@@ -115,6 +160,11 @@ public class ProjectController {
         }
     }
 
+    /**
+     * Displays the current application status for the given applicant.
+     *
+     * @param applicant The applicant whose application status is being viewed.
+     */
     public void viewApplicationStatus(Applicant applicant) {
         try {
             Application app = applicationService.getApplication(applicant);

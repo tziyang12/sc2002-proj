@@ -13,15 +13,17 @@ import model.transaction.Enquiry;
 import java.io.*;
 import java.time.LocalDate;
 import java.util.*;
-
+/**
+ * This class provides methods to load data from CSV files and populate the corresponding objects
+ * for applicants, projects, officers, managers, applications, and enquiries in the system.
+ */
 public class DataLoader {
-
-    
-    /** 
-     * @param filePath
-     * @return List<Applicant>
+    /**
+     * Loads applicants from a CSV file.
+     *
+     * @param filePath The path to the CSV file.
+     * @return A list of Applicants loaded from the CSV file.
      */
-    // Load applicants from ApplicantList.csv
     public List<Applicant> loadApplicants(String filePath) {
         List<Applicant> applicants = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
@@ -43,8 +45,15 @@ public class DataLoader {
         }
         return applicants;
     }
-
-    // Load projects from ProjectList.csv
+    /**
+     * Loads projects from a CSV file, including related officers and managers.
+     *
+     * @param filePath The path to the CSV file.
+     * @param allOfficers List of all HDB Officers in the system.
+     * @param allManagers List of all HDB Managers in the system.
+     * @return A list of Projects loaded from the CSV file.
+     * @throws IOException If an I/O error occurs during file reading.
+     */
     public static List<Project> loadProjects(String filePath, List<HDBOfficer> allOfficers, List<HDBManager> allManagers) throws IOException {
         List<Project> projects = new ArrayList<>();
     
@@ -155,7 +164,12 @@ public class DataLoader {
         reader.close();
         return projects;
     }
-
+    /**
+     * Loads HDB officers from a CSV file.
+     *
+     * @param filePath The path to the CSV file.
+     * @return A list of HDB Officers loaded from the CSV file.
+     */
     public List<HDBOfficer> loadOfficers(String filePath) {
         List<HDBOfficer> officers = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
@@ -177,7 +191,13 @@ public class DataLoader {
         }
         return officers;
     }
-
+    /**
+     * Parses the flat type from a string representation.
+     *
+     * @param type The string representation of the flat type (e.g., "2-Room").
+     * @return The corresponding FlatType enum.
+     * @throws IllegalArgumentException If the string does not match a known flat type.
+     */
     private static FlatType parseFlatType(String type) {
         switch (type) {
             case "2-Room":
@@ -188,7 +208,12 @@ public class DataLoader {
                 throw new IllegalArgumentException("Unknown flat type: " + type);
         }
     }
-
+    /**
+     * Loads HDB managers from a CSV file.
+     *
+     * @param filePath The path to the CSV file.
+     * @return A list of HDB Managers loaded from the CSV file.
+     */
     public List<HDBManager> loadHDBManagers(String filePath) {
         List<HDBManager> managers = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
@@ -211,7 +236,13 @@ public class DataLoader {
         }
         return managers;
     }
-
+    /**
+     * Loads applications from a CSV file and links them to the corresponding applicants and projects.
+     *
+     * @param filePath The path to the CSV file.
+     * @param allUsers List of all users (including applicants).
+     * @param allProjects List of all projects.
+     */
     public void loadApplications(String filePath, List<User> allUsers, List<Project> allProjects) {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
@@ -260,7 +291,13 @@ public class DataLoader {
             e.printStackTrace();
         }
     }
-
+    /**
+     * Loads enquiries from a CSV file and links them to the corresponding applicants and projects.
+     *
+     * @param filePath The path to the CSV file.
+     * @param allUsers List of all users (including applicants).
+     * @param allProjects List of all projects.
+     */
     public void loadEnquiries(String filePath, List<User> allUsers, List<Project> allProjects) {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;

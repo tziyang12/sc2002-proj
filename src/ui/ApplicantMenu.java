@@ -13,7 +13,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+/**
+ * Represents the menu for an applicant to interact with BTO projects and manage their applications and enquiries.
+ * The class provides methods for displaying project lists, applying for projects, managing enquiries, and changing filter settings.
+ * It acts as the main interface for the applicant within the system.
+ */
 public class ApplicantMenu {
     private final ApplicantController applicantController = new ApplicantController();
 

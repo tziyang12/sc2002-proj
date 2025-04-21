@@ -8,35 +8,53 @@ import model.user.User;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service class responsible for handling user-related operations such as authentication,
+ * password management, and retrieving user details based on different criteria.
+ */
 public class UserService {
 
     private List<User> users;  // Holds the loaded users from DataLoader
 
-    // Constructor that takes the pre-loaded list of users
+    /**
+     * Constructor that initializes the service with a list of pre-loaded users.
+     *
+     * @param users A list of users loaded from the data source.
+     */
     public UserService(List<User> users) {
         this.users = users;
     }
 
-    
     /** 
-     * @param nric
-     * @return Optional<User>
+     * Finds a user by their NRIC.
+     * 
+     * @param nric The NRIC of the user to search for.
+     * @return Optional<User> An Optional containing the user if found, otherwise an empty Optional.
      */
-    // Find a user by their NRIC
     public Optional<User> findUserByNric(String nric) {
         return users.stream()
                 .filter(user -> user.getNric().equalsIgnoreCase(nric))
                 .findFirst();
     }
 
-    // Find a user by their username
+    /** 
+     * Finds a user by their username.
+     * 
+     * @param username The username of the user to search for.
+     * @return Optional<User> An Optional containing the user if found, otherwise an empty Optional.
+     */
     public Optional<User> findUserByUsername(String username) {
         return users.stream()
                 .filter(user -> user.getName().equalsIgnoreCase(username))
                 .findFirst();
     }
 
-    // Find a user by their NRIC (specific to applicants)
+    /** 
+     * Finds an applicant by their NRIC.
+     * 
+     * @param nric The NRIC of the applicant to search for.
+     * @return Optional<Applicant> An Optional containing the applicant if found, otherwise an empty Optional.
+     */
     public Optional<Applicant> findApplicantByNric(String nric) {
         return users.stream()
                 .filter(user -> user instanceof Applicant)
@@ -45,7 +63,13 @@ public class UserService {
                 .findFirst();
     }
 
-    // Authenticate user login
+    /** 
+     * Authenticates a user by their NRIC and password.
+     * 
+     * @param nric The NRIC of the user to authenticate.
+     * @param password The password of the user.
+     * @return Optional<User> An Optional containing the user if authentication is successful, otherwise an empty Optional.
+     */
     public Optional<User> authenticate(String nric, String password) {
         if (!ValidationService.isValidNric(nric)) return Optional.empty();
     
@@ -55,24 +79,39 @@ public class UserService {
                 .findFirst();
     }
 
-    // Validate NRIC and password
+    /** 
+     * Validates and updates a user's password.
+     * 
+     * @param nric The NRIC of the user whose password is being updated.
+     * @param currentPass The current password of the user.
+     * @param newPass The new password to set.
+     * @return boolean Returns true if the password is updated successfully, false otherwise.
+     * @throws IllegalArgumentException if the NRIC is invalid or passwords are empty or match.
+     */
     public boolean updatePasswordWithValidation(String nric, String currentPass, String newPass) {
-    if (!ValidationService.isValidNric(nric)) {
-        throw new IllegalArgumentException("[ERROR] Invalid NRIC format.");
+        if (!ValidationService.isValidNric(nric)) {
+            throw new IllegalArgumentException("[ERROR] Invalid NRIC format.");
+        }
+
+        if (ValidationService.isNullOrEmpty(currentPass) || ValidationService.isNullOrEmpty(newPass)) {
+            throw new IllegalArgumentException("[ERROR] Passwords cannot be empty.");
+        }
+
+        if (currentPass.equals(newPass)) {
+            throw new IllegalArgumentException("[ERROR] New password cannot be the same as the current password.");
+        }
+
+        return updatePassword(nric, currentPass, newPass); // returns true if updated
     }
 
-    if (ValidationService.isNullOrEmpty(currentPass) || ValidationService.isNullOrEmpty(newPass)) {
-        throw new IllegalArgumentException("[ERROR] Passwords cannot be empty.");
-    }
-
-    if (currentPass.equals(newPass)) {
-        throw new IllegalArgumentException("[ERROR] New password cannot be the same as the current password.");
-    }
-
-    return updatePassword(nric, currentPass, newPass); // returns true if updated
-}
-
-    // Update user password
+    /** 
+     * Updates a user's password.
+     * 
+     * @param nric The NRIC of the user whose password is being updated.
+     * @param oldPassword The user's current password.
+     * @param newPassword The new password to set.
+     * @return boolean Returns true if the password is updated successfully, false if the current password is incorrect.
+     */
     public boolean updatePassword(String nric, String oldPassword, String newPassword) {
         Optional<User> userOpt = findUserByNric(nric);
         if (userOpt.isPresent()) {
@@ -85,7 +124,12 @@ public class UserService {
         return false;   
     }
 
-    // Get a list of all officers for a specific manager
+    /** 
+     * Retrieves a list of all officers assigned to a specific manager.
+     * 
+     * @param manager The manager whose officers are to be retrieved.
+     * @return List<HDBOfficer> A list of HDB officers assigned to the manager's projects.
+     */
     public List<HDBOfficer> getOfficersForManager(HDBManager manager) {
         return users.stream()
                 .filter(user -> user instanceof HDBOfficer)
@@ -95,7 +139,11 @@ public class UserService {
                 .toList();
     }
 
-    // Get all applicants (this could be useful for filtering purposes)
+    /** 
+     * Retrieves a list of all applicants.
+     * 
+     * @return List<Applicant> A list of all applicants.
+     */
     public List<Applicant> getAllApplicants() {
         return users.stream()
                 .filter(user -> user instanceof Applicant)
@@ -103,7 +151,11 @@ public class UserService {
                 .toList();
     }
 
-    // Get all managers
+    /** 
+     * Retrieves a list of all managers.
+     * 
+     * @return List<HDBManager> A list of all managers.
+     */
     public List<HDBManager> getAllManagers() {
         return users.stream()
                 .filter(user -> user instanceof HDBManager)
@@ -111,7 +163,11 @@ public class UserService {
                 .toList();
     }
 
-    // Get all officers
+    /** 
+     * Retrieves a list of all officers.
+     * 
+     * @return List<HDBOfficer> A list of all officers.
+     */
     public List<HDBOfficer> getAllOfficers() {
         return users.stream()
                 .filter(user -> user instanceof HDBOfficer)
@@ -119,7 +175,11 @@ public class UserService {
                 .toList();
     }
 
-    //Get all users
+    /** 
+     * Retrieves a list of all users.
+     * 
+     * @return List<User> A list of all users.
+     */
     public List<User> getAllUsers() {
         return users;
     }

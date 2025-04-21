@@ -17,14 +17,18 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
+/**
+ * Controller class responsible for managing BTO projects, officer registrations, and applications
+ * within the HDB Management System. It includes methods to create, edit, delete, and toggle visibility
+ * for projects, as well as approve/reject officer registrations and applications.
+ */
 public class ManagerController {
-
-    
-    /** 
-     * @param manager
-     * @param newProject
-     * @return boolean
+    /**
+     * Checks if a HDB Manager can create a new project.
+     * 
+     * @param manager the HDBManager instance requesting to create the project
+     * @param newProject the new project to be created
+     * @return boolean indicating if the new project can be created
      */
     public boolean canCreateNewProject(HDBManager manager, Project newProject) {
         // Check if project name exists in ProjectRepository
@@ -45,16 +49,40 @@ public class ManagerController {
         }
         return true;
     }
-
+    /**
+     * Returns the list of projects managed by the specified HDB Manager.
+     *
+     * @param manager the HDBManager instance whose projects are to be fetched
+     * @return List of projects managed by the specified manager
+     */
     public List<Project> getManagedProjects(HDBManager manager) {
         return manager.getManagedProjects();
     }
-
+    /**
+     * Creates a new project and adds it to the manager's list of managed projects.
+     * 
+     * @param manager the HDBManager instance creating the project
+     * @param project the project to be created
+     */
     public void createProject(HDBManager manager, Project project) {
         manager.addManagedProject(project);
         ProjectService.createProject(project);
     }
-
+    /**
+     * Edits the details of an existing project.
+     * 
+     * @param project the project to be edited
+     * @param newName the new name for the project
+     * @param newNeighbourhood the new neighbourhood for the project
+     * @param new2Room the updated number of 2-room flats
+     * @param new3Room the updated number of 3-room flats
+     * @param new2RoomPrice the updated price for 2-room flats
+     * @param new3RoomPrice the updated price for 3-room flats
+     * @param newOpen the new application start date
+     * @param newClose the new application end date
+     * @param newmaxOfficer the updated maximum number of officers for the project
+     * @param newVisible the updated visibility status of the project
+     */
     public void editProject(Project project, String newName, String newNeighbourhood, int new2Room, int new3Room, double new2RoomPrice, double new3RoomPrice, LocalDate newOpen, LocalDate newClose, int newmaxOfficer, Boolean newVisible) {
         project.setProjectName(newName);
         project.setNeighbourhood(newNeighbourhood);
@@ -66,18 +94,34 @@ public class ManagerController {
         project.setVisible(newVisible);
         project.setApplicationPeriod(newOpen, newClose);
     }
-
+    /**
+     * Deletes a project from the manager's list and the project service.
+     * 
+     * @param manager the HDBManager instance deleting the project
+     * @param project the project to be deleted
+     */
     public void deleteProject(HDBManager manager, Project project) {
         manager.getManagedProjects().remove(project);
         ProjectService.deleteProject(project);
     }
-
+    /**
+     * Toggles the visibility status of a project.
+     * 
+     * @param project the project whose visibility is being toggled
+     * @param visible the new visibility status
+     */
     public void toggleVisibility(Project project, boolean visible) {
         project.setVisible(visible);
     }
 
     // Officer Registration Logic
 
+    /**
+     * Displays the officer registrations for the specified manager's projects.
+     * 
+     * @param managerProjects the list of projects managed by the manager
+     * @param allOfficers the list of all officers to check for registrations
+     */
     public void viewOfficerRegistrations(List<Project> managerProjects, List<HDBOfficer> allOfficers) {
         System.out.println("======= Officer Registrations for Your Projects =======");
 
@@ -101,7 +145,12 @@ public class ManagerController {
             }
         }
     }
-
+    /**
+     * Approves an officer's registration for a project.
+     * 
+     * @param project the project for which the officer is being approved
+     * @param officer the officer to approve for the project
+     */
     public void approveOfficer(Project project, HDBOfficer officer) {
         if (project.getAvailableOfficerSlots() > 0) {
             project.addOfficer(officer);
@@ -109,13 +158,24 @@ public class ManagerController {
             officer.setProjectRegistrationStatus(project, OfficerRegistrationStatus.APPROVED);
         }
     }
-
+    /**
+     * Rejects an officer's registration for a project.
+     * 
+     * @param project the project for which the officer is being rejected
+     * @param officer the officer to reject for the project
+     */
     public void rejectOfficer(Project project, HDBOfficer officer) {
         officer.setProjectRegistrationStatus(project, OfficerRegistrationStatus.REJECTED);
     }
 
     // Application Logic
-    
+
+    /**
+     * Retrieves the list of applications for all projects managed by the specified manager.
+     * 
+     * @param manager the HDBManager instance whose applications are to be fetched
+     * @return List of applications for the manager's managed projects
+     */
     public List<Application> getApplicationsForManagedProjects(HDBManager manager) {
         List<Application> result = new ArrayList<>();
     
@@ -125,32 +185,51 @@ public class ManagerController {
     
         return result;
     }
-
+    /**
+     * Approves an application and updates the project status and remaining flats accordingly.
+     * 
+     * @param app the application to be approved
+     */
     public void approveApplication(Application app) {
-        app.setStatus(ApplicationStatus.SUCCESSFUL);
-        // maybe update booking status too?
-    }
-
-    public void approveApplication(Project project, Application app) {
         FlatType type = app.getFlatType();
+        Project project = app.getProject();
         if (project.getNumUnits(type) > 0) {
             project.decreaseRemainingFlats(type);
             app.approve();
         }
+        app.setStatus(ApplicationStatus.SUCCESSFUL);
+        // maybe update booking status too?
     }
-
+    /**
+     * Rejects an application and updates its status accordingly.
+     * 
+     * @param app the application to be rejected
+     */
     public void rejectApplication(Application app) {
         app.reject();
     }
-
+    /**
+     * Approves a withdrawal request for an application.
+     * 
+     * @param app the application whose withdrawal request is to be approved
+     */
     public void approveWithdrawal(Application app) {
         app.withdraw();
     }
-
+    /**
+     * Rejects a withdrawal request for an application.
+     * 
+     * @param app the application whose withdrawal request is to be rejected
+     */
     public void rejectWithdrawal(Application app) {
         app.cancelWithdrawalRequest();
     }
-
+    /**
+     * Retrieves all enquiries related to the specified projects.
+     * 
+     * @param projects the list of projects whose enquiries are to be fetched
+     * @return List of all enquiries for the specified projects
+     */
     public List<Enquiry> getAllEnquiries(List<Project> projects) {
         List<Enquiry> allEnquiries = new ArrayList<>();
         for (Project project : projects) {
@@ -158,7 +237,14 @@ public class ManagerController {
         }
         return allEnquiries;
     }
-
+    /**
+     * Generates a report of applications based on the specified filters.
+     * 
+     * @param manager the HDBManager instance generating the report
+     * @param filterCategory the category to filter the applications (e.g., marital status, flat type)
+     * @param filterType the type of filter value to apply
+     * @return List of applications filtered based on the specified criteria
+     */
     public List<Application> generateApplicantReport(HDBManager manager, String filterCategory, String filterType) {
         System.out.println("Generating report for " + manager.getName() + "...");
         
@@ -217,10 +303,13 @@ public class ManagerController {
 
         return filteredApplications;
     }
-    
-
-
-
+    /**
+     * Retrieves the list of officers who have pending registrations for a specified project.
+     * 
+     * @param allOfficers the list of all officers to check for pending registrations
+     * @param selectedProject the project for which pending officer registrations are to be fetched
+     * @return List of HDBOfficers with pending registrations for the project
+     */
     public List<HDBOfficer> getPendingOfficers(List<HDBOfficer> allOfficers, Project selectedProject) {
         List<HDBOfficer> pendingOfficers = new ArrayList<>();
         for (HDBOfficer officer : allOfficers) {
@@ -233,7 +322,13 @@ public class ManagerController {
         }
         return pendingOfficers;
     }
-    
+    /**
+     * Filters applications based on the specified search criteria.
+     * 
+     * @param applications the list of applications to filter
+     * @param searchCriteria the criteria used to filter the applications
+     * @return List of applications that match the search criteria
+     */
     private List<Application> filterApplications(List<Application> applications, ProjectSearchCriteria searchCriteria) {
         return applications.stream()
             .filter(app -> {
@@ -257,8 +352,13 @@ public class ManagerController {
             })
             .collect(Collectors.toList());
     }
-
-        
+    /**
+     * Finds a project by its name within the list of projects managed by the manager.
+     * 
+     * @param projectName the name of the project to search for
+     * @param manager the HDBManager instance whose projects are to be searched
+     * @return the project with the specified name, or null if not found
+     */
     public Project findProjectByName(String projectName, HDBManager manager) {
         for (Project project : manager.getManagedProjects()) {
             if (project.getProjectName().equals(projectName)) {
