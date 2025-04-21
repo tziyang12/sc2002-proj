@@ -5,10 +5,9 @@ import model.project.FlatType;
 import model.user.Applicant;
 import model.user.HDBManager;
 import model.user.User;
-import model.user.enums.MaritalStatus;
 import model.user.HDBOfficer;
+import model.user.MaritalStatus;
 import model.transaction.Application;
-import model.transaction.ApplicationStatus;
 import model.transaction.Enquiry;
 
 import java.io.*;

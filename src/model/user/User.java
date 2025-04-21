@@ -1,6 +1,5 @@
 package model.user;
 
-import model.user.enums.MaritalStatus;
 import model.project.ProjectSearchCriteria;
 
 /**

@@ -1,8 +1,9 @@
 package model.project;
 
-import model.user.enums.MaritalStatus;
 import java.util.HashSet;
 import java.util.Set;
+
+import model.user.MaritalStatus;
 
 public class ProjectSearchCriteria {
     private String neighbourhood;

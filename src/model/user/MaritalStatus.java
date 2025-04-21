@@ -1,4 +1,4 @@
-package model.user.enums;
+package model.user;
 
 /**
  * Enumeration representing the marital status of a user.

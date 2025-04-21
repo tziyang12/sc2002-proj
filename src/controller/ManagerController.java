@@ -8,7 +8,7 @@ import model.transaction.OfficerProjectRegistration;
 import model.transaction.OfficerRegistrationStatus;
 import model.user.HDBManager;
 import model.user.HDBOfficer;
-import model.user.enums.MaritalStatus;
+import model.user.MaritalStatus;
 import model.transaction.Application;
 import model.transaction.ApplicationStatus;
 import service.ProjectService;

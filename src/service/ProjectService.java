@@ -13,7 +13,6 @@ import model.project.Project;
 import model.project.ProjectSearchCriteria;
 import model.user.Applicant;
 import model.user.HDBOfficer;
-import model.user.enums.MaritalStatus;
 
 public class ProjectService {
     

@@ -6,7 +6,6 @@ import java.util.List;
 import model.project.Project;
 import model.transaction.OfficerProjectRegistration;
 import model.transaction.OfficerRegistrationStatus;
-import model.user.enums.MaritalStatus;
 
 public class HDBOfficer extends Applicant {
     private List<OfficerProjectRegistration> registeredProjects = new ArrayList<>(); // changed to list of OfficerProjectRegistration
