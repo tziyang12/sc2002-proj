@@ -14,14 +14,27 @@ import model.project.FlatType;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
-
+/**
+ * Represents the CLI menu interface for HDB Managers to manage BTO projects, officer registrations,
+ * applicant applications, enquiries, and reports.
+ * <p>
+ * This class handles user interaction logic and delegates business logic to {@link ManagerController},
+ * {@link EnquiryController}, and related services.
+ * </p>
+ */
 public class ManagerMenu {
     private HDBManager manager;
     private ManagerController managerController;
     private EnquiryController enquiryController;
     private List<Project> allProjects;
     private List<User> allUsers;
-
+    /**
+     * Constructs the manager menu interface.
+     *
+     * @param manager     The currently logged-in HDBManager.
+     * @param allProjects The list of all BTO projects in the system.
+     * @param allUsers    The list of all users in the system.
+     */
     public ManagerMenu(HDBManager manager, List<Project> allProjects, List<User> allUsers) {
         this.manager = manager;
         this.managerController = new ManagerController();
@@ -29,7 +42,9 @@ public class ManagerMenu {
         this.allProjects = allProjects;
         this.allUsers = allUsers;
     }
-
+    /**
+     * Displays the main menu for HDB Managers and handles menu navigation based on user input.
+     */
     public void showMenu() {
         String[] menuOptions = {
             "View and Manage Projects",
@@ -63,7 +78,9 @@ public class ManagerMenu {
             }
         }
     }
-
+    /**
+     * Displays the submenu for viewing and managing BTO projects managed by the HDB Manager.
+     */
     private void viewAndManageProjectsMenu() {
         String[] projectOptions = {
             "Create New BTO Project",
@@ -93,8 +110,10 @@ public class ManagerMenu {
             }
         }
     }
-    
-
+    /**
+     * Handles creation of a new BTO project by prompting the manager for input.
+     * Performs validation before delegating creation to the {@link ManagerController}.
+     */
     private void createProjectMenu() {
         // Prompt for new details
         String name = CLIView.prompt("Enter Project Name: ");
@@ -142,6 +161,9 @@ public class ManagerMenu {
         }
     }
 
+    /**
+     * Displays a table of all BTO projects in the system.
+     */
     private void viewAllProjects() {
         CLIView.printProjectTableHeader();
         for (Project project : allProjects) {
@@ -149,7 +171,10 @@ public class ManagerMenu {
         }
         CLIView.printProjectTableFooter();
     }
-    
+
+    /**
+     * Displays a table of BTO projects managed by the currently logged-in HDB Manager.
+     */
     private void viewMyProjects() {
         List<Project> myProjects = managerController.getManagedProjects(manager);
         CLIView.printProjectTableHeader();
@@ -159,6 +184,10 @@ public class ManagerMenu {
         CLIView.printProjectTableFooter();
     }
 
+    /**
+     * Allows the manager to edit an existing project by modifying attributes such as
+     * name, neighborhood, unit counts, prices, dates, and visibility.
+     */
     private void editProjectMenu() {
         String projectName = CLIView.prompt("Enter Project Name to Edit: ");
 
@@ -235,6 +264,9 @@ public class ManagerMenu {
         CLIView.printMessage("Project updated successfully!");
     }
 
+    /**
+     * Allows the manager to delete one of their managed projects after user confirmation.
+     */
     private void deleteProjectMenu() {
         // Display all projects
         viewAllProjects();
@@ -257,6 +289,9 @@ public class ManagerMenu {
         CLIView.printMessage("Project deleted successfully!");
     }
 
+    /**
+     * Toggles the visibility (public or hidden) of a selected BTO project managed by the HDB Manager.
+     */
     private void toggleProjectVisibilityMenu() {
         String projectName = CLIView.prompt("Enter Project Name to Toggle Visibility: ");
 
@@ -273,6 +308,9 @@ public class ManagerMenu {
         CLIView.printMessage("Project visibility toggled successfully!");
     }
 
+    /**
+     * Displays officer registration requests for the manager's projects and allows them to accept or reject pending officers.
+     */
     private void manageOfficerRegistrationsMenu() {
         List<Project> managerProjects = manager.getManagedProjects();
         if (managerProjects.isEmpty()) {
@@ -300,10 +338,11 @@ public class ManagerMenu {
         handleOfficerDecision(selectedProject, selectedOfficer);
     }
 
-    
-    /** 
-     * @param managerProjects
-     * @return Project
+    /**
+     * Prompts the HDB Manager to select a project from the list of projects they manage.
+     *
+     * @param managerProjects List of projects managed by the current manager.
+     * @return The selected {@link Project}, or null if the user cancels or makes an invalid selection.
      */
     private Project selectProject(List<Project> managerProjects) {
         CLIView.printHeader("Select Project for Officer Registrations");
@@ -318,6 +357,12 @@ public class ManagerMenu {
         return managerProjects.get(projectChoice - 1);
     }
 
+    /**
+     * Prompts the HDB Manager to select a pending officer from the provided list.
+     *
+     * @param pendingOfficers List of HDB Officers pending registration approval.
+     * @return The selected {@link HDBOfficer}, or null if the user cancels or selects an invalid option.
+     */
     private HDBOfficer selectOfficer(List<HDBOfficer> pendingOfficers) {
         CLIView.printHeader("Pending Officers for Registration");
         for (int i = 0; i < pendingOfficers.size(); i++) {
@@ -332,6 +377,13 @@ public class ManagerMenu {
         return pendingOfficers.get(officerChoice - 1);
     }
 
+    /**
+     * Handles the decision logic for approving or rejecting an officer's registration to a project.
+     * Displays appropriate messages and delegates to the {@link ManagerController} for logic execution.
+     *
+     * @param selectedProject The project for which the officer is being considered.
+     * @param selectedOfficer The officer whose registration is being approved or rejected.
+     */
     private void handleOfficerDecision(Project selectedProject, HDBOfficer selectedOfficer) {
         String decision = CLIView.prompt("Approve or Reject? (A/R): ").trim().toUpperCase();
 
@@ -350,6 +402,10 @@ public class ManagerMenu {
         }
     }
 
+    /**
+     * Displays a menu listing all applications submitted to the manager's projects and
+     * allows the manager to approve, reject, or handle withdrawal requests for an individual application.
+     */
     private void manageApplicantApplicationsMenu() {
         List<Application> applications = managerController.getApplicationsForManagedProjects(manager);
     
@@ -438,6 +494,11 @@ public class ManagerMenu {
         }
     }
 
+    /**
+     * Displays a menu that allows the HDB Manager to generate various filtered reports
+     * on applications, such as by marital status, flat type, neighbourhood, age range, price, or no filter.
+     * Delegates filtering logic to the {@link ManagerController} and prints the results.
+     */
     private void generateReportMenu() {
         // Add the option for no filter and all the other filter categories
         String[] reportOptions = {

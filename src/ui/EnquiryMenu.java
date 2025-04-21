@@ -9,18 +9,33 @@ import model.user.HDBOfficer;
 import model.user.User;
 
 import java.util.List;
-
+/**
+ * This menu handles the command-line interface for enquiry management.
+ * Provides different options based on whether the user is an HDB Manager or HDB Officer.
+ */
 public class EnquiryMenu {
     private final User user;
     private final List<Project> accessibleProjects;
     private final EnquiryController enquiryController;
-
+    /**
+     * Constructs an EnquiryMenu for a given user, their accessible projects,
+     * and the associated enquiry controller.
+     *
+     * @param user               The logged-in user (Manager or Officer).
+     * @param accessibleProjects The list of projects the user has access to.
+     * @param enquiryController  Controller for handling enquiry logic.
+     */
     public EnquiryMenu(User user, List<Project> accessibleProjects, EnquiryController enquiryController) {
         this.user = user;
         this.accessibleProjects = accessibleProjects;
         this.enquiryController = enquiryController;
     }
 
+
+    /**
+     * Displays the enquiry management menu and handles user input for navigation.
+     * Managers and officers will see different sets of options.
+     */
     public void show() {
         // Define menu options for different user roles
         String[] managerOptions = {
@@ -69,6 +84,10 @@ public class EnquiryMenu {
         }
     }
 
+    /**
+     * Displays all enquiries from all available projects.
+     * Only available to HDB Managers.
+     */
     private void viewAllEnquiries() {
         List<Enquiry> all = enquiryController.getAllEnquiries(ProjectRepository.getAllProjects());
 
@@ -91,6 +110,9 @@ public class EnquiryMenu {
         CLIView.printEnquiryTableFooter();
     }
 
+    /**
+     * Displays enquiries for only those projects the user (Manager or Officer) manages or is assigned to.
+     */
     private void viewManagedEnquiries() {
         List<Enquiry> enquiries = enquiryController.getAllEnquiries(accessibleProjects);
 
@@ -113,6 +135,10 @@ public class EnquiryMenu {
         CLIView.printEnquiryTableFooter();
     }
 
+    /**
+     * Prompts the user to select a project and enquiry ID, then enter a reply message.
+     * The reply is recorded via the EnquiryController.
+     */
     private void replyToEnquiry() {
         String projectName = CLIView.prompt("Enter the project name to reply to an enquiry: ");
         Project selectedProject = accessibleProjects.stream()

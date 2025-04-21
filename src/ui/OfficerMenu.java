@@ -9,7 +9,11 @@ import model.transaction.ApplicationStatus;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * The OfficerMenu class handles all CLI-based interactions for HDB Officers,
+ * including applicant-related features, project registration, managing enquiries,
+ * generating booking receipts, and booking flats for successful applicants.
+ */
 public class OfficerMenu {
 
     private OfficerController officerController;
@@ -17,7 +21,13 @@ public class OfficerMenu {
     private HDBOfficer currentOfficer;
     private List<Project> projectList;
     private List<Applicant> applicantList;
-
+    /**
+     * Constructs an OfficerMenu with the given officer, projects, and applicants.
+     *
+     * @param officer    The currently logged-in HDB Officer.
+     * @param projects   The list of all available BTO projects.
+     * @param applicants The list of all applicants in the system.
+     */
     public OfficerMenu(HDBOfficer officer, List<Project> projects, List<Applicant> applicants) {
         this.officerController = new OfficerController();
         this.enquiryController = new EnquiryController();
@@ -25,7 +35,9 @@ public class OfficerMenu {
         this.projectList = projects;
         this.applicantList = applicants;
     }
-
+    /**
+     * Displays the main officer menu and handles user input for navigation.
+     */
     public void showMenu() {
         String[] menuOptions = {
                 "Applicant Options",
@@ -50,6 +62,10 @@ public class OfficerMenu {
         }
     }
 
+    /**
+     * Displays the applicant menu for the officer, allowing them to apply for new projects.
+     * Projects the officer is already assigned to are excluded.
+     */
     private void showApplicantMenu() {
         // Filter out projects the officer is already assigned to
         List<Project> filteredProjects = new ArrayList<>();
@@ -62,6 +78,9 @@ public class OfficerMenu {
         new ApplicantMenu().show(currentOfficer, filteredProjects); // HDBOfficer is an Applicant
     }
 
+    /**
+     * Displays the menu for officer-specific actions and handles their navigation.
+     */
     private void showOfficerOptions() {
         String[] menuOptions = {
                 "View projects available for officer registration",
@@ -92,7 +111,9 @@ public class OfficerMenu {
             }
         }
     }
-
+    /**
+     * Displays a list of BTO projects the officer is eligible to register for.
+     */
     private void viewProjectsAvailableForOfficer() {
         CLIView.printHeader("Available Projects for Officer Registration");
 
@@ -120,7 +141,10 @@ public class OfficerMenu {
             CLIView.printError("No projects available for registration.");
         }
     }
-    
+
+    /**
+     * Prompts the officer to input a project name and attempts to register them for it.
+     */
     private void registerOfficerToProject() {
         String projectName = CLIView.prompt("Enter project name: ");
         // Retrieve the project object by name (You can customize this part based on your project structure)
@@ -136,6 +160,9 @@ public class OfficerMenu {
         }
     }
 
+    /**
+     * Displays all projects the officer is currently assigned to.
+     */
     private void viewAssignedProject() {
         CLIView.printHeader("Assigned Projects");
         List<Project> assignedProjects = currentOfficer.getAssignedProjects();
@@ -151,10 +178,12 @@ public class OfficerMenu {
         }
     }
 
-    
-    /** 
-     * @param allApplicants
-     * @param officer
+    /**
+     * Displays successful applications for a selected project and allows the officer
+     * to book a flat for an applicant and generate a receipt.
+     *
+     * @param allApplicants List of all applicants in the system.
+     * @param officer       The current HDB officer.
      */
     private void manageApplicantApplicationMenu(List<Applicant> allApplicants, HDBOfficer officer) {
         List<Project> assignedProjects = officer.getAssignedProjects();
@@ -223,6 +252,9 @@ public class OfficerMenu {
         }
     }
 
+    /**
+     * Prompts the officer to input an applicant NRIC and generates a booking receipt for them.
+     */
     private void generateBookingReceipt() {
         String applicantNRIC = CLIView.prompt("Enter Applicant's NRIC: ");
         // Retrieve the applicant (you can retrieve by name or some identifier)
@@ -235,6 +267,12 @@ public class OfficerMenu {
         }
     }
 
+    /**
+     * Finds a project by its name from the project list.
+     *
+     * @param name The project name to search for.
+     * @return The Project object, or null if not found.
+     */
     private Project findProjectByName(String name) {
         for (Project project : projectList) {
             if (project.getProjectName().equalsIgnoreCase(name)) {
@@ -244,6 +282,12 @@ public class OfficerMenu {
         return null;
     }
 
+    /**
+     * Finds an applicant by their NRIC from the applicant list.
+     *
+     * @param nric The NRIC of the applicant.
+     * @return The Applicant object, or null if not found.
+     */
     private Applicant findApplicantByNric(String nric) {
         for (Applicant applicant : applicantList) {
             if (applicant.getNric().equalsIgnoreCase(nric)) {

@@ -59,6 +59,12 @@ public class ApplicantMenu {
             }
         }
     }
+    /**
+     * Prompts the applicant for project and flat type selection, and initiates the application.
+     *
+     * @param applicant The applicant applying for the project.
+     * @param projects  The list of available BTO projects.
+     */
 
     private void handleApply(Applicant applicant, List<Project> projects) {
         String projectName = CLIView.prompt("Enter project name to apply: ");
@@ -81,7 +87,13 @@ public class ApplicantMenu {
             CLIView.printError("Invalid flat type.");
         }
     }
-
+    /**
+     * Initiates the process of submitting an enquiry for a specific project.
+     * Displays eligible projects and prompts the applicant for an enquiry message.
+     *
+     * @param applicant The applicant submitting the enquiry.
+     * @param projects  The list of available BTO projects.
+     */
     private void createEnquiry(Applicant applicant, List<Project> projects) {
         applicantController.viewProjects(applicant, projects);
         // Step 1: Show eligible projects
@@ -95,7 +107,13 @@ public class ApplicantMenu {
         String enquiry = CLIView.prompt("Enter your enquiry: ");
         applicantController.submitEnquiry(applicant, enquiry, selectedProject);
     }
-
+    /**
+     * Manages the applicant's existing enquiries, allowing them to view, edit, or delete their enquiries.
+     * Provides a menu for selecting the desired action and interacts with the relevant methods.
+     *
+     * @param applicant The applicant managing their enquiries.
+     * @param projects  The list of available BTO projects.
+     */
     private void manageEnquiries(Applicant applicant, List<Project> projects) {
         String[] enquiryOptions = {
                 "View Enquiries",
@@ -121,8 +139,12 @@ public class ApplicantMenu {
         }
     }
 
-
-
+    /**
+     * Views the applicant's existing enquiries grouped by project.
+     * Displays a list of all enquiries and their status for each project.
+     *
+     * @param currentApplicant The applicant whose enquiries are being viewed.
+     */
     private void viewMyEnquiries(Applicant currentApplicant) {
         // Get a list of all enquiries grouped by project
         Map<Project, List<Enquiry>> projectEnquiriesMap = new HashMap<>();
@@ -159,7 +181,12 @@ public class ApplicantMenu {
             CLIView.printEnquiryTableFooter();
         }
     }
-
+    /**
+     * Edits an existing enquiry by allowing the applicant to modify their message for a selected enquiry.
+     *
+     * @param applicant The applicant modifying their enquiry.
+     * @param projects  The list of available BTO projects.
+     */
     private void editEnquiry(Applicant applicant, List<Project> projects) {
         viewMyEnquiries(applicant);
     
@@ -169,7 +196,12 @@ public class ApplicantMenu {
         String newMessage = CLIView.prompt("Enter the new enquiry message: ");
         applicantController.editEnquiry(applicant, enquiry, newMessage);
     }
-
+    /**
+     * Deletes an existing enquiry.
+     *
+     * @param applicant The applicant deleting their enquiry.
+     * @param projects  The list of available BTO projects.
+     */
     private void deleteEnquiry(Applicant applicant, List<Project> projects) {
         viewMyEnquiries(applicant);
     
@@ -178,8 +210,13 @@ public class ApplicantMenu {
     
         applicantController.deleteEnquiry(applicant, enquiry);
     }
-    
-    // Helper method to get the enquiry by project and ID
+    /**
+     * Retrieves an enquiry by project and ID, prompting the applicant for selection.
+     * 
+     * @param applicant The applicant retrieving their enquiry.
+     * @param projects  The list of available BTO projects.
+     * @return The selected enquiry, or null if not found.
+     */
     private Enquiry getApplicantEnquiryByProjectAndId(Applicant applicant, List<Project> projects) {
         Project project = CLIView.promptProject(projects);
         if (project == null) {
@@ -199,7 +236,13 @@ public class ApplicantMenu {
     
         return enquiry;
     }
-
+    /**
+     * Allows the applicant to change their project filter settings, such as neighbourhood, flat types, and price sorting.
+     * Provides an interface to modify these criteria and apply the updated settings.
+     *
+     * @param applicant The applicant changing their filter settings.
+     * @param projects  The list of available BTO projects.
+     */
     private void changeProjectFilterSettings(Applicant applicant, List<Project> projects) {
         ProjectSearchCriteria criteria = applicant.getSearchCriteria();
 
@@ -229,7 +272,11 @@ public class ApplicantMenu {
             }
         }
     }
-
+    /**
+     * Displays the current project filter settings.
+     * 
+     * @param criteria The current project search criteria.
+     */
     private void printCurrentFilterSettings(ProjectSearchCriteria criteria) {
         CLIView.printMessage("--- Current Filter Settings ---");
         String neighbourhood = criteria.getNeighbourhood().isEmpty() ? "All" : criteria.getNeighbourhood();
@@ -244,7 +291,12 @@ public class ApplicantMenu {
         CLIView.printMessage("Sort by Price: " + (criteria.isSortByPriceAscending() ? "Ascending" : "Descending"));
         CLIView.printMessage("------------------------------");
     }
-
+    /**
+     * Allows the applicant to select and change their preferred neighbourhood filter.
+     *
+     * @param criteria   The current project search criteria.
+     * @param projects   The list of available BTO projects.
+     */
     private void changeNeighbourhood(ProjectSearchCriteria criteria, List<Project> projects) {
         List<String> neighbourhoods = projects.stream()
                 .map(Project::getNeighbourhood)
@@ -266,7 +318,11 @@ public class ApplicantMenu {
             CLIView.printError("Invalid selection. Neighbourhood unchanged.");
         }
     }
-
+    /**
+     * Allows the applicant to select and change their preferred flat types filter.
+     * 
+     * @param criteria The current project search criteria.
+     */
     private void changeFlatTypes(ProjectSearchCriteria criteria) {
         Set<FlatType> selectedTypes = new HashSet<>();
         if (CLIView.promptYesNo("Include TWO_ROOM? ")) {
@@ -277,17 +333,23 @@ public class ApplicantMenu {
         }
         criteria.setFlatTypes(selectedTypes);
     }
-
+    /**
+     * Toggles the sorting order of project prices between ascending and descending.
+     *
+     * @param criteria The current project search criteria.
+     */
     private void togglePriceSorting(ProjectSearchCriteria criteria) {
         criteria.setSortByPriceAscending(!criteria.isSortByPriceAscending());
     }
-
+    /**
+     * Resets the filter settings to the default values.
+     *
+     * @param criteria The current project search criteria.
+     */
     private void resetFilters(ProjectSearchCriteria criteria) {
         criteria.setNeighbourhood("");
         criteria.setFlatTypes(new HashSet<>());
         criteria.setSortByPriceAscending(true);
         CLIView.printMessage("Filters reset to default.");
     }
-    
-    
 }

@@ -8,7 +8,12 @@ import model.project.Project;
 import model.user.Applicant;
 import model.user.HDBOfficer;
 import service.ProjectService;
-
+/**
+ * The {@code CLIView} class handles all the user interface interactions for the 
+ * Command Line Interface (CLI) in the Build-To-Order (BTO) Management System. 
+ * It provides various methods to display project information, prompt user inputs, 
+ * and interact with the system.
+ */
 public class CLIView {
     private static final Scanner scanner = new Scanner(System.in);
     private static final String PROJECT_TABLE_BORDER = "+-----+----------------------+-----------------+---------+---------+------------+------------+--------------+--------------+----------+------------+--------------------+------------+--------------+--------------+%n";
@@ -18,25 +23,42 @@ public class CLIView {
     }
 
     
-    /** 
-     * @param title
+    /**
+     * Prints the header with a title.
+     * 
+     * @param title The title to be displayed in the header.
      */
     public static void printHeader(String title) {
         System.out.println("\n=== " + title + " ===");
     }
-
+    /**
+     * Prints a menu with the given options.
+     * 
+     * @param options An array of strings representing the menu options.
+     */
     public static void printMenu(String[] options) {
         for (int i = 0; i < options.length; i++) {
             System.out.printf("%d. %s%n", i + 1, options[i]);
         }
         System.out.print("Enter choice: ");
     }
-
+    /**
+     * Prompts the user with a message and returns their input.
+     * 
+     * @param message The message to display to the user.
+     * @return The user's input as a string.
+     */
     public static String prompt(String message) {
         System.out.print(message);
         return scanner.nextLine();
     }
 
+    /**
+     * Prompts the user for an integer input with a message.
+     * 
+     * @param message The message to display to the user.
+     * @return The integer input from the user.
+     */
     public static int promptInt(String message) {
         while (true) {
             System.out.print(message);
@@ -48,27 +70,49 @@ public class CLIView {
         }
     }
 
+    /**
+     * Prints an error message to the user.
+     * 
+     * @param message The error message to display.
+     */
     public static void printError(String message) {
         System.out.println("[Error] " + message);
     }
 
+    /**
+     * Prints a general message to the user.
+     * 
+     * @param message The message to display.
+     */
     public static void printMessage(String message) {
         System.out.println(message);
     }
 
+    /**
+     * Prints the details of a project.
+     * 
+     * @param project The project whose details are to be printed.
+     */
     public static void printProject(Project project){
         System.out.println("• " + project.getProjectName() + " in " + project.getNeighbourhood() +
         " (Opening: " + project.getApplicationStartDate() + ", Closing: " + project.getApplicationEndDate() + ")");
     }
-    
 
+    /**
+     * Prints the header for the project table.
+     */
     public static void printProjectTableHeader() {
         System.out.println("\n=== Project List ===");
         System.out.format(PROJECT_TABLE_BORDER);
         System.out.format("| ID  | Project Name         | Neighbourhood   | 2-Room  | 3-Room  | 2R Price   | 3R Price   | Start Date   | End Date     | Visible  | Manager    | Officers           | OfficerMax | #Enquiries   | #Applicants  |%n");
         System.out.format(PROJECT_TABLE_BORDER);
     }
-    
+
+    /**
+     * Prints a row of project details in the project table.
+     * 
+     * @param project The project to display in the row.
+     */
     public static void printProjectRow(Project project) {
         String leftAlignFormat = "| %-3s | %-20s | %-15s | %-7s | %-7s | %-10s | %-10s | %-12s | %-12s | %-8s | %-10s | %-18s | %-10s | %-12s | %-12s |%n";
     
@@ -111,13 +155,19 @@ public class CLIView {
                 enquiryCount,
                 applicantCount
         );
-
     }
+
+
+    /**
+     * Prints the footer for the project table.
+     */
     public static void printProjectTableFooter() {
         System.out.format(PROJECT_TABLE_BORDER);
     }
-    
 
+    /**
+     * Prints the header for the enquiry table.
+     */
     public static void printEnquiryTableHeader() {
         System.out.println("\n=== Enquiries ===");
         System.out.format("+----------------------+------------+-------------------------------+-------------------------------+%n");
@@ -125,6 +175,14 @@ public class CLIView {
         System.out.format("+----------------------+------------+-------------------------------+-------------------------------+%n");
     }
 
+    /**
+     * Prints a row of enquiry details in the enquiry table.
+     * 
+     * @param projectName     The project name related to the enquiry.
+     * @param enquiryID       The unique identifier for the enquiry.
+     * @param enquiryMessage  The message of the enquiry.
+     * @param replyMessage    The reply to the enquiry.
+     */
     public static void printEnquiryRow(String projectName, int enquiryID, String enquiryMessage, String replyMessage) {
         String leftAlignFormat = "| %-20s | %-10s | %-29s | %-29s |%n";
 
@@ -135,15 +193,31 @@ public class CLIView {
         System.out.format(leftAlignFormat, projectName, enquiryID, enquiryMessage, replyMessage);
     }
 
+    /**
+     * Prints the footer for the enquiry table.
+     */
     public static void printEnquiryTableFooter() {
         System.out.format("+----------------------+------------+-------------------------------+-------------------------------+%n");
     }
 
+    /**
+     * Truncates the input string to the specified maximum length.
+     * 
+     * @param input      The string to truncate.
+     * @param maxLength  The maximum allowed length of the string.
+     * @return A truncated version of the input string.
+     */
     private static String truncate(String input, int maxLength) {
         if (input == null) return "-";
         return input.length() > maxLength ? input.substring(0, maxLength - 3) + "..." : input;
     }
 
+    /**
+     * Prompts the user with a yes/no question and returns their answer.
+     * 
+     * @param message The question to ask the user.
+     * @return {@code true} if the user responds with 'y', {@code false} if the user responds with 'n'.
+     */
     public static boolean promptYesNo(String message) {
         while (true) {
             System.out.print(message + " (y/n): ");
@@ -154,11 +228,22 @@ public class CLIView {
         }
     }
 
+    /**
+     * Prompts the user to select a project from a list.
+     * 
+     * @param projects A list of available projects.
+     * @return The selected project, or {@code null} if no project is found.
+     */
     public static Project promptProject(List<Project> projects) {
         String projectName = prompt("Enter the project name: ");
         return ProjectService.findByName(projectName, projects);
     }
 
+    /**
+     * Prints a row of applicant application details.
+     * 
+     * @param applicant The applicant whose details are to be displayed.
+     */
     public static void printApplicantApplicationRow(Applicant applicant) {
         System.out.printf("NRIC: %s | Name: %s | Flat Type: %s%n",
             applicant.getNric(),
@@ -166,6 +251,12 @@ public class CLIView {
             applicant.getApplication().getFlatType());
     }
 
+    /**
+     * Prints a formatted string.
+     * 
+     * @param format The format string.
+     * @param args The arguments to be formatted.
+     */
     public static void printFormatter(String format, Object... args) {
         System.out.printf(format, args);
     }
