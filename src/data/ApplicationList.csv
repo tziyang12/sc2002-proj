@@ -1,2 +1,2 @@
 Applicant,NRIC,Project,FlatType,Status,WithdrawalRequested,ApplicationDate
-Emily,S6543210I,Test,TWO_ROOM,BOOKED,false,2025-04-21
+Emily,S6543210I,Test,TWO_ROOM,BOOKED,true,2025-04-23

@@ -219,8 +219,8 @@ public class OfficerController {
     public void generateBookingReceipt(Applicant applicant) {
         Application app = applicant.getApplication();
 
-        if (app == null || app.getStatus() != ApplicationStatus.BOOKED) {
-            System.out.println("No booking details available.");
+        if (app.getStatus() != ApplicationStatus.BOOKED) {
+            System.out.println("User application is currently " + app.getStatus() + ". Receipt is only available after flat booking");
             return;
         }
 

@@ -247,10 +247,10 @@ public class OfficerMenu {
         // Retrieve the applicant (you can retrieve by name or some identifier)
         Applicant applicant = findApplicantByNric(applicantNRIC);
 
-        if (applicant != null) {
+        if (applicant != null && applicant.getApplication() != null) {
             officerController.generateBookingReceipt(applicant);
         } else {
-            CLIView.printError("Applicant not found.");
+            CLIView.printError("Applicant or applicant's application not found.");
         }
     }
 

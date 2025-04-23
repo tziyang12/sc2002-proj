@@ -215,11 +215,18 @@ public class ManagerController {
      * @param app the application whose withdrawal request is to be approved
      */
     public void approveWithdrawal(Application app) {
-        if (app.getStatus() == ApplicationStatus.BOOKED) {
+        if (app.getStatus() == ApplicationStatus.PENDING) {
+            app.getApplicant().setApplication(null);
+            app.getProject().getApplications().remove(app);
+        }
+        else if (app.getStatus() == ApplicationStatus.BOOKED) {
             Project project = app.getProject();
             project.setNumUnits(app.getFlatType(), project.getNumUnits(app.getFlatType()) + 1);
+            app.withdraw();
         }
-        app.withdraw();
+        else {
+            app.withdraw();
+        }
 
     }
     /**

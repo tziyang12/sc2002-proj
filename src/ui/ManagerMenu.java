@@ -166,6 +166,7 @@ public class ManagerMenu {
      * Displays a table of all BTO projects in the system.
      */
     private void viewAllProjects() {
+        CLIView.printMessage("Today's Date: " + LocalDate.now());
         CLIView.printProjectTableHeader();
         for (Project project : allProjects) {
             CLIView.printProjectRow(project);
@@ -430,8 +431,7 @@ public class ManagerMenu {
         );
         }
 
-        int choice = CLIView.promptInt("\\n" + //
-                        "Enter application number to manage (0 to cancel): ");
+        int choice = CLIView.promptInt("Enter application number to manage (0 to cancel): ");
     
         if (choice <= 0 || choice > applications.size()) {
             CLIView.printError("Invalid choice.");
@@ -482,6 +482,10 @@ public class ManagerMenu {
     
         switch (action) {
             case 1 -> {
+                if (selected.getProject().getNumUnits(selected.getFlatType()) == 0) {
+                    CLIView.printError("No available flats of this type.");
+                    return;
+                }
                 managerController.approveApplication(selected);
                 CLIView.printMessage("Application approved.");
             }

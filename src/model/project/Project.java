@@ -377,7 +377,7 @@ public class Project {
      */
     public boolean isApplicationPeriodOver() {
         LocalDate today = LocalDate.now();
-        return today.isAfter(applicationEndDate);
+        return !today.isBefore(applicationEndDate) || !today.isAfter(applicationStartDate);
     }
 
     /**

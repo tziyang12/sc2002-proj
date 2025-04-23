@@ -44,7 +44,10 @@ public class ApplicantMenu {
             int choice = CLIView.promptInt("");
 
             switch (choice) {
-                case 1 -> applicantController.viewProjects(applicant, projects);
+                case 1 -> {
+                    CLIView.printMessage("Applicant Name : " + applicant.getName());
+                    applicantController.viewProjects(applicant, projects);
+                }
                 case 2 -> changeProjectFilterSettings(applicant, projects);
                 case 3 -> handleApply(applicant, projects);
                 case 4 -> {
@@ -73,6 +76,7 @@ public class ApplicantMenu {
      */
 
     private void handleApply(Applicant applicant, List<Project> projects) {
+        CLIView.printMessage("Applicant Name : " + applicant.getName());
         String projectName = CLIView.prompt("Enter project name to apply (enter 0 to return):");
         if ("0".equals(projectName)) {
             CLIView.printMessage("Exiting application process.");
