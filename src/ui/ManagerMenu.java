@@ -152,7 +152,14 @@ public class ManagerMenu {
         newProject.addFlatUnit(FlatType.THREE_ROOM, num3Room);
         newProject.setVisible(true);  // Set project to visible by default
         newProject.setManager(manager);  // Set the manager for the project
-    
+        for (Project project : allProjects) {
+            // Check if the project name already exists
+            if (project.getProjectName().equalsIgnoreCase(name)) {
+                CLIView.printError("Project name already exists. Please choose a different name.");
+                return;
+            }
+            
+        }
         // Check if the project can be created
         if (managerController.canCreateNewProject(manager, newProject)) {
             managerController.createProject(manager, newProject);

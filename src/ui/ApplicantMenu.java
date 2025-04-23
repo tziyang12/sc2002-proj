@@ -46,6 +46,9 @@ public class ApplicantMenu {
             switch (choice) {
                 case 1 -> {
                     CLIView.printMessage("Applicant Name : " + applicant.getName());
+                    CLIView.printMessage("Available Projects (Eligible Only):");
+                    CLIView.printFormatter("%-20s %-20s %-10s %-10s %-10s %-10s %n", "Project Name", "Neighbourhood", "TWO_ROOM", "Price", "THREE_ROOM", "Price");
+                    CLIView.printMessage("------------------------------------------------------------------------------------");
                     applicantController.viewProjects(applicant, projects);
                 }
                 case 2 -> changeProjectFilterSettings(applicant, projects);
@@ -112,6 +115,9 @@ public class ApplicantMenu {
      * @param projects  The list of available BTO projects.
      */
     private void createEnquiry(Applicant applicant, List<Project> projects) {
+        CLIView.printMessage("Available Projects (Eligible Only):");
+        CLIView.printFormatter("%-20s %-20s %-10s %-10s %-10s %-10s %n", "Project Name", "Neighbourhood", "TWO_ROOM", "Price", "THREE_ROOM", "Price");
+        CLIView.printMessage("------------------------------------------------------------------------------------");
         applicantController.viewProjects(applicant, projects);
         // Step 1: Show eligible projects
         Project selectedProject = CLIView.promptProject(projects);

@@ -1,5 +1,5 @@
 Project Name,Neighborhood,Type 1,Number of units for Type 1,Selling price for Type 1,Type 2,Number of units for Type 2,Selling price for Type 2,Application opening date,Application closing date,Manager,Officer Slot,Officer
-Acacia Breeze,Yishun,2-Room,2,350000.00,3-Room,3,600000.00,2025-02-15,2025-03-20,Jessica,3,Daniel
-Test,Clementi,2-Room,1,400000.00,3-Room,4,500000.00,2025-03-21,2025-04-30,Jessica,3,Daniel
-Cant,Lavender,2-Room,4,350000.00,3-Room,5,450000.00,2025-03-01,2025-03-20,Michael,3,David
-Second,Dover,2-Room,4,350000.00,3-Room,5,650000.00,2025-06-01,2025-06-20,Michael,3,David
+Acacia Breeze,Yishun,2-Room,2,350000.00,3-Room,3,600000.00,2025-02-15,2025-02-28,Jessica,3,"Daniel"
+Test,Clementi,2-Room,1,400000.00,3-Room,4,500000.00,2025-03-21,2025-04-30,Jessica,3,"Daniel"
+Cant,Lavender,2-Room,4,350000.00,3-Room,5,450000.00,2025-03-01,2025-05-20,Michael,3,"Emily,David"
+Second,Dover,2-Room,4,350000.00,3-Room,5,650000.00,2025-06-01,2025-06-20,Michael,3,"David"

@@ -94,7 +94,7 @@ public class DataSaver {
                 project.getApplicationEndDate(),
                 managerName,
                 maxOfficerSlots,
-                officerNames.toString()
+                "\"" + officerNames.toString() + "\""
         );
     }
     /**

@@ -47,10 +47,6 @@ public class ProjectController {
      * @param projects The filtered list of eligible projects.
      */
     private void displayEligibleProjects(Applicant applicant, List<Project> projects) {
-        System.out.println("Available Projects (Eligible Only):");
-        System.out.printf("%-20s %-20s %-10s %-10s %-10s %-10s %n", "Project Name", "Neighbourhood", "TWO_ROOM", "Price", "THREE_ROOM", "Price");
-        System.out.println("------------------------------------------------------------------------------------");
-
         boolean hasEligible = false;
 
         for (Project project : projects) {
