@@ -496,6 +496,8 @@ public class ManagerMenu {
             case 3 -> {
                 managerController.approveWithdrawal(selected);
                 CLIView.printMessage("Withdrawal approved.");
+                if (selected.getStatus() == ApplicationStatus.PENDING) CLIView.printMessage("Application has been deleted.");
+                else CLIView.printMessage("Application status has been updated to UNSUCCESSFUL.");
             }
             case 4 -> {
                 managerController.rejectWithdrawal(selected);
